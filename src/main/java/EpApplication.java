@@ -1,14 +1,8 @@
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+package main.java;
+
 import java.util.Scanner;
+import java.sql.*;
+import java.time.LocalDate;
 
 public class EpApplication {
 
@@ -25,15 +19,10 @@ public class EpApplication {
 		String url = String.format("jdbc:postgresql://%s/%s", host, dbName);
 
 
-        try{
+		try{
 
-            conn = DriverManager.getConnection(url, user, password);
-
+			conn = DriverManager.getConnection(url, user, password);
 			System.out.println("\nConexão estabelecida com sucesso!\n");
-
-			
-
-			System.out.println();
 
 			var sentinela = 1;
 			while(sentinela == 1){
@@ -42,44 +31,50 @@ public class EpApplication {
 
 				int numero = opcao.nextInt();
 				switch (numero) {
+
 					case 1:
 						inserirDado();
-						// System.out.println("inserirDado()");
-						break;
+					break;
+
 					case 2:
-						// excluirDado();
-						System.out.println("excluirDado()");
-						break;
+						mostrarTabela();
+						excluirDado();
+					break;
+
 					case 3:
-						// alterarDado();
-						System.out.println("alterarDado()");
-						break;
+						mostrarTabela();
+						alterarDado();
+					break;
+
 					case 4:
-						// fazerConsulta();
-						System.out.println("fazerConsulta()");
-						break;
-					default:
-						break;
+						consultarDado();
+					break;
+
+					case 5:
+						mostrarTabela();
+					break;
+
+					default: break;
 				}
 
 				imprimeMenu(2);
 				sentinela = opcao.nextInt();
 			}
 
-        } catch (SQLException e) {
-            System.err.println("Erro ao conectar ao banco de dados!");
-            e.printStackTrace();
-        }
-    }
+		} catch (SQLException e) {
+				System.err.println("Erro ao conectar ao banco de dados!");
+				e.printStackTrace();
+		}
+	}
 
 	public static void imprimeMenu(int session){
-
 		if (session == 1){
-			System.out.println("\nInsira a opção desejada\n" +
-			"1. Inserir dados em uma tabela\n" +
-			"2. Excluir dados de um tabela\n" +
-			"3. Alterar dados de uma tabela\n" +
-			"4. Fazer uma consulta\n");
+			System.out.println("Insira a opção desejada a ser realizada na tabela CLIENTE\n" +
+			"1. Inserir dado\n" +
+			"2. Excluir dado\n" +
+			"3. Alterar dado\n" +
+			"4. Consultar dado\n" +
+			"5. Ver tabela completa\n");
 		}else if (session == 2){
 			System.out.print("\n0: para encerrar o programa\n" +
 							"1: para exibir o menu novamente: ");
@@ -90,135 +85,189 @@ public class EpApplication {
 
 	public static void inserirDado() throws SQLException {
 
-		String tabelaEscolhida = escolherTabela();
-		List<String> foreignKeys = buscarForeignKeys(tabelaEscolhida);
+		opcao.nextLine();
 
-		List<String> nomesColunas = new ArrayList<>();
-		List<Integer> tiposColunas = new ArrayList<>();
-		buscarColunas(tabelaEscolhida, foreignKeys, nomesColunas, tiposColunas);
+		System.out.println("Nome: ");
+		String nomeInput = opcao.nextLine();
 
-		List<Object> valores = coletarValoresUsuario(nomesColunas, tiposColunas);
+		System.out.println("CPF: ");
+		long cpfInput = Long.parseLong(opcao.nextLine());
 
-		executarInsert(tabelaEscolhida, nomesColunas, valores);
-	}
+		System.out.println("Data de Nascimento (YYYY-MM-DD): ");
+		String nascimentoInput = opcao.nextLine();
 
-	// 1. Listar tabelas e deixar usuário escolher
-	private static String escolherTabela() throws SQLException {
-		ResultSet rs = buscaTabelas();
-		List<String> tabelas = new ArrayList<>();
-		int num = 1;
+		System.out.println("ID do Plano: ");
+		int idPlanoInput = Integer.parseInt(opcao.nextLine());
 
-		System.out.println("\nEscolha uma tabela no banco para inserir os dados:");
-		while (rs.next()) {
-			String nome = rs.getString("TABLE_NAME");
-			tabelas.add(nome);
-			System.out.println("   " + num + ". " + nome);
-			num++;
-		}
-		rs.close();
+		String sql = "INSERT INTO cliente (nome, cpf, data_nasc, id_plano) VALUES (?, ?, ?, ?)";
 
-		System.out.print("\nDigite o número da tabela: ");
-		int escolha = opcao.nextInt();
-		opcao.nextLine(); // limpar buffer
-		return tabelas.get(escolha - 1);
-	}
 
-	public static ResultSet buscaTabelas() throws SQLException{
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-		DatabaseMetaData meta = conn.getMetaData();
-		ResultSet rs = meta.getTables(null, null, "%", new String[] { "TABLE" });
-		return rs;
-	}
+			stmt.setString(1, nomeInput);
+			stmt.setLong(2, cpfInput);
 
-	// 2. Buscar chaves estrangeiras da tabela
-	private static List<String> buscarForeignKeys(String tabela) throws SQLException {
-		ResultSet fks = conn.getMetaData().getImportedKeys(null, null, tabela);
-		List<String> foreignKeys = new ArrayList<>();
-		while (fks.next()) {
-			foreignKeys.add(fks.getString("FKCOLUMN_NAME"));
-		}
-		fks.close();
-		return foreignKeys;
-	}
+			LocalDate localDate = LocalDate.parse(nascimentoInput);
+			Date sqlDate = Date.valueOf(localDate);
+			stmt.setDate(3, sqlDate);
 
-	// 3. Buscar colunas da tabela (ignorando auto-increment e FKs)
-	private static void buscarColunas(
-			String tabela,
-			List<String> foreignKeys,
-			List<String> nomesColunas,
-			List<Integer> tiposColunas) throws SQLException {
+			stmt.setInt(4, idPlanoInput);
 
-		ResultSet colunas = conn.getMetaData().getColumns(null, null, tabela, null);
+			stmt.executeUpdate();
+			System.out.println("Salvo com sucesso!");
 
-		while (colunas.next()) {
-			String coluna = colunas.getString("COLUMN_NAME");
-			int tipo = colunas.getInt("DATA_TYPE");
-			String isAuto = colunas.getString("IS_AUTOINCREMENT"); // "YES" ou "NO"
-
-			if ("YES".equals(isAuto) || foreignKeys.contains(coluna)) continue;
-
-			nomesColunas.add(coluna);
-			tiposColunas.add(tipo);
-		}
-		colunas.close();
-	}
-
-	// 4. Perguntar valores ao usuário e converter
-	private static List<Object> coletarValoresUsuario(List<String> nomes, List<Integer> tipos) {
-		List<Object> valores = new ArrayList<>();
-
-		for (int i = 0; i < nomes.size(); i++) {
-			String coluna = nomes.get(i);
-			int tipo = tipos.get(i);
-
-			if (coluna.equalsIgnoreCase("data_nasc"))
-				System.out.print("Digite a " + coluna.toUpperCase() + " (YYYY-MM-DD): ");
-			else
-				System.out.print("Digite o " + coluna.toUpperCase() + ": ");
-
-			String input = opcao.nextLine();
-			valores.add(converterValor(input, tipo));
-		}
-		return valores;
-	}
-
-	// 4a. Conversão de tipos
-	private static Object converterValor(String input, int tipo) {
-		switch (tipo) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT: return Integer.parseInt(input);
-			case Types.BIGINT: return Long.parseLong(input);
-			case Types.FLOAT:
-			case Types.DOUBLE:
-			case Types.REAL: return Double.parseDouble(input);
-			case Types.BOOLEAN:
-			case Types.BIT: return Boolean.parseBoolean(input);
-			case Types.DATE: return java.sql.Date.valueOf(input);
-			default: return input;
+		} catch (SQLException e) {
+			System.err.println("❌ Erro ao inserir dado! Verifique restrições.");
+			e.printStackTrace();
+		} catch (java.time.format.DateTimeParseException e) {
+			System.err.println("❌ Erro de formato de data! Use o padrão YYYY-MM-DD.");
 		}
 	}
 
-	// 5. Montar e executar INSERT
-	private static void executarInsert(String tabela, List<String> colunas, List<Object> valores) throws SQLException {
-		String sql = "INSERT INTO " + tabela + " (" +
-				String.join(", ", colunas) + ") VALUES (" +
-				String.join(", ", Collections.nCopies(colunas.size(), "?")) + ")";
-		PreparedStatement stmt = conn.prepareStatement(sql);
+	public static  void excluirDado() throws SQLException {
+		opcao.nextLine();
 
-		for (int i = 0; i < valores.size(); i++) {
-			Object v = valores.get(i);
-			if (v instanceof Integer) stmt.setInt(i + 1, (Integer) v);
-			else if (v instanceof Long) stmt.setLong(i + 1, (Long) v);
-			else if (v instanceof Double) stmt.setDouble(i + 1, (Double) v);
-			else if (v instanceof Boolean) stmt.setBoolean(i + 1, (Boolean) v);
-			else if (v instanceof java.sql.Date) stmt.setDate(i + 1, (java.sql.Date) v);
-			else stmt.setString(i + 1, (String) v);
+		System.out.println("CPF: ");
+		long cpfInput = Long.parseLong(opcao.nextLine());
+
+		String sql = "DELETE FROM cliente WHERE CPF = ?";
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setLong(1, cpfInput);
+
+			int linhasAfetadas = stmt.executeUpdate();
+			if (linhasAfetadas > 0) {
+				System.out.println("Cliente com CPF " + cpfInput + " EXCLUÍDO com sucesso!");
+			} else {
+				System.out.println("Nenhum cliente encontrado com o CPF " + cpfInput + "!");
+			}
+
+		} catch (SQLException e) {
+			System.err.println("❌ Erro ao excluir dado! Verifique restrições.");
+			e.printStackTrace();
 		}
 
-		int linhas = stmt.executeUpdate();
-		System.out.println("\nLinhas inseridas: " + linhas);
-		stmt.close();
+	}
+
+	public static void alterarDado() throws SQLException {
+		opcao.nextLine();
+
+		System.out.print("Digite o CPF do cliente que deseja ALTERAR: ");
+		long cpfBusca = Long.parseLong(opcao.nextLine());
+
+		if (!clienteExiste(cpfBusca)) {
+			System.out.println("Cliente com CPF " + cpfBusca + " não encontrado no sistema.");
+			return;
+		}
+
+		System.out.print("Digite o NOVO NOME para o cliente: ");
+		String novoNome = opcao.nextLine();
+
+		String sql = "UPDATE cliente SET nome = ? WHERE cpf = ?";
+
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setString(1, novoNome);
+			stmt.setLong(2, cpfBusca);
+
+			int linhasAfetadas = stmt.executeUpdate();
+
+			if (linhasAfetadas > 0) {
+				System.out.println("Nome do cliente com CPF " + cpfBusca + " atualizado com sucesso!");
+			} else {
+				System.out.println("Nenhuma alteração foi realizada.");
+			}
+
+		} catch (SQLException e) {
+			System.err.println("Erro ao alterar dado! Falha na comunicação com o banco.");
+			e.printStackTrace();
+		}
+	}
+	private static boolean clienteExiste(long cpf) throws SQLException {
+		String sql = "SELECT COUNT(cpf) FROM cliente WHERE cpf = ?";
+
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setLong(1, cpf);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt(1) > 0;
+				}
+			}
+		} catch (SQLException e) {
+			System.err.println("Erro na verificação de existência do cliente: " + e.getMessage());
+		}
+		return false;
+	}
+
+	public static void consultarDado() throws SQLException {
+		opcao.nextLine();
+
+		System.out.print("Digite o CPF do cliente para consulta: ");
+		long cpfBusca = Long.parseLong(opcao.nextLine());
+
+		String sql = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente WHERE cpf = ?";
+
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setLong(1, cpfBusca);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.isBeforeFirst()) {
+					System.out.println("Nenhum cliente encontrado com o CPF " + cpfBusca + ".");
+					return;
+				}
+
+				System.out.println("--------------------------------------------------------------------------------");
+				System.out.printf("%-5s %-30s %-15s %-12s %-8s\n", "ID", "NOME", "CPF", "NASC.", "ID_PLANO");
+				System.out.println("--------------------------------------------------------------------------------");
+
+				while (rs.next()) {
+					int id = rs.getInt("id");
+					String nome = rs.getString("nome");
+					int cpf = rs.getInt("cpf");
+					Date dataNasc = rs.getDate("data_nasc");
+					int idPlano = rs.getInt("id_plano");
+
+					System.out.printf("%-5d %-30s %-15s %-12s %-8d\n", id, nome, cpf, dataNasc.toString(), idPlano);
+				}
+			}
+
+		} catch (SQLException e) {
+			System.err.println("Erro ao realizar consulta específica!");
+			e.printStackTrace();
+		}
+	}
+
+	public static void mostrarTabela() throws SQLException {
+		String sql = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente ORDER BY id";
+
+		try (Statement stmt = conn.createStatement();
+				 ResultSet rs = stmt.executeQuery(sql)) {
+
+			System.out.println("\n--- TABELA COMPLETA: CLIENTE ---");
+			System.out.printf("%-5s %-30s %-15s %-12s %-8s\n", "ID", "NOME", "CPF", "NASC.", "ID_PLANO");
+			System.out.println("--------------------------------------------------------------------------------");
+
+			if (!rs.isBeforeFirst()) {
+				System.out.println("A tabela CLIENTE está vazia.");
+				return;
+			}
+
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String nome = rs.getString("nome");
+				long cpf = rs.getLong("cpf");
+				Date dataNasc = rs.getDate("data_nasc");
+				int idPlano = rs.getInt("id_plano");
+
+				System.out.printf("%-5d %-30s %-15s %-12s %-8d\n", id, nome, cpf, dataNasc.toString(), idPlano);
+			}
+			System.out.println("--------------------------------------------------------------------------------");
+
+		} catch (SQLException e) {
+			System.err.println("Erro ao listar a tabela completa!");
+			e.printStackTrace();
+		}
 	}
 
 }
