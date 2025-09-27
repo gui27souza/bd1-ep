@@ -39,15 +39,9 @@ public class EpApplication {
 			var sentinela = 1;
 			while(sentinela == 1){
 
-
-				System.out.println("\nInsira a opção desejada\n" +
-									"1. Inserir dados em uma tabela\n" +
-									"2. Excluir dados de um tabela\n" +
-									"3. Alterar dados de uma tabela\n" +
-									"4. Fazer uma consulta\n");
+				imprimeMenu(1);
 
 				int numero = opcao.nextInt();
-
 				switch (numero) {
 					case 1:
 						// inserirDado();
@@ -69,11 +63,8 @@ public class EpApplication {
 						break;
 				}
 
-				System.out.print("\n0: para encerrar o programa\n" +
-									"1: para exibir o menu novamente: ");
-				
+				imprimeMenu(2);
 				sentinela = opcao.nextInt();
-
 			}
 
 			rs.close();
@@ -84,4 +75,19 @@ public class EpApplication {
             e.printStackTrace();
         }
     }
+
+	public static void imprimeMenu(int session){
+
+		if (session == 1){
+			System.out.println("\nInsira a opção desejada\n" +
+			"1. Inserir dados em uma tabela\n" +
+			"2. Excluir dados de um tabela\n" +
+			"3. Alterar dados de uma tabela\n" +
+			"4. Fazer uma consulta\n");
+		}else if (session == 2){
+			System.out.print("\n0: para encerrar o programa\n" +
+							"1: para exibir o menu novamente: ");
+		}
+	}
+
 }
