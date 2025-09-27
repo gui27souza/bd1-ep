@@ -1,23 +1,95 @@
-CREATE DATABASE planejei;
-
-CREATE TABLE cliente(
-	id SERIAL INTEGER NOT NULL PRIMARY KEY,
-	nome VARCHAR(50),
-	cpf VARCHAR(11) UNIQUE,
-	data_nasc DATE,
-	---id_plano INTEGER,
-	---FOREIGN KEY (id_plano) REFERENCES plano(id)
+CREATE TABLE Plano (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(20) NOT NULL UNIQUE,
+    valor DECIMAL(10, 2) NOT NULL,
+    qtd_convites INTEGER NOT NULL DEFAULT 0
 );
 
-INSERT INTO cliente (nome, cpf, data_nasc) VALUES
-('Machado de Assis', '11111111111', '1839-06-21'),
-('Graciliano Ramos', '22222222222', '1892-10-27'),
-('Lygia Fagundes Telles', '33333333333', '1923-04-19'),
-('Clarice Lispector', '44444444444', '1920-12-10'),
-('Antonio Candido', '55555555555', '1918-07-24');
-('Fiódor Dostoiévski', '66666666666', '1821-11-11'),
-('Lev Tolstói', '77777777777', '1828-09-09'),
-('Antón Tchékhov', '88888888888', '1860-01-29');
-('Victor Hugo', '99999999999', '1802-02-26'),
-('Stendhal', '10101010101', '1783-01-23');
-('Jane Austen', '12121212121', '1775-12-16');
+CREATE TABLE Cliente (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf BIGINT NOT NULL UNIQUE,
+    data_nasc DATE NOT NULL,
+    id_plano INTEGER NOT NULL,
+
+    CONSTRAINT fk_plano FOREIGN KEY(id_plano) REFERENCES Plano(id)
+);
+
+CREATE TABLE Credenciais (
+    id_cliente SERIAL PRIMARY KEY,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha_hash VARCHAR(255) NOT NULL,
+
+    CONSTRAINT fk_cliente FOREIGN KEY(id_cliente) REFERENCES Cliente(id)
+);
+
+
+CREATE TABLE Grupo (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(40) NOT NULL,
+    status VARCHAR(20) CHECK (status IN ('ativo', 'inativo', 'arquivado')),
+    data_criacao TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    descricao TEXT
+);
+
+CREATE TABLE Categoria (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(20) NOT NULL UNIQUE,
+    descricao TEXT
+);
+
+CREATE TABLE Transacao (
+    id SERIAL PRIMARY KEY,
+    descricao TEXT,
+    valor DECIMAL(10, 2) NOT NULL,
+    id_cliente INTEGER NOT NULL,
+    id_grupo INTEGER NOT NULL,
+    id_categoria INTEGER NOT NULL,
+
+    CONSTRAINT fk_cliente FOREIGN KEY(id_cliente) REFERENCES Cliente(id),
+    CONSTRAINT fk_grupo FOREIGN KEY(id_grupo) REFERENCES Grupo(id),
+    CONSTRAINT fk_categoria FOREIGN KEY(id_categoria) REFERENCES Categoria(id)
+);
+
+
+CREATE TABLE Pix (
+    id_transacao INTEGER PRIMARY KEY,
+    chave VARCHAR(255) NOT NULL,
+
+    CONSTRAINT fk_transacao FOREIGN KEY(id_transacao) REFERENCES Transacao(id)
+);
+
+
+CREATE TABLE Cartao (
+    id_transacao INTEGER PRIMARY KEY,
+    bandeira VARCHAR(50) NOT NULL,
+    digitos_finais VARCHAR(4) NOT NULL,
+
+    CONSTRAINT fk_transacao FOREIGN KEY(id_transacao) REFERENCES Transacao(id)
+);
+
+CREATE TABLE MembroGrupo (
+    id SERIAL PRIMARY KEY,
+    id_cliente INTEGER NOT NULL,
+    id_grupo INTEGER NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'membro' CHECK (role IN ('membro', 'admin')),
+
+    CONSTRAINT fk_cliente FOREIGN KEY(id_cliente) REFERENCES Cliente(id),
+    CONSTRAINT fk_grupo FOREIGN KEY(id_grupo) REFERENCES Grupo(id),
+
+    UNIQUE (id_cliente, id_grupo)
+);
+
+CREATE TABLE Convite (
+    id SERIAL PRIMARY KEY,
+    id_remetente INTEGER NOT NULL,
+    id_destino INTEGER,
+    id_grupo INTEGER NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'pendente' CHECK (status IN ('pendente', 'aceito', 'recusado')),
+
+    CONSTRAINT fk_remetente FOREIGN KEY(id_remetente) REFERENCES Cliente(id),
+    CONSTRAINT fk_destino FOREIGN KEY(id_destino) REFERENCES Cliente(id),
+    CONSTRAINT fk_grupo FOREIGN KEY(id_grupo) REFERENCES Grupo(id)
+);
+
+INSERT INTO plano (nome, valor, qtd_convites) VALUES ('free', 0, 0), ('admin', 50, 20)
