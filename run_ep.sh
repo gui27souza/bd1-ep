@@ -5,7 +5,7 @@ mkdir -p bin
 javac -d bin -cp lib/postgresql-42.7.8.jar src/main/java/EpApplication.java
 
 # Executa
-java -cp bin:lib/postgresql-42.7.8.jar EpApplication
+java -cp bin:lib/postgresql-42.7.8.jar main.java.EpApplication
 
 # Limpa bin/ ao fim da execução
 rm -rf bin
