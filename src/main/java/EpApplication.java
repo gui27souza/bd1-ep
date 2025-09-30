@@ -117,10 +117,10 @@ public class EpApplication {
 			System.out.println("Salvo com sucesso!");
 
 		} catch (SQLException e) {
-			System.err.println("❌ Erro ao inserir dado! Verifique restrições.");
+			System.err.println("Erro ao inserir dado! Verifique restrições.");
 			e.printStackTrace();
 		} catch (java.time.format.DateTimeParseException e) {
-			System.err.println("❌ Erro de formato de data! Use o padrão YYYY-MM-DD.");
+			System.err.println("Erro de formato de data! Use o padrão YYYY-MM-DD.");
 		}
 	}
 
@@ -143,7 +143,7 @@ public class EpApplication {
 			}
 
 		} catch (SQLException e) {
-			System.err.println("❌ Erro ao excluir dado! Verifique restrições.");
+			System.err.println("Erro ao excluir dado! Verifique restrições.");
 			e.printStackTrace();
 		}
 
