@@ -13,7 +13,7 @@ Kennedy Rohab Menezes da Silva NºUSP: 12683395
 
 - Na raíz do diretório foram criados 2 scripts para compilação e execução do programa de forma mais prática, um para Windows e outro para Linux, basta criar suas variáveis de ambiente de acordo com o seu sistema operacional.
 ```
-# Windowsa
+# Windows
 run_ep.bat
 
 # Linux
