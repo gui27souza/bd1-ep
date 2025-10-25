@@ -81,8 +81,6 @@ public class EpApplication {
 		}
 	}
 
-
-
 	public static void inserirDado() throws SQLException {
 
 		opcao.nextLine();
@@ -183,6 +181,7 @@ public class EpApplication {
 			e.printStackTrace();
 		}
 	}
+
 	private static boolean clienteExiste(long cpf) throws SQLException {
 		String sql = "SELECT COUNT(cpf) FROM cliente WHERE cpf = ?";
 
