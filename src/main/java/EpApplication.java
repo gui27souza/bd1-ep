@@ -34,25 +34,29 @@ public class EpApplication {
 
 					case 1:
 						inserirDado();
-					break;
+						break;
 
 					case 2:
 						mostrarTabela();
 						excluirDado();
-					break;
+						break;
 
 					case 3:
 						mostrarTabela();
 						alterarDado();
-					break;
+						break;
 
 					case 4:
 						consultarDado();
-					break;
+						break;
 
 					case 5:
 						mostrarTabela();
-					break;
+						break;
+
+					case 6:
+						relatorioTransacoesPorCpf();
+						break;
 
 					default: break;
 				}
@@ -62,22 +66,30 @@ public class EpApplication {
 			}
 
 		} catch (SQLException e) {
-				System.err.println("Erro ao conectar ao banco de dados!");
-				e.printStackTrace();
+			System.err.println("Erro ao conectar ao banco de dados!");
+			e.printStackTrace();
 		}
 	}
 
 	public static void imprimeMenu(int session){
 		if (session == 1){
-			System.out.println("Insira a opção desejada a ser realizada na tabela CLIENTE\n" +
-			"1. Inserir dado\n" +
-			"2. Excluir dado\n" +
-			"3. Alterar dado\n" +
-			"4. Consultar dado\n" +
-			"5. Ver tabela completa\n");
+			System.out.println(
+					"===== MENU PRINCIPAL =====\n" +
+							"Operações na tabela CLIENTE:\n" +
+							"1. Inserir dado\n" +
+							"2. Excluir dado\n" +
+							"3. Alterar dado\n" +
+							"4. Consultar dado\n" +
+							"5. Ver tabela completa\n" +
+							"\n" +
+							"Relatórios e Consultas:\n" +
+							"6. Relatório de Transações (Cliente + Transacao + Categoria)\n" +
+							"===========================\n" +
+							"Escolha uma opção:"
+			);
 		}else if (session == 2){
 			System.out.print("\n0: para encerrar o programa\n" +
-							"1: para exibir o menu novamente: ");
+					"1: para exibir o menu novamente: ");
 		}
 	}
 
@@ -241,7 +253,7 @@ public class EpApplication {
 		String sql = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente ORDER BY id";
 
 		try (Statement stmt = conn.createStatement();
-				 ResultSet rs = stmt.executeQuery(sql)) {
+			 ResultSet rs = stmt.executeQuery(sql)) {
 
 			System.out.println("\n--- TABELA COMPLETA: CLIENTE ---");
 			System.out.printf("%-5s %-30s %-15s %-12s %-8s\n", "ID", "NOME", "CPF", "NASC.", "ID_PLANO");
@@ -266,6 +278,54 @@ public class EpApplication {
 		} catch (SQLException e) {
 			System.err.println("Erro ao listar a tabela completa!");
 			e.printStackTrace();
+		}
+	}
+
+	public static void relatorioTransacoesPorCpf() throws SQLException {
+		opcao.nextLine(); // consumir quebra de linha pendente do Scanner
+
+		System.out.print("Digite o CPF do cliente: ");
+		long cpfBusca = Long.parseLong(opcao.nextLine());
+
+		String sql =
+				"SELECT c.nome AS cliente, " +
+						"       t.descricao AS transacao, " +
+						"       t.valor AS valor, " +
+						"       cat.nome AS categoria " +
+						"FROM Transacao t " +
+						"JOIN Cliente c ON t.id_cliente = c.id " +
+						"JOIN Categoria cat ON t.id_categoria = cat.id " +
+						"WHERE c.cpf = ? " +
+						"ORDER BY t.id";
+
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setLong(1, cpfBusca);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				System.out.printf("%-20s | %-20s | %-10s | %-15s%n",
+						"Cliente", "Transação", "Valor", "Categoria");
+				System.out.println("---------------------------------------------------------------------");
+
+				boolean temRegistro = false;
+				while (rs.next()) {
+					temRegistro = true;
+
+					String cliente   = rs.getString("cliente");
+					String transacao = rs.getString("transacao");
+					double valor     = rs.getDouble("valor");
+					String categoria = rs.getString("categoria");
+
+					System.out.printf("%-20s | %-20s | %-10.2f | %-15s%n",
+							cliente, transacao, valor, categoria);
+				}
+
+				if (!temRegistro) {
+					System.out.println("Nenhuma transação encontrada para o CPF " + cpfBusca + ".");
+				}
+			}
+
+		} catch (SQLException e) {
+			System.err.println("Erro ao gerar relatório: " + e.getMessage());
 		}
 	}
 
