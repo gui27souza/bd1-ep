@@ -14,7 +14,7 @@ REM Verifica se a compilação falhou (código de erro > 0)
 if errorlevel 1 goto :EOF
 
 REM 3. Executa - O classpath usa a pasta 'bin' e o driver
-java -cp bin;lib\postgresql-42.7.8.jar EpApplication
+java -cp bin;lib\postgresql-42.7.8.jar main.java.EpApplication
 
 REM 4. Remove a pasta bin e seu conteúdo
 rmdir /s /q bin
