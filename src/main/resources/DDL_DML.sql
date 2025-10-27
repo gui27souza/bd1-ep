@@ -165,6 +165,77 @@ INSERT INTO Transacao (descricao, valor, id_cliente, id_grupo, id_categoria) VAL
     ('Conta de luz', 120.00, 9, 9, 9),
     ('Compra diversa', 60.00, 10, 10, 10);
 
+INSERT INTO Transacao (descricao, valor, id_cliente, id_grupo, id_categoria) VALUES
+-- Cliente 1
+('Padaria', 25.00, 1, 1, 1),              -- Alimentação
+('Restaurante', 80.00, 1, 1, 1),          -- Alimentação
+('Farmácia', 60.00, 1, 1, 4),             -- Saúde
+('Posto de gasolina', 150.00, 1, 1, 2),   -- Transporte
+('Roupas', 200.00, 1, 1, 10),             -- Outros
+
+-- Cliente 2
+('Mercado', 130.00, 2, 2, 1),             -- Alimentação
+('Streaming', 45.00, 2, 2, 7),            -- Assinaturas
+('Combustível', 90.00, 2, 2, 2),          -- Transporte
+('Academia', 120.00, 2, 2, 4),            -- Saúde
+('Café', 15.00, 2, 2, 1),                 -- Alimentação
+
+-- Cliente 3
+('Livraria', 70.00, 3, 3, 3),             -- Educação
+('Supermercado', 140.00, 3, 3, 1),        -- Alimentação
+('Cinema', 50.00, 3, 3, 5),               -- Lazer
+('Aplicativo de transporte', 22.00, 3, 3, 2), -- Transporte
+('Curso de idiomas', 250.00, 3, 3, 3),    -- Educação
+
+-- Cliente 4
+('Exame laboratorial', 180.00, 4, 4, 4),  -- Saúde
+('Farmácia', 90.00, 4, 4, 4),             -- Saúde
+('Seguro saúde', 400.00, 4, 4, 4),        -- Saúde
+('Supermercado', 160.00, 4, 4, 1),        -- Alimentação
+('Restaurante', 75.00, 4, 4, 1),          -- Alimentação
+
+-- Cliente 5
+('Bar', 60.00, 5, 5, 5),                  -- Lazer
+('Show', 150.00, 5, 5, 5),                -- Lazer
+('Restaurante', 90.00, 5, 5, 1),          -- Alimentação
+('Loja de roupas', 200.00, 5, 5, 10),     -- Outros
+('Streaming', 40.00, 5, 5, 7),            -- Assinaturas
+
+-- Cliente 6
+('Hotel', 500.00, 6, 6, 6),               -- Viagem
+('Transporte local', 60.00, 6, 6, 2),     -- Transporte
+('Restaurante', 180.00, 6, 6, 1),         -- Alimentação
+('Bagagem extra', 100.00, 6, 6, 6),       -- Viagem
+('Lembranças de viagem', 90.00, 6, 6, 6), -- Viagem
+
+-- Cliente 7
+('Spotify', 35.00, 7, 7, 7),              -- Assinaturas
+('Cinema', 50.00, 7, 7, 5),               -- Lazer
+('Livraria', 80.00, 7, 7, 3),             -- Educação
+('Restaurante', 120.00, 7, 7, 1),         -- Alimentação
+('Games', 200.00, 7, 7, 5),               -- Lazer
+
+-- Cliente 8
+('Investimento em ações', 600.00, 8, 8, 8), -- Investimento
+('Aporte CDB', 500.00, 8, 8, 8),            -- Investimento
+('Compra de livros', 120.00, 8, 8, 3),      -- Educação
+('Restaurante', 90.00, 8, 8, 1),            -- Alimentação
+('Café', 18.00, 8, 8, 1),                   -- Alimentação
+
+-- Cliente 9
+('Conta de água', 90.00, 9, 9, 9),          -- Utilidades
+('Conta de internet', 130.00, 9, 9, 9),     -- Utilidades
+('Supermercado', 150.00, 9, 9, 1),          -- Alimentação
+('Farmácia', 45.00, 9, 9, 4),               -- Saúde
+('Seguro residência', 200.00, 9, 9, 9),     -- Utilidades
+
+-- Cliente 10
+('Loja de eletrônicos', 900.00, 10, 10, 10), -- Outros
+('Supermercado', 130.00, 10, 10, 1),         -- Alimentação
+('Combustível', 100.00, 10, 10, 2),          -- Transporte
+('Restaurante', 85.00, 10, 10, 1),           -- Alimentação
+('Farmácia', 60.00, 10, 10, 4);              -- Saúde
+
 INSERT INTO Pix (id_transacao, chave) VALUES
     (1, 'chavepix1'),
     (2, 'chavepix2'),

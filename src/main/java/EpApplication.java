@@ -32,6 +32,8 @@ public class EpApplication {
 				int numero = opcao.nextInt();
 				switch (numero) {
 
+					case 0:
+						break;
 					case 1:
 						inserirDado();
 						break;
@@ -55,11 +57,21 @@ public class EpApplication {
 						break;
 
 					case 6:
+						mostrarTabela();
 						relatorioTransacoesPorCpf();
 						break;
 
-					default: break;
+					default:
+						System.out.println("\n\n      ********** Insira uma opção válida **********	  \n\n");
+						try {
+							Thread.sleep(1300); // 2 segundo para ele ver a mensagem
+						} catch (InterruptedException e) {
+							Thread.currentThread().interrupt();
+						}
+						continue;
 				}
+
+				if (numero == 0) break;
 
 				imprimeMenu(2);
 				sentinela = opcao.nextInt();
@@ -73,7 +85,7 @@ public class EpApplication {
 
 	public static void imprimeMenu(int session){
 		if (session == 1){
-			System.out.println(
+			System.out.print(
 					"===== MENU PRINCIPAL =====\n" +
 							"Operações na tabela CLIENTE:\n" +
 							"1. Inserir dado\n" +
@@ -83,9 +95,9 @@ public class EpApplication {
 							"5. Ver tabela completa\n" +
 							"\n" +
 							"Relatórios e Consultas:\n" +
-							"6. Relatório de Transações (Cliente + Transacao + Categoria)\n" +
-							"===========================\n" +
-							"Escolha uma opção:"
+							"6. Relatório de Transações (Cliente + Transacao + Categoria)\n\n" +
+							"0. Encerrar o programa\n\n" +
+							"Escolha uma opção: "
 			);
 		}else if (session == 2){
 			System.out.print("\n0: para encerrar o programa\n" +
@@ -284,7 +296,7 @@ public class EpApplication {
 	public static void relatorioTransacoesPorCpf() throws SQLException {
 		opcao.nextLine(); // consumir quebra de linha pendente do Scanner
 
-		System.out.print("Digite o CPF do cliente: ");
+		System.out.print("\nDigite o CPF do cliente: ");
 		long cpfBusca = Long.parseLong(opcao.nextLine());
 
 		String sql =
