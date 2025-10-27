@@ -8,7 +8,7 @@ REM 1. Cria a pasta bin
 if not exist bin mkdir bin
 
 REM 2. Compila - Coloca o .class em 'bin' (-d bin) e usa o driver como classpath (-cp)
-javac -d bin -cp lib\postgresql-42.7.8.jar src\main\java\EpApplication.java
+javac -encoding UTF-8 -d bin -cp lib\postgresql-42.7.8.jar src\main\java\EpApplication.java
 
 REM Verifica se a compilação falhou (código de erro > 0)
 if errorlevel 1 goto :EOF
