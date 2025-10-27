@@ -33,6 +33,7 @@ public class EpApplication {
 				switch (numero) {
 
 					case 0:
+						imprimeMenu(3);
 						break;
 					case 1:
 						inserirDado();
@@ -75,6 +76,8 @@ public class EpApplication {
 
 				imprimeMenu(2);
 				sentinela = opcao.nextInt();
+
+				if(sentinela == 0) imprimeMenu(3);
 			}
 
 		} catch (SQLException e) {
@@ -102,6 +105,8 @@ public class EpApplication {
 		}else if (session == 2){
 			System.out.print("\n0: para encerrar o programa\n" +
 					"1: para exibir o menu novamente: ");
+		}else if(session == 3){
+			System.out.println("\n\n      ********** PROGRAMA ENCERRADO **********	  \n\n");
 		}
 	}
 
