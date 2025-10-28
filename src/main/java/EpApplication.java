@@ -252,7 +252,7 @@ public class EpApplication {
 				while (rs.next()) {
 					int id = rs.getInt("id");
 					String nome = rs.getString("nome");
-					int cpf = rs.getInt("cpf");
+					long cpf = rs.getLong("cpf");
 					Date dataNasc = rs.getDate("data_nasc");
 					int idPlano = rs.getInt("id_plano");
 
