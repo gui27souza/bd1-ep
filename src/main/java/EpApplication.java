@@ -36,9 +36,10 @@ public class EpApplication {
 						imprimeMenu(3);
 						break;
 					case 1:
-						inserirDado();
+						imprimeMenu(4);
+						int id_plano = opcao.nextInt();
+						inserirDado(id_plano);
 						break;
-
 					case 2:
 						mostrarTabela();
 						excluirDado();
@@ -89,16 +90,9 @@ public class EpApplication {
 	public static void imprimeMenu(int session){
 		if (session == 1){
 			System.out.print(
-					"===== MENU PRINCIPAL =====\n" +
-							"Operações na tabela CLIENTE:\n" +
-							"1. Inserir dado\n" +
-							"2. Excluir dado\n" +
-							"3. Alterar dado\n" +
-							"4. Consultar dado\n" +
-							"5. Ver tabela completa\n" +
-							"\n" +
-							"Relatórios e Consultas:\n" +
-							"6. Relatório de Transações (Cliente + Transacao + Categoria)\n\n" +
+							"\n1. Fazer cadastro\n" +
+							"2. Fazer login\n" +
+
 							"0. Encerrar o programa\n\n" +
 							"Escolha uma opção: "
 			);
@@ -107,10 +101,19 @@ public class EpApplication {
 					"1: para exibir o menu novamente: ");
 		}else if(session == 3){
 			System.out.println("\n\n      ********** PROGRAMA ENCERRADO **********	  \n\n");
+		}else if(session == 4){
+			System.out.print(
+							"\n\n--------------------------------------------------------------------------------\n" +
+							"                                   CADASTRO\n" +
+							"--------------------------------------------------------------------------------\n\n" +
+							"   1. Free\n" +
+							"   2. Admin\n" +
+							"   3. Premium\n" +
+							"\nEscolha um plano: ");			
 		}
 	}
 
-	public static void inserirDado() throws SQLException {
+	public static void inserirDado(int id_plano) throws SQLException {
 
 		opcao.nextLine();
 
@@ -123,8 +126,7 @@ public class EpApplication {
 		System.out.println("Data de Nascimento (YYYY-MM-DD): ");
 		String nascimentoInput = opcao.nextLine();
 
-		System.out.println("ID do Plano: ");
-		int idPlanoInput = Integer.parseInt(opcao.nextLine());
+		int idPlanoInput = id_plano;
 
 		String sql = "INSERT INTO cliente (nome, cpf, data_nasc, id_plano) VALUES (?, ?, ?, ?)";
 
@@ -149,6 +151,11 @@ public class EpApplication {
 		} catch (java.time.format.DateTimeParseException e) {
 			System.err.println("Erro de formato de data! Use o padrão YYYY-MM-DD.");
 		}
+
+	}
+
+	public static void cadastroCliente() {
+
 	}
 
 	public static  void excluirDado() throws SQLException {
