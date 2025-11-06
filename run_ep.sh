@@ -3,14 +3,11 @@ export EP_NAME_DB="nome BD"
 export EP_DB_USER="usuario BD (default: postgres)"
 export EP_DB_PASS="Senha do user"
 
-# Cria o bin/ se necessário
-mkdir -p bin
 
 # Compila os arquivos, mandando tudo para bin/
-javac -d bin -cp lib/postgresql-42.7.8.jar src/main/java/EpApplication.java
+javac -d . -cp lib/postgresql-42.7.8.jar src/main/java/*.java
 
 # Executa
-java -cp bin:lib/postgresql-42.7.8.jar main.java.EpApplication
+java -cp .:lib/postgresql-42.7.8.jar main.java.Main
 
-# Limpa bin/ ao fim da execução
-rm -rf bin
+rm -rf main
