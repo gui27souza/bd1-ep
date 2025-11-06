@@ -84,7 +84,7 @@ public class Menu {
 	 */
 	public static void printTabela(String tableName, DBConnector connector) {
 
-		// ===== Estruturas de controle =====
+		// ========== Estruturas de controle ==========
 
 		// Quantidade de colunas
 		int columnCount;
@@ -98,14 +98,15 @@ public class Menu {
 		// Lista com todas as linhas
 		ArrayList<String[]> allLines;
 
-		// ==================================
+		// ============================================
 
 		// Execução da query no banco de dados
 		try {
 
-			// Prepara a query
-			String query = "SELECT * FROM " + tableName;
-			ResultSet resultSet = connector.executeQuery(query);
+			ResultSet resultSet = connector.queryTable(tableName);
+			if (resultSet == null) {
+				return;
+			}
 
 			// Pega os nomes e contagem de colunas
 			ResultSetMetaData metaData = resultSet.getMetaData();
