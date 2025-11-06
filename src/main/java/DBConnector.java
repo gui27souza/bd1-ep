@@ -1,17 +1,19 @@
 package main.java;
 
-import java.lang.module.ResolutionException;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class DBConnector {
 
 	Connection conn = null;
 
-	public DBConnector() {
-		this.conn = createConnection();
+	ArrayList<String> availableTables = null;
+
+	public DBConnector() throws SQLException {
+		createConnection();
 	}
 
-	private Connection createConnection() {
+	private void createConnection() throws SQLException {
 
 		String host;
 		String dbName;
@@ -28,7 +30,7 @@ public class DBConnector {
 		} catch (Exception e) {
 			System.out.println("Erro ao buscar variáveis de ambiente para conexão com o banco de dados:\n"+e.getMessage());
 			e.printStackTrace();
-			return null;
+			return;
 		}
 
 		Connection conn;
@@ -39,10 +41,46 @@ public class DBConnector {
 		} catch (SQLException e) {
 			System.err.println("Erro ao tentar conectar ao banco de dados:\n"+e.getMessage());
 			e.printStackTrace();
-			return null;
+			return;
 		}
 
-		return conn;
+		this.conn = conn;
+
+		getAvailableTables();
+	}
+
+	private ArrayList<String> getAvailableTables() throws SQLException {
+
+		ArrayList<String> availableList;
+
+		try {
+
+			// Caching - Caso já esteja na memória
+			if (this.availableTables != null) {
+				return this.availableTables;
+			}
+
+			DatabaseMetaData metaData = conn.getMetaData();
+			ResultSet tables = metaData.getTables(
+				null, null, "%",
+				new String[]{"TABLE"}
+			);
+
+			availableList = new ArrayList<>();
+			while (tables.next()) {
+				availableList.add(tables.getString("TABLE_NAME").toUpperCase());
+			}
+
+			tables.close();
+		} catch (SQLException e) {
+			this.availableTables = null;
+			throw e;
+		}
+
+		// Armazena na memória
+		this.availableTables = availableList;
+
+		return this.availableTables;
 	}
 
 	public void closeConnection() {
