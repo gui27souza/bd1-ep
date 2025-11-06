@@ -44,4 +44,16 @@ public class DBConnector {
 
 		return conn;
 	}
+
+	public void closeConnection() {
+		if (conn != null) {
+			try {
+				conn.close();
+				System.out.println("Conexão com o banco de dados fechada.");
+			} catch (SQLException e) {
+				System.err.println("Erro ao tentar fechar a conexão: " + e.getMessage());
+			}
+		}
+	}
+
 }
