@@ -94,4 +94,28 @@ public class DBConnector {
 		}
 	}
 
+	public ResultSet executeQuery(String query) throws SQLException {
+
+		if (query == null) {
+			System.out.println("Query inválida!\n");
+			return null;
+		}
+
+		if (this.conn == null || this.conn.isClosed()) {
+			throw new SQLException("Conexão com Banco de Dados não estabelecida!\n");
+		}
+
+		ResultSet resultSet;
+		Statement statement;
+
+		try {
+			statement = conn.createStatement();
+			resultSet = statement.executeQuery(query);
+		} catch (SQLException e) {
+			System.err.println("Erro ao executar a query: " + e.getMessage());
+			throw e;
+		}
+
+		return resultSet;
+	}
 }
