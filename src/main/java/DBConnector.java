@@ -118,4 +118,24 @@ public class DBConnector {
 
 		return resultSet;
 	}
+
+	public ResultSet queryTable(String tableName) throws SQLException {
+
+		ArrayList<String> availableTables = getAvailableTables();
+
+		if (this.availableTables == null || availableTables.isEmpty()) {
+			System.out.println("Nenhuma tabela disponível.");
+			return null;
+		}
+
+		if  (!availableTables.contains(tableName)) {
+			System.out.println("Tabela "+tableName+" não disponível no banco de dados!");
+			return null;
+		}
+
+		String query = "SELECT * FROM " + tableName;
+		ResultSet resultSet = executeQuery(query);
+
+		return resultSet;
+	}
 }
