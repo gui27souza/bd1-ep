@@ -35,7 +35,8 @@ public class Menu {
 			int inputOpcao;
 
 			try{
-				inputOpcao = opcao.nextInt();
+				String inputLine = opcao.nextLine().trim();
+				inputOpcao = Integer.parseInt(inputLine);
 
 				if ((inputOpcao - 1) >= options.length || inputOpcao < 0) {
 					throw new NumberFormatException();
@@ -52,7 +53,6 @@ public class Menu {
 			return inputOpcao-1;
 		}
 	}
-
 
 	/**
 	 * Imprime uma linha já extraída de um ResultSet
@@ -171,6 +171,7 @@ public class Menu {
 		// Jogo da velha final
 		larguraLinha += 1;
 
+		// Linha de jogos da velha
 		String linhaJogoDaVelha = "";
 		for (int i = 0; i<larguraLinha; i++) {
 			linhaJogoDaVelha += "#";
