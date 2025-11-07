@@ -12,6 +12,11 @@ public class Menu {
 
 	static Scanner opcao = new Scanner(System.in);
 
+	public static String readStringInput(String prompt) {
+		System.out.print(prompt);
+		return opcao.nextLine().trim();
+	}
+
 	/**
 	 * @param options Vetor de Strings que contém as opções a serem impressos
 	 * @return Posição do array OU -1 (usuário quer encerrar o programa)
