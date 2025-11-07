@@ -63,6 +63,10 @@ public class DBConnector {
 		this.conn = conn;
 	}
 
+	public Connection getConnection() {
+		return conn;
+	}
+
 	private ArrayList<String> getAvailableTables() throws SQLException {
 
 		ArrayList<String> availableList;
