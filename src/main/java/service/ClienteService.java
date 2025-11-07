@@ -23,6 +23,40 @@ public class ClienteService {
 		this.dbConnector = dbConnector;
 	}
 
+	public void menu() throws SQLException {
+
+		String[] menuOptions = {
+			"Ver todos os clientes",
+			"Criar cliente",
+			"Retornar ao menu principal"
+		};
+
+		while (true) {
+			int opt = MenuUtil.printOptions(menuOptions);
+
+			switch (opt) {
+
+				// Encerrar o programa
+				case -1:
+					System.out.println("\nEncerrando programa...");
+					System.exit(0);
+				break;
+
+				// Ver todos os clientes
+				case 0:
+					MenuUtil.printTabela("CLIENTE", this.dbConnector);
+				break;
+
+				// Criar cliente
+				case 1:
+				break;
+
+				// Retornar ao menu principal
+				case 2: return;
+
+			}
+		}
+	}
 	public Cliente createCliente(String nome, long cpf, Date dataNascimento) throws SQLException, DomainException {
 
 		if (nome == null || nome.trim().isEmpty()) {

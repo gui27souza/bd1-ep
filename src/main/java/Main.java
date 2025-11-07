@@ -1,6 +1,7 @@
 package main.java;
 
 import main.java.db.DBConnector;
+import main.java.service.ClienteService;
 
 import java.sql.SQLException;
 
@@ -10,15 +11,18 @@ public class Main {
 		// Inicializa a conexao com o banco de dados
 		DBConnector db = new DBConnector();
 
+		ClienteService clienteService = new ClienteService(db);
+
 		// Menu inicial
 		String[] primeirasOpcoes = {
 			"Ver todas as tabelas",
 			"Buscar tabela específica",
 			"Listar o nome das tabelas",
+			"Acessar ClientService"
 		};
 
 		while (true) {
-			int opt = Menu.printOptions(primeirasOpcoes);
+			int opt = MenuUtil.printOptions(primeirasOpcoes);
 			switch (opt) {
 
 				// Encerrar o programa
@@ -30,7 +34,7 @@ public class Main {
 				// Ver todas as tabelas
 				case 0:
 					for (String tableName : db.availableTables) {
-						Menu.printTabela(tableName, db);
+						MenuUtil.printTabela(tableName, db);
 						System.out.println();
 					}
 				break;
@@ -38,17 +42,22 @@ public class Main {
 				// Buscar tabela específica
 				case 1:
 					System.out.println();
-					String tableName = Menu.readStringInput("Digite o nome da tabela (ou \\q para voltar): ");
+					String tableName = MenuUtil.readStringInput("Digite o nome da tabela (ou \\q para voltar): ");
 					if (tableName.equals("\\q")) {
 						break;
 					}
 					System.out.println();
-					Menu.printTabela(tableName, db);
+					MenuUtil.printTabela(tableName, db);
 				break;
 
 				// Listar o nome das tabelas
 				case 2:
 					System.out.println("\nTabelas disponíveis no BD:\n" + db.availableTables);
+				break;
+
+				// Acessar ClientService
+				case 3:
+					clienteService.menu();
 				break;
 
 			}
