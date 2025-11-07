@@ -9,13 +9,18 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Menu {
+public class MenuUtil {
 
 	static Scanner opcao = new Scanner(System.in);
 
 	public static String readStringInput(String prompt) {
 		System.out.print(prompt);
 		return opcao.nextLine().trim();
+	}
+
+	public static Long  readLongInput(String prompt) {
+		System.out.print(prompt);
+		return Long.parseLong(opcao.nextLine().trim());
 	}
 
 	/**
