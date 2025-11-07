@@ -38,21 +38,22 @@ public class Main {
 				// Buscar tabela específica
 				case 1:
 					System.out.println();
-					String tableName = Menu.readStringInput("Digite o nome da tabela: ");
+					String tableName = Menu.readStringInput("Digite o nome da tabela (ou \\q para voltar): ");
+					if (tableName.equals("\\q")) {
+						break;
+					}
+					System.out.println();
 					Menu.printTabela(tableName, db);
-//					System.out.println("\nOperação ainda não implementada!");
 				break;
 
 				// Listar o nome das tabelas
 				case 2:
-					System.out.println("\nTabelas disponíveis no BD:\n" + db.availableTables + "\n");
+					System.out.println("\nTabelas disponíveis no BD:\n" + db.availableTables);
 				break;
 
 			}
 
 			System.out.println();
 		}
-
-
 	}
 }
