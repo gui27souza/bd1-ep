@@ -1,19 +1,35 @@
-package main.java;
+package main.java.db;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class DBConnector {
 
+
+	// === Conexao com Banco de Dados ===
 	Connection conn = null;
+	// ==================================
 
-	ArrayList<String> availableTables = null;
 
+	// ==================== Dados do banco ====================
+
+	// Nome das tabelas disponiveis
+	public ArrayList<String> availableTables = null;
+
+	// ========================================================
+
+
+	// Construtor
 	public DBConnector() throws SQLException {
+
+		// Cria a conexao com o Banco de Dados
 		createConnection();
+
+		// Popula a estrutura com dados
+		getAvailableTables();
 	}
 
-	private void createConnection() throws SQLException {
+	private void createConnection() {
 
 		String host;
 		String dbName;
@@ -45,8 +61,6 @@ public class DBConnector {
 		}
 
 		this.conn = conn;
-
-		getAvailableTables();
 	}
 
 	private ArrayList<String> getAvailableTables() throws SQLException {
@@ -138,4 +152,5 @@ public class DBConnector {
 
 		return resultSet;
 	}
+
 }

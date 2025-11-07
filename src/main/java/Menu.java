@@ -1,6 +1,7 @@
 package main.java;
 
-import javax.swing.*;
+import main.java.db.DBConnector;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
