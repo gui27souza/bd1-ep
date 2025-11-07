@@ -15,7 +15,7 @@ import java.time.format.DateTimeParseException;
 
 public class ClienteService {
 
-	DBConnector dbConnector = null;
+	DBConnector dbConnector;
 
 	int idPlanoBasico = 1;
 
@@ -23,7 +23,7 @@ public class ClienteService {
 		this.dbConnector = dbConnector;
 	}
 
-	public void menu() throws SQLException {
+	public void menu() {
 
 		String[] menuOptions = {
 			"Ver todos os clientes",
