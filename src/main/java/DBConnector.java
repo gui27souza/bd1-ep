@@ -128,7 +128,7 @@ public class DBConnector {
 			return null;
 		}
 
-		if  (!availableTables.contains(tableName)) {
+		if  (!availableTables.contains(tableName.toUpperCase())) {
 			System.out.println("Tabela "+tableName+" não disponível no banco de dados!");
 			return null;
 		}
