@@ -5,9 +5,9 @@ export EP_DB_PASS="Senha do user"
 
 
 # Compila os arquivos, mandando tudo para bin/
-javac -d . -cp lib/postgresql-42.7.8.jar src/main/java/*.java
+javac -d bin -cp lib/postgresql-42.7.8.jar src/main/java/**/*.java src/main/java/*.java
 
 # Executa
-java -cp .:lib/postgresql-42.7.8.jar main.java.Main
+java -cp bin:lib/postgresql-42.7.8.jar main.java.Main
 
-rm -rf main
+rm -rf bin
