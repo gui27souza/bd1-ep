@@ -49,6 +49,7 @@ public class ClienteService {
 
 				// Criar cliente
 				case 1:
+					menuCreateCliente();
 				break;
 
 				// Retornar ao menu principal
@@ -57,6 +58,36 @@ public class ClienteService {
 			}
 		}
 	}
+
+	public Cliente menuCreateCliente() {
+		System.out.println("Digite os dados do cliente a ser inserido:");
+
+		String nome = MenuUtil.readStringInput("\tNome: ");
+		Long cpf = MenuUtil.readLongInput("\tCpf: ");
+		String dataNascimentoStr = MenuUtil.readStringInput("\tData de Nascimento (YYYY-MM-DD): ");
+
+		Cliente novoCliente = null;
+
+		try {
+			LocalDate localDate = LocalDate.parse(dataNascimentoStr);
+			Date dataNascimentoSqlDate = Date.valueOf(localDate);
+
+			novoCliente = createCliente(nome, cpf, dataNascimentoSqlDate);
+			System.out.println("Cliente " + novoCliente.getNome() + " cadastrado com sucesso! ID: " + novoCliente.getId());
+
+		} catch (DateTimeParseException e) {
+			System.err.println("ERRO DE ENTRADA: O formato da data está incorreto. Use YYYY-MM-DD.");
+		} catch (DomainException e) {
+			System.err.println("ERRO DE CADASTRO: " + e.getMessage());
+		} catch (SQLException e) {
+			System.err.println("\nERRO CRÍTICO NO BANCO DE DADOS!");
+			System.err.println("Não foi possível completar a operação. Detalhes: " + e.getMessage());
+			e.printStackTrace();
+		}
+		
+		return novoCliente;
+	}
+	
 	public Cliente createCliente(String nome, long cpf, Date dataNascimento) throws SQLException, DomainException {
 
 		if (nome == null || nome.trim().isEmpty()) {
