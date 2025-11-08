@@ -188,13 +188,23 @@ public class ClienteService {
 
 				// Busca por nome
 				case 1:
-					System.out.println("Operação ainda não implementada!");
-				break;
+					String nomeInput = MenuUtil.readStringInput("Digite o nome a ser buscado: ");
+					ArrayList<Cliente> clientesBuscados = findByName(nomeInput, dbConnector);
+					System.out.println(clientesBuscados.size()+" clientes encontrados!\n");
+					MenuUtilCliente.printListaCliente(clientesBuscados);
+					clienteBuscado = MenuUtilCliente.chooseClienteFromLista(clientesBuscados);
+				return clienteBuscado;
 
 				// Busca por CPF
 				case 2:
-					System.out.println("Operação ainda não implementada!");
-				break;
+					long cpfInput = MenuUtil.readLongInput("Digite o CPF a ser buscado: ");
+					clienteBuscado = findByCpf(cpfInput, dbConnector);
+					if (clienteBuscado == null) {
+						System.out.println("\nNenhum cliente com o CPF "+cpfInput+" encontrado!");
+					} else {
+						MenuUtilCliente.printCliente(clienteBuscado);
+					}
+				return clienteBuscado;
 
 
 				// Retornar ao menu anterior
@@ -213,28 +223,74 @@ public class ClienteService {
 		List<Object> parameters =  new ArrayList<>();
 		parameters.add(id);
 
-		ResultSet resultSet = dbConnector.executeQuery(query, parameters);
+		try (ResultSet resultSet = dbConnector.executeQuery(query, parameters)) {
 
-		if (resultSet.next()) {
-			String nome = resultSet.getString("nome");
-			long cpf = resultSet.getLong("cpf");
-			Date dataNascimento = resultSet.getDate("data_nasc");
-			int  idPlano = resultSet.getInt("id_plano");
-			Cliente clienteBuscado = new Cliente(id, nome, cpf, dataNascimento, idPlano);
+			if (resultSet.next()) {
+				String nome = resultSet.getString("nome");
+				long cpf = resultSet.getLong("cpf");
+				Date dataNascimento = resultSet.getDate("data_nasc");
+				int idPlano = resultSet.getInt("id_plano");
+				Cliente clienteBuscado = new Cliente(id, nome, cpf, dataNascimento, idPlano);
 
-			resultSet.close();
-			return clienteBuscado;
+				return clienteBuscado;
+			}
+
+			return null;
+		}
+	}
+
+	public static ArrayList<Cliente> findByName(String name, DBConnector dbConnector) throws SQLException {
+
+		String query = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente WHERE nome LIKE ?";
+		List<Object> parameters =  new ArrayList<>();
+		parameters.add("%" + name + "%");
+
+		ArrayList<Cliente> clientesBuscados = new ArrayList<>();
+
+		try (ResultSet resultSet = dbConnector.executeQuery(query, parameters)) {
+
+			while (resultSet.next()) {
+
+				int id = resultSet.getInt("id");
+				String nomeDB = resultSet.getString("nome");
+				long cpf = resultSet.getLong("cpf");
+				Date dataNascimento = resultSet.getDate("data_nasc");
+				int idPlano = resultSet.getInt("id_plano");
+
+				Cliente cliente = new Cliente(id, nomeDB, cpf, dataNascimento, idPlano);
+				clientesBuscados.add(cliente);
+			}
 		}
 
-		resultSet.close();
-		return null;
+		return clientesBuscados;
 	}
 
-	public static Cliente findByName(String name) {
-		return null;
+	public static Cliente findByCpf(long cpf, DBConnector dbConnector) throws DomainException, SQLException {
+
+		if (cpf <= 0) {
+			throw new DomainException("CPF inválido, deve ser positivo");
+		}
+
+		String query = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente WHERE cpf = ?";
+		List<Object> parameters =  new ArrayList<>();
+		parameters.add(cpf);
+
+		try (ResultSet resultSet = dbConnector.executeQuery(query, parameters)) {
+
+			if (resultSet.next()) {
+				int id = resultSet.getInt("id");
+				String nome = resultSet.getString("nome");
+				Date dataNascimento = resultSet.getDate("data_nasc");
+				int idPlano = resultSet.getInt("id_plano");
+				Cliente clienteBuscado = new Cliente(id, nome, cpf, dataNascimento, idPlano);
+
+				return clienteBuscado;
+			}
+
+			return null;
+		}
 	}
 
-	public static Cliente findByCpf(long cpf) {
 
 	// ===== Update ====================
 
