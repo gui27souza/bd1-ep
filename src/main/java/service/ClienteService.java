@@ -1,29 +1,28 @@
 package main.java.service;
 
-import main.java.MenuUtil;
-import main.java.Models.Cliente;
+import main.java.util.MenuUtil;
+import main.java.model.cliente.Cliente;
 import main.java.db.DBConnector;
 import main.java.exceptions.DomainException;
 
-import java.awt.*;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClienteService {
 
 	DBConnector dbConnector;
 
-	int idPlanoBasico = 1;
-
 	public ClienteService(DBConnector dbConnector) {
 		this.dbConnector = dbConnector;
 	}
 
-	public void menu() {
+	public void menu() throws DomainException, SQLException {
 
 		String[] menuOptions = {
 			"Ver todos os clientes",
@@ -52,7 +51,7 @@ public class ClienteService {
 
 				// Criar cliente
 				case 1:
-					menuCreateCliente();
+					CreateCliente.menu(this.dbConnector);
 				break;
 
 				// Retornar ao menu principal
@@ -62,7 +61,11 @@ public class ClienteService {
 		}
 	}
 
-	public Cliente menuCreateCliente() {
+class CreateCliente {
+
+	static final int idPlanoBasico = 1;
+
+	public static Cliente menu(DBConnector dbConnector) {
 		System.out.println("Digite os dados do cliente a ser inserido:");
 
 		String nome = MenuUtil.readStringInput("\tNome: ");
@@ -75,7 +78,7 @@ public class ClienteService {
 			LocalDate localDate = LocalDate.parse(dataNascimentoStr);
 			Date dataNascimentoSqlDate = Date.valueOf(localDate);
 
-			novoCliente = createCliente(nome, cpf, dataNascimentoSqlDate);
+			novoCliente = createCliente(nome, cpf, dataNascimentoSqlDate, dbConnector);
 			System.out.println("Cliente " + novoCliente.getNome() + " cadastrado com sucesso! ID: " + novoCliente.getId());
 
 		} catch (DateTimeParseException e) {
@@ -87,11 +90,11 @@ public class ClienteService {
 			System.err.println("Não foi possível completar a operação. Detalhes: " + e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 		return novoCliente;
 	}
-	
-	public Cliente createCliente(String nome, long cpf, Date dataNascimento) throws SQLException, DomainException {
+
+	public static Cliente createCliente(String nome, long cpf, Date dataNascimento, DBConnector dbConnector) throws SQLException, DomainException {
 
 		if (nome == null || nome.trim().isEmpty()) {
 			throw new DomainException("O nome do cliente não pode ser vazio.");
@@ -99,12 +102,12 @@ public class ClienteService {
 		if (cpf <= 0) {
 			throw new DomainException("CPF inválido.");
 		}
-		
-		Cliente novoCliente = new Cliente(nome, cpf, dataNascimento, this.idPlanoBasico);
+
+		Cliente novoCliente = new Cliente(nome, cpf, dataNascimento, idPlanoBasico);
 
 		String query = "INSERT INTO cliente (nome, cpf, data_nasc, id_plano) VALUES (?, ?, ?, ?) RETURNING id";
 
-		try (PreparedStatement pstmt = this.dbConnector.getConnection().prepareStatement(query)) {
+		try (PreparedStatement pstmt = dbConnector.getConnection().prepareStatement(query)) {
 
 			pstmt.setString(1, novoCliente.getNome());
 			pstmt.setLong(2, novoCliente.getCpf());
@@ -135,3 +138,10 @@ public class ClienteService {
 		}
 	}
 }
+
+class ReadCliente {
+}
+
+class UpdateCliente {}
+
+class DeleteCliente {}
