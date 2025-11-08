@@ -1,12 +1,14 @@
 package main.java.managerapp;
 
 import main.java.db.DBConnector;
+import main.java.exceptions.DomainException;
 import main.java.service.ClienteService;
+import main.java.util.MenuUtil;
 
 import java.sql.SQLException;
 
 public class Main {
-	public static void main(String[] args) throws SQLException {
+	public static void main(String[] args) throws SQLException, DomainException {
 
 		// Inicializa a conexao com o banco de dados
 		DBConnector db = new DBConnector();
@@ -36,7 +38,7 @@ public class Main {
 
 				// Ver todas as tabelas
 				case 0:
-					for (String tableName : db.availableTables) {
+					for (String tableName : db.getAvailableTables()) {
 						MenuUtil.printTabela(tableName, db);
 						System.out.println();
 					}
@@ -55,7 +57,7 @@ public class Main {
 
 				// Listar o nome das tabelas
 				case 2:
-					System.out.println("\nTabelas disponíveis no BD:\n" + db.availableTables);
+					System.out.println("\nTabelas disponíveis no BD:\n" + db.getAvailableTables());
 				break;
 
 				// Acessar ClientService

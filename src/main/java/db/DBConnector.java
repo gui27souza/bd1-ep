@@ -15,7 +15,7 @@ public class DBConnector {
 	// ==================== Dados do banco ====================
 
 	// Nome das tabelas disponiveis
-	public ArrayList<String> availableTables = null;
+	ArrayList<String> availableTables = null;
 
 	// ========================================================
 
@@ -68,7 +68,7 @@ public class DBConnector {
 		return conn;
 	}
 
-	private ArrayList<String> getAvailableTables() throws SQLException {
+	public ArrayList<String> getAvailableTables() throws SQLException {
 
 		ArrayList<String> availableList;
 
