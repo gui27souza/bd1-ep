@@ -2,6 +2,7 @@ package main.java.db;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DBConnector {
 
@@ -135,6 +136,45 @@ public class DBConnector {
 		}
 
 		return resultSet;
+	}
+
+	public ResultSet executeQuery(String query, List<Object> parameters) throws SQLException {
+
+		if (this.conn == null || this.conn.isClosed()) {
+			throw new SQLException("Conexão com Banco de Dados não estabelecida!");
+		}
+
+		try {
+
+			PreparedStatement pstmt = conn.prepareStatement(query);
+
+			if (parameters != null) {
+				for (int i = 0; i < parameters.size(); i++) {
+					Object param = parameters.get(i);
+					int index = i + 1;
+
+					if (param instanceof String) {
+						pstmt.setString(index, (String) param);
+					} else if (param instanceof Integer) {
+						pstmt.setInt(index, (Integer) param);
+					} else if (param instanceof Long) {
+						pstmt.setLong(index, (Long) param);
+					} else if (param instanceof Double) {
+						pstmt.setDouble(index, (Double) param);
+					} else if (param instanceof Boolean) {
+						pstmt.setBoolean(index, (Boolean) param);
+					} else if (param == null) {
+						pstmt.setNull(index, java.sql.Types.VARCHAR);
+					}
+				}
+			}
+
+			return pstmt.executeQuery();
+
+		} catch (SQLException e) {
+			System.err.println("Erro ao executar PreparedStatement: " + e.getMessage());
+			throw e;
+		}
 	}
 
 	public ResultSet queryTable(String tableName) throws SQLException {
