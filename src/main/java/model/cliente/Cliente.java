@@ -54,4 +54,13 @@ public class Cliente {
 	}
 	public void setIdPlano(int idPlano) { this.idPlano = idPlano; }
 
+	public void repr() {
+		System.out.println("\n====================");
+		System.out.println("ID: " + this.id);
+		System.out.println("Nome: " + this.nome);
+		System.out.println("CPF: " + this.cpf);
+		System.out.println("Data de Nascimento: " + this.dataNascimento);
+		System.out.println("Id de Plano: " + this.idPlano);
+		System.out.println("====================");
+	}
 }
