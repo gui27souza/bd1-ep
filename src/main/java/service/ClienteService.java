@@ -176,6 +176,8 @@ class ReadCliente {
 					Cliente clienteBuscado = findById(idInput, dbConnector);
 					if (clienteBuscado == null) {
 						System.out.println("\nNenhum cliente com o Id "+idInput+" encontrado!");
+					} else {
+						clienteBuscado.repr();
 					}
 				break;
 
@@ -207,9 +209,6 @@ class ReadCliente {
 
 		ResultSet resultSet = dbConnector.executeQuery(query, parameters);
 
-		System.out.println();
-		MenuUtil.printResultSet(resultSet);
-
 		if (resultSet.next()) {
 			String nome = resultSet.getString("nome");
 			long cpf = resultSet.getLong("cpf");
@@ -217,6 +216,7 @@ class ReadCliente {
 			int  idPlano = resultSet.getInt("id_plano");
 			Cliente clienteBuscado = new Cliente(id, nome, cpf, dataNascimento, idPlano);
 
+			resultSet.close();
 			return clienteBuscado;
 		}
 
