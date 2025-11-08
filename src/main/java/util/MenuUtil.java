@@ -18,7 +18,12 @@ public class MenuUtil {
 		return opcao.nextLine().trim();
 	}
 
-	public static Long  readLongInput(String prompt) {
+	public static int readIntInput(String prompt) {
+		System.out.print(prompt);
+		return Integer.parseInt(opcao.nextLine().trim());
+	}
+
+	public static Long readLongInput(String prompt) {
 		System.out.print(prompt);
 		return Long.parseLong(opcao.nextLine().trim());
 	}
