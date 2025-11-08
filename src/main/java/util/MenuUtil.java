@@ -95,6 +95,26 @@ public class MenuUtil {
 	 */
 	public static void printTabela(String tableName, DBConnector connector) {
 
+		// Execução da query no banco de dados
+		try {
+
+			ResultSet resultSet = connector.queryTable(tableName);
+
+			if (resultSet == null) {
+				System.out.println("Nenhum resultado a ser impresso!");
+				return;
+			}
+
+			System.out.println("Tabela: "+tableName.toUpperCase());
+			printResultSet(resultSet);
+
+		} catch (SQLException e) {
+			System.err.println("Erro ao acessar a tabela: " + e.getMessage());
+		}
+	}
+
+	public static void printResultSet(ResultSet resultSet) {
+
 		// ========== Estruturas de controle ==========
 
 		// Quantidade de colunas
@@ -111,13 +131,7 @@ public class MenuUtil {
 
 		// ============================================
 
-		// Execução da query no banco de dados
 		try {
-
-			ResultSet resultSet = connector.queryTable(tableName);
-			if (resultSet == null) {
-				return;
-			}
 
 			// Pega os nomes e contagem de colunas
 			ResultSetMetaData metaData = resultSet.getMetaData();
@@ -184,7 +198,6 @@ public class MenuUtil {
 		}
 
 		// Imprime a linha com o nome das colunas
-		System.out.println("Tabela: "+tableName.toUpperCase());
 		System.out.println(linhaJogoDaVelha);
 		printLinha(columnNames, columnCount, columnSizes);
 		System.out.println(linhaJogoDaVelha);
