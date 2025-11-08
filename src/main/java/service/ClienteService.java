@@ -29,6 +29,8 @@ public class ClienteService {
 			"Ver todos os clientes",
 			"Criar cliente",
 			"Buscar cliente",
+			"Atualizar cliente",
+			"Deletar cliente",
 			"Retornar ao menu principal"
 		};
 
@@ -61,8 +63,18 @@ public class ClienteService {
 					menuRead();
 				break;
 
+				// Atualizar cliente
+				case 3:
+					menuUpdate();
+				break;
+
+				// Deletar cliente
+				case 4:
+					menuDelete();
+				break;
+
 				// Retornar ao menu principal
-				case 3: return;
+				case 5: return;
 
 			}
 		}
@@ -302,4 +314,17 @@ public class ClienteService {
 	// ===== Delete ====================
 
 	public static void menuDelete() throws DomainException, SQLException {
+	}
+
+	public static void deleteCliente(Cliente cliente, DBConnector dbConnector) throws DomainException, SQLException {
+
+	}
+
+	public static void deleteCliente(int id, DBConnector dbConnector) throws DomainException, SQLException {
+
+	}
+
+	public static void deleteCliente(long cpf, DBConnector dbConnector) throws DomainException, SQLException {
+
+	}
 }
