@@ -17,10 +17,10 @@ import java.util.List;
 
 public class ClienteService {
 
-	DBConnector dbConnector;
+	static DBConnector dbConnector;
 
 	public ClienteService(DBConnector dbConnector) {
-		this.dbConnector = dbConnector;
+		ClienteService.dbConnector = dbConnector;
 	}
 
 	public void menu() throws DomainException, SQLException {
@@ -48,17 +48,17 @@ public class ClienteService {
 
 				// Ver todos os clientes
 				case 0:
-					MenuUtil.printTabela("CLIENTE", this.dbConnector);
+					MenuUtil.printTabela("CLIENTE", dbConnector);
 				break;
 
 				// Criar cliente
 				case 1:
-					CreateCliente.menu(this.dbConnector);
+					menuCreate();
 				break;
 
 				// Buscar cliente
 				case 2:
-					ReadCliente.menu(this.dbConnector);
+					menuRead();
 				break;
 
 				// Retornar ao menu principal
@@ -67,13 +67,15 @@ public class ClienteService {
 			}
 		}
 	}
-}
 
-class CreateCliente {
+	// ==================== CRUD Section ==================== //
+
+
+	// ===== Create ====================
 
 	static final int idPlanoBasico = 1;
 
-	public static Cliente menu(DBConnector dbConnector) {
+	public static Cliente menuCreate() {
 		System.out.println("Digite os dados do cliente a ser inserido:");
 
 		String nome = MenuUtil.readStringInput("\tNome: ");
@@ -145,11 +147,13 @@ class CreateCliente {
 			throw e;
 		}
 	}
-}
 
-class ReadCliente {
 
-	public static Cliente menu(DBConnector dbConnector) throws DomainException, SQLException {
+	// ===== Read ====================
+
+	public static Cliente menuRead() throws DomainException, SQLException {
+
+		Cliente clienteBuscado;
 
 		String[] menuOptions = {
 			"Id",
@@ -174,13 +178,13 @@ class ReadCliente {
 				// Busca por Id
 				case 0:
 					int idInput = MenuUtil.readIntInput("Digite o Id a ser buscado: ");
-					Cliente clienteBuscado = findById(idInput, dbConnector);
+					clienteBuscado = findById(idInput, dbConnector);
 					if (clienteBuscado == null) {
 						System.out.println("\nNenhum cliente com o Id "+idInput+" encontrado!");
 					} else {
-						clienteBuscado.repr();
+						MenuUtilCliente.printCliente(clienteBuscado);
 					}
-				break;
+				return clienteBuscado;
 
 				// Busca por nome
 				case 1:
@@ -192,7 +196,8 @@ class ReadCliente {
 					System.out.println("Operação ainda não implementada!");
 				break;
 
-				// Retornar ao menu Cliente Service
+
+				// Retornar ao menu anterior
 				case 3: return null;
 			}
 		}
@@ -230,10 +235,15 @@ class ReadCliente {
 	}
 
 	public static Cliente findByCpf(long cpf) {
+
+	// ===== Update ====================
+
+	public static Cliente menuUpdate() throws DomainException, SQLException {
 		return null;
 	}
+
+
+	// ===== Delete ====================
+
+	public static void menuDelete() throws DomainException, SQLException {
 }
-
-class UpdateCliente {}
-
-class DeleteCliente {}
