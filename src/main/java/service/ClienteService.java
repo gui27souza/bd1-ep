@@ -140,6 +140,43 @@ class CreateCliente {
 }
 
 class ReadCliente {
+	public static Cliente findById(int id, DBConnector dbConnector) throws DomainException, SQLException {
+
+		if (id <= 0) {
+			throw new DomainException("ID inválido, deve ser positivo");
+		}
+
+		String query = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente WHERE id = ?";
+		List<Object> parameters =  new ArrayList<>();
+		parameters.add(id);
+
+		ResultSet resultSet = dbConnector.executeQuery(query, parameters);
+
+		System.out.println();
+		MenuUtil.printResultSet(resultSet);
+
+		if (resultSet.next()) {
+			String nome = resultSet.getString("nome");
+			long cpf = resultSet.getLong("cpf");
+			Date dataNascimento = resultSet.getDate("data_nasc");
+			int  idPlano = resultSet.getInt("id_plano");
+			Cliente clienteBuscado = new Cliente(id, nome, cpf, dataNascimento, idPlano);
+
+			return clienteBuscado;
+		}
+
+		resultSet.close();
+
+		return null;
+	}
+
+	public static Cliente findByName(String name) {
+		return null;
+	}
+
+	public static Cliente findByCpf(long cpf) {
+		return null;
+	}
 }
 
 class UpdateCliente {}
