@@ -3,7 +3,7 @@ package main.java.managerapp;
 import main.java.db.DBConnector;
 import main.java.exceptions.DomainException;
 import main.java.service.ClienteService;
-import main.java.util.MenuUtil;
+import main.java.util.menu.MenuUtil;
 
 import java.sql.SQLException;
 

@@ -1,9 +1,10 @@
 package main.java.service;
 
-import main.java.util.MenuUtil;
+import main.java.util.menu.MenuUtil;
 import main.java.model.cliente.Cliente;
 import main.java.db.DBConnector;
 import main.java.exceptions.DomainException;
+import main.java.util.menu.MenuUtilCliente;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;

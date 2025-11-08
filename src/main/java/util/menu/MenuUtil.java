@@ -1,4 +1,4 @@
-package main.java.util;
+package main.java.util.menu;
 
 import main.java.db.DBConnector;
 
