@@ -27,6 +27,7 @@ public class ClienteService {
 		String[] menuOptions = {
 			"Ver todos os clientes",
 			"Criar cliente",
+			"Buscar cliente",
 			"Retornar ao menu principal"
 		};
 
@@ -54,12 +55,18 @@ public class ClienteService {
 					CreateCliente.menu(this.dbConnector);
 				break;
 
+				// Buscar cliente
+				case 2:
+					ReadCliente.menuBuscarCliente(this.dbConnector);
+				break;
+
 				// Retornar ao menu principal
-				case 2: return;
+				case 3: return;
 
 			}
 		}
 	}
+}
 
 class CreateCliente {
 
@@ -140,6 +147,54 @@ class CreateCliente {
 }
 
 class ReadCliente {
+
+	public static Cliente menuBuscarCliente(DBConnector dbConnector) throws DomainException, SQLException {
+
+		String[] menuOptions = {
+			"Id",
+			"Nome",
+			"CPF",
+			"Retornar ao menu Cliente Service"
+		};
+
+		while (true) {
+
+			System.out.println("\n=============== Busca Cliente ===============\n");
+			int opt = MenuUtil.printOptions(menuOptions);
+
+			switch (opt) {
+
+				// Encerrar o programa
+				case -1:
+					System.out.println("\nEncerrando programa...");
+					System.exit(0);
+					break;
+
+				// Busca por Id
+				case 0:
+					int idInput = MenuUtil.readIntInput("Digite o Id a ser buscado: ");
+					Cliente clienteBuscado = findById(idInput, dbConnector);
+					if (clienteBuscado == null) {
+						System.out.println("\nNenhum cliente com o Id "+idInput+" encontrado!");
+					}
+					break;
+
+				// Busca por nome
+				case 1:
+					System.out.println("Operação ainda não implementada!");
+					break;
+
+				// Busca por CPF
+				case 2:
+					System.out.println("Operação ainda não implementada!");
+					break;
+
+				// Retornar ao menu Cliente Service
+				case 3: return null;
+			}
+		}
+	}
+
 	public static Cliente findById(int id, DBConnector dbConnector) throws DomainException, SQLException {
 
 		if (id <= 0) {
