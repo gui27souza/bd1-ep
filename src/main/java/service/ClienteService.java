@@ -307,6 +307,9 @@ public class ClienteService {
 	// ===== Update ====================
 
 	public static Cliente menuUpdate() throws DomainException, SQLException {
+
+		Cliente clienteBuscado = menuRead();
+
 		return null;
 	}
 
@@ -314,9 +317,49 @@ public class ClienteService {
 	// ===== Delete ====================
 
 	public static void menuDelete() throws DomainException, SQLException {
+
+		Cliente clienteBuscado = menuRead();
+
+		if (clienteBuscado == null) {
+			System.out.println("\nOperação de exclusão cancelada.");
+			return;
+		}
+
+		System.out.println("\n--=== Confirmação de Exclusão ===--");
+		MenuUtilCliente.printCliente(clienteBuscado);
+
+		String confirmacao = MenuUtil.readStringInput("Tem certeza que deseja DELETAR o clienta acima? (S/N): ");
+
+		if (confirmacao.equalsIgnoreCase("S")) {
+			try {
+				deleteCliente(clienteBuscado, dbConnector);
+				System.out.println("Cliente ID " + clienteBuscado.getId() + " excluído com sucesso.");
+			} catch (SQLException e) {
+				System.err.println("\nERRO CRÍTICO NO BANCO: Falha na exclusão. Detalhes: " + e.getMessage());
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println("\nOperação de exclusão cancelada pelo usuário.");
+		}
 	}
 
 	public static void deleteCliente(Cliente cliente, DBConnector dbConnector) throws DomainException, SQLException {
+
+		if (cliente == null) {
+			throw new DomainException("Cliente nulo não pode ser deletado!");
+		}
+
+		String query = "DELETE FROM cliente WHERE cliente.id = ?";
+		List<Object> parameters =  new ArrayList<>();
+		parameters.add(cliente.getId());
+
+		int rowsAffected = dbConnector.executeUpdate(query, parameters);
+
+		if (rowsAffected == 0) {
+			throw new SQLException("Falha ao deletar cliente ID " + cliente.getId() + ". Registro não encontrado.");
+		} else if (rowsAffected != 1) {
+			throw new RuntimeException("ERRO DE INTEGRIDADE: Mais de um cliente deletado. Rows affected: " + rowsAffected);
+		}
 
 	}
 
