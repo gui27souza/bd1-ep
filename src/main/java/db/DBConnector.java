@@ -207,4 +207,38 @@ public class DBConnector {
 		return resultSet;
 	}
 
+
+	// ========== Create, Update e Delete ==============================
+
+	public int executeUpdate(String query) throws SQLException {
+
+		if (query == null) {
+			System.out.println("Query inválida!\n");
+			return 0;
+		}
+
+		if (this.conn == null || this.conn.isClosed()) {
+			throw new SQLException("Conexão com Banco de Dados não estabelecida!\n");
+		}
+
+		Statement statement = conn.createStatement();
+		return statement.executeUpdate(query);
+	}
+
+	public int executeUpdate(String query, List<Object> parameters) throws SQLException {
+
+		if (this.conn == null || this.conn.isClosed()) {
+			throw new SQLException("Conexão com Banco de Dados não estabelecida!");
+		}
+
+		try {
+			PreparedStatement pstmt = getPreparedStatement(query, parameters);
+			return pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.err.println("Erro ao executar PreparedStatement: " + e.getMessage());
+			throw e;
+		}
+
+	}
+
 }
