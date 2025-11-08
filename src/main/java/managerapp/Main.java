@@ -1,4 +1,4 @@
-package main.java;
+package main.java.managerapp;
 
 import main.java.db.DBConnector;
 import main.java.service.ClienteService;

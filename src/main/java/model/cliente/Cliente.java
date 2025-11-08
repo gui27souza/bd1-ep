@@ -1,4 +1,4 @@
-package main.java.Models;
+package main.java.model.cliente;
 
 import java.sql.Date;
 
