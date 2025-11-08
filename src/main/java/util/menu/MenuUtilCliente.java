@@ -18,4 +18,18 @@ public class MenuUtilCliente {
 		}
 	}
 
+	public static Cliente chooseClienteFromLista(ArrayList<Cliente> listaClientes) {
+
+		String[] menuOptions = new String[listaClientes.size()];
+
+		for (int i = 0; i < listaClientes.size(); i++) {
+			Cliente clienteAux = listaClientes.get(i);
+			menuOptions[i] = clienteAux.getNome() + " | CPF: " + clienteAux.getCpf() + " | Id: " + clienteAux.getId();
+		}
+
+		System.out.println("Digite o número do cliente a ser escolhido: ");
+		int opt = MenuUtil.printOptions(menuOptions);
+
+		return listaClientes.get(opt);
+	}
 }
