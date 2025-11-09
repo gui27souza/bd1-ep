@@ -1,7 +1,7 @@
-export EP_DB="ip e porta"
-export EP_NAME_DB="nome BD"
-export EP_DB_USER="usuario BD (default: postgres)"
-export EP_DB_PASS="Senha do user"
+export EP_DB="127.0.0.1:5432"
+export EP_NAME_DB="ep_bd"
+export EP_DB_USER="postgres"
+export EP_DB_PASS="2505"
 
 
 # Compila os arquivos, mandando tudo para bin/
