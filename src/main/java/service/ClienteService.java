@@ -124,7 +124,7 @@ public class ClienteService {
 		if (nome == null || nome.trim().isEmpty()) {
 			throw new DomainException("O nome do cliente não pode ser vazio.");
 		}
-		if (cpf <= 0) {
+		if (cpf <= 0 || String.valueOf(cpf).length() != 11) {
 			throw new DomainException("CPF inválido.");
 		}
 
