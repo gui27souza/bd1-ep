@@ -18,6 +18,23 @@ public class CadastroService {
 		this.dbConnector = connector;
 	}
 
+	public void createCredenciais(int id, String email, String senha) throws SQLException {
+
+		String query = "INSERT INTO Credenciais (id_cliente, email, senha_hash) VALUES (?, ?, ?)";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(id);
+		parameters.add(email);
+		parameters.add(senha);
+
+		int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
+
+		if (rowsAffected == 0) {
+		} else if (rowsAffected != 1) {
+			throw new RuntimeException("ERRO DE INTEGRIDADE: Mais de uma credencial criada. Rows affected: " + rowsAffected);
+		}
+
+	}
+
 	public Acesso login(ClienteService clienteService) {
 
 		System.out.println("\n========== Login ==========");
