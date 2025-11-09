@@ -4,6 +4,7 @@ import main.java.exceptions.DomainException;
 import main.java.model.cliente.Cliente;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Grupo {
 
@@ -56,5 +57,15 @@ public class Grupo {
 		}
 
 		this.clientes.remove(cliente);
+	}
+
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Grupo grupo = (Grupo) o;
+		return id == grupo.id;
+	}
+	public int hashCode() {
+		return Objects.hash(id);
 	}
 }

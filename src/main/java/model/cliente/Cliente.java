@@ -1,6 +1,7 @@
 package main.java.model.cliente;
 
 import java.sql.Date;
+import java.util.Objects;
 
 public class Cliente {
 
@@ -60,5 +61,15 @@ public class Cliente {
 		System.out.println("CPF: " + this.cpf);
 		System.out.println("Data de Nascimento: " + this.dataNascimento);
 		System.out.println("Id de Plano: " + this.idPlano);
+	}
+
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Cliente cliente = (Cliente) o;
+		return id == cliente.id;
+	}
+	public int hashCode() {
+		return Objects.hash(id);
 	}
 }
