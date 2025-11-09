@@ -65,7 +65,8 @@ public class ClienteService {
 
 				// Atualizar cliente
 				case 3:
-					menuUpdate();
+					// menuUpdate();
+					System.out.println("\nOperação ainda não implementada!");
 				break;
 
 				// Deletar cliente

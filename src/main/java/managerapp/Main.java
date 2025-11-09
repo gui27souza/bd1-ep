@@ -10,10 +10,17 @@ import java.sql.SQLException;
 public class Main {
 	public static void main(String[] args) throws SQLException, DomainException {
 
+
+		// =============== Inicialização de Servicos ===============
+
 		// Inicializa a conexao com o banco de dados
 		DBConnector db = new DBConnector();
 
+		// Inicializa servico que lida com Clientes
 		ClienteService clienteService = new ClienteService(db);
+
+		// =========================================================
+
 
 		// Menu inicial
 		String[] primeirasOpcoes = {
@@ -24,10 +31,12 @@ public class Main {
 		};
 
 		while (true) {
+
 			System.out.println("==============================================");
 			System.out.println("=============== Menu Principal ===============");
 			System.out.println("==============================================\n");
 			int opt = MenuUtil.printOptions(primeirasOpcoes);
+
 			switch (opt) {
 
 				// Encerrar o programa
