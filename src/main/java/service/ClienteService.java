@@ -17,10 +17,10 @@ import java.util.List;
 
 public class ClienteService {
 
-	static DBConnector dbConnector;
+	DBConnector dbConnector;
 
 	public ClienteService(DBConnector dbConnector) {
-		ClienteService.dbConnector = dbConnector;
+		this.dbConnector = dbConnector;
 	}
 
 	public void menu() throws DomainException, SQLException {
@@ -50,7 +50,7 @@ public class ClienteService {
 
 				// Ver todos os clientes
 				case 0:
-					MenuUtil.printTabela("CLIENTE", dbConnector);
+					MenuUtil.printTabela("CLIENTE", this.dbConnector);
 				break;
 
 				// Criar cliente
@@ -85,9 +85,9 @@ public class ClienteService {
 
 	// ===== Create ====================
 
-	static final int idPlanoBasico = 1;
+	final int idPlanoBasico = 1;
 
-	public static Cliente menuCreate() {
+	public Cliente menuCreate() {
 		System.out.println("Digite os dados do cliente a ser inserido:");
 
 		String nome = MenuUtil.readStringInput("\tNome: ");
@@ -100,7 +100,7 @@ public class ClienteService {
 			LocalDate localDate = LocalDate.parse(dataNascimentoStr);
 			Date dataNascimentoSqlDate = Date.valueOf(localDate);
 
-			novoCliente = createCliente(nome, cpf, dataNascimentoSqlDate, dbConnector);
+			novoCliente = createCliente(nome, cpf, dataNascimentoSqlDate, this.dbConnector);
 			System.out.println("Cliente " + novoCliente.getNome() + " cadastrado com sucesso! ID: " + novoCliente.getId());
 
 		} catch (DateTimeParseException e) {
@@ -116,7 +116,7 @@ public class ClienteService {
 		return novoCliente;
 	}
 
-	public static Cliente createCliente(String nome, long cpf, Date dataNascimento, DBConnector dbConnector) throws SQLException, DomainException {
+	public Cliente createCliente(String nome, long cpf, Date dataNascimento, DBConnector dbConnector) throws SQLException, DomainException {
 
 		if (nome == null || nome.trim().isEmpty()) {
 			throw new DomainException("O nome do cliente não pode ser vazio.");
@@ -125,7 +125,7 @@ public class ClienteService {
 			throw new DomainException("CPF inválido.");
 		}
 
-		Cliente novoCliente = new Cliente(nome, cpf, dataNascimento, idPlanoBasico);
+		Cliente novoCliente = new Cliente(nome, cpf, dataNascimento, this.idPlanoBasico);
 
 		String query = "INSERT INTO cliente (nome, cpf, data_nasc, id_plano) VALUES (?, ?, ?, ?) RETURNING id";
 
@@ -163,7 +163,7 @@ public class ClienteService {
 
 	// ===== Read ====================
 
-	public static Cliente menuRead() throws DomainException, SQLException {
+	public Cliente menuRead() throws DomainException, SQLException {
 
 		Cliente clienteBuscado;
 
@@ -190,7 +190,7 @@ public class ClienteService {
 				// Busca por Id
 				case 0:
 					int idInput = MenuUtil.readIntInput("Digite o Id a ser buscado: ");
-					clienteBuscado = findById(idInput, dbConnector);
+					clienteBuscado = findById(idInput, this.dbConnector);
 					if (clienteBuscado == null) {
 						System.out.println("\nNenhum cliente com o Id "+idInput+" encontrado!");
 					} else {
@@ -201,7 +201,7 @@ public class ClienteService {
 				// Busca por nome
 				case 1:
 					String nomeInput = MenuUtil.readStringInput("Digite o nome a ser buscado: ");
-					ArrayList<Cliente> clientesBuscados = findByName(nomeInput, dbConnector);
+					ArrayList<Cliente> clientesBuscados = findByName(nomeInput, this.dbConnector);
 					System.out.println(clientesBuscados.size()+" clientes encontrados!\n");
 					MenuUtilCliente.printListaCliente(clientesBuscados);
 					clienteBuscado = MenuUtilCliente.chooseClienteFromLista(clientesBuscados);
@@ -210,7 +210,7 @@ public class ClienteService {
 				// Busca por CPF
 				case 2:
 					long cpfInput = MenuUtil.readLongInput("Digite o CPF a ser buscado: ");
-					clienteBuscado = findByCpf(cpfInput, dbConnector);
+					clienteBuscado = findByCpf(cpfInput, this.dbConnector);
 					if (clienteBuscado == null) {
 						System.out.println("\nNenhum cliente com o CPF "+cpfInput+" encontrado!");
 					} else {
@@ -225,7 +225,7 @@ public class ClienteService {
 		}
 	}
 
-	public static Cliente findById(int id, DBConnector dbConnector) throws DomainException, SQLException {
+	public Cliente findById(int id, DBConnector dbConnector) throws DomainException, SQLException {
 
 		if (id <= 0) {
 			throw new DomainException("ID inválido, deve ser positivo");
@@ -251,7 +251,7 @@ public class ClienteService {
 		}
 	}
 
-	public static ArrayList<Cliente> findByName(String name, DBConnector dbConnector) throws SQLException {
+	public ArrayList<Cliente> findByName(String name, DBConnector dbConnector) throws SQLException {
 
 		String query = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente WHERE nome LIKE ?";
 		List<Object> parameters =  new ArrayList<>();
@@ -277,7 +277,7 @@ public class ClienteService {
 		return clientesBuscados;
 	}
 
-	public static Cliente findByCpf(long cpf, DBConnector dbConnector) throws DomainException, SQLException {
+	public Cliente findByCpf(long cpf, DBConnector dbConnector) throws DomainException, SQLException {
 
 		if (cpf <= 0) {
 			throw new DomainException("CPF inválido, deve ser positivo");
@@ -306,7 +306,7 @@ public class ClienteService {
 
 	// ===== Update ====================
 
-	public static Cliente menuUpdate() throws DomainException, SQLException {
+	public Cliente menuUpdate() throws DomainException, SQLException {
 
 		Cliente clienteBuscado = menuRead();
 
@@ -316,7 +316,7 @@ public class ClienteService {
 
 	// ===== Delete ====================
 
-	public static void menuDelete() throws DomainException, SQLException {
+	public void menuDelete() throws DomainException, SQLException {
 
 		Cliente clienteBuscado = menuRead();
 
@@ -332,7 +332,7 @@ public class ClienteService {
 
 		if (confirmacao.equalsIgnoreCase("S")) {
 			try {
-				deleteCliente(clienteBuscado, dbConnector);
+				deleteCliente(clienteBuscado, this.dbConnector);
 				System.out.println("Cliente ID " + clienteBuscado.getId() + " excluído com sucesso.");
 			} catch (SQLException e) {
 				System.err.println("\nERRO CRÍTICO NO BANCO: Falha na exclusão. Detalhes: " + e.getMessage());
@@ -343,7 +343,7 @@ public class ClienteService {
 		}
 	}
 
-	public static void deleteCliente(Cliente cliente, DBConnector dbConnector) throws DomainException, SQLException {
+	public void deleteCliente(Cliente cliente, DBConnector dbConnector) throws DomainException, SQLException {
 
 		if (cliente == null) {
 			throw new DomainException("Cliente nulo não pode ser deletado!");
@@ -363,11 +363,11 @@ public class ClienteService {
 
 	}
 
-	public static void deleteCliente(int id, DBConnector dbConnector) throws DomainException, SQLException {
+	public void deleteCliente(int id, DBConnector dbConnector) throws DomainException, SQLException {
 
 	}
 
-	public static void deleteCliente(long cpf, DBConnector dbConnector) throws DomainException, SQLException {
+	public void deleteCliente(long cpf, DBConnector dbConnector) throws DomainException, SQLException {
 
 	}
 }
