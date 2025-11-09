@@ -12,10 +12,10 @@ import java.util.ArrayList;
 
 public class CadastroService {
 
-	DBConnector connector;
+	DBConnector dbConnector;
 
 	public CadastroService(DBConnector connector) {
-		this.connector = connector;
+		this.dbConnector = connector;
 	}
 
 	public Acesso login(ClienteService clienteService) {
@@ -49,13 +49,13 @@ public class CadastroService {
 		parameters.add(email);
 		parameters.add(senha);
 
-		try (ResultSet resultSet = this.connector.executeQuery(query, parameters)) {
+		try (ResultSet resultSet = this.dbConnector.executeQuery(query, parameters)) {
 
 			if (resultSet.next()) {
 
 				int id = resultSet.getInt("id_cliente");
 
-				Cliente clienteVinculado = clienteService.findById(id, this.connector);
+				Cliente clienteVinculado = clienteService.findById(id);
 
 				if (clienteVinculado == null) {
 					throw new DomainException("Erro de integridade: Cliente vinculado (ID: " + id + ") não encontrado.");
@@ -63,7 +63,6 @@ public class CadastroService {
 
 				Acesso acesso = new Acesso(id, email, senha, clienteVinculado);
 
-				resultSet.close();
 				return acesso;
 			}
 
