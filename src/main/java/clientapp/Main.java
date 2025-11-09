@@ -36,6 +36,7 @@ public class Main {
 				break;
 
 				case 0:
+					acessoAtual = cadastroService.login(clienteService);
 				break;
 
 				case 1:
