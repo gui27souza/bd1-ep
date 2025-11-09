@@ -1,0 +1,161 @@
+package main.java.service;
+
+import main.java.db.DBConnector;
+import main.java.exceptions.DomainException;
+import main.java.model.acesso.Acesso;
+import main.java.model.cliente.Cliente;
+import main.java.util.menu.MenuUtil;
+
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+
+public class CadastroService {
+
+	DBConnector dbConnector;
+
+	public CadastroService(DBConnector connector) {
+		this.dbConnector = connector;
+	}
+
+
+
+	// ==================== CADASTRO ====================
+
+	public Acesso cadastro(ClienteService clienteService) {
+
+		System.out.println("\n========== Cadastro ==========");
+		System.out.println("Insira suas credenciais para criar uma conta na plataforma.");
+
+		Long cpf = MenuUtil.readLongInput("CPF: ");
+		String email = MenuUtil.readStringInput("E-mail: ");
+		String senha = MenuUtil.readStringInput("Senha: ");
+		String nome = MenuUtil.readStringInput("Nome: ");
+		String dataNascStr = MenuUtil.readStringInput("Data de Nascimento (YYYY-MM-DD): ");
+
+		try {
+
+			if (nome.trim().isEmpty()) {
+				throw new DomainException("O nome é obrigatório!");
+			}
+
+			if (String.valueOf(cpf).length() != 11) {
+				throw new DomainException("O CPF deve conter 11 dígitos!");
+			}
+
+			LocalDate localDate = LocalDate.parse(dataNascStr);
+			Date dataNascimento = Date.valueOf(localDate);
+
+			return processarCadastro(nome, cpf, email, senha, dataNascimento, clienteService);
+
+		} catch (java.time.format.DateTimeParseException e) {
+			System.err.println("ERRO: Formato de data inválido. Use YYYY-MM-DD.");
+		} catch (DomainException e) {
+			System.err.println("Falha no Cadastro: " + e.getMessage());
+		} catch (SQLException e) {
+			System.err.println("Erro crítico ao acessar o banco de dados." + e.getMessage());
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public Acesso processarCadastro(
+		String nome, long cpf, String email, String senha,
+		Date dataNascimento, ClienteService clienteService
+	) throws DomainException, SQLException {
+
+		Cliente novoCliente = clienteService.createCliente(nome, cpf, dataNascimento);
+
+		try{
+			createCredenciais(novoCliente.getId(), email, senha);
+		} catch (SQLException e) {
+			clienteService.deleteCliente(novoCliente);
+			throw e;
+		}
+
+		Acesso novoAcesso = new Acesso(novoCliente.getId(), email, senha, novoCliente);
+
+		return novoAcesso;
+	}
+
+	public void createCredenciais(int id, String email, String senha) throws SQLException {
+
+		String query = "INSERT INTO Credenciais (id_cliente, email, senha_hash) VALUES (?, ?, ?)";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(id);
+		parameters.add(email);
+		parameters.add(senha);
+
+		int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
+
+		if (rowsAffected == 0) {
+			throw new SQLException("Falha ao criar credenciais para o cliente de ID " + id + "Realizando rollback.");
+		} else if (rowsAffected != 1) {
+			throw new RuntimeException("ERRO DE INTEGRIDADE: Mais de uma credencial criada. Rows affected: " + rowsAffected);
+		}
+
+	}
+
+	// ==================================================
+
+
+
+	// ==================== LOGIN ====================
+
+	public Acesso login(ClienteService clienteService) {
+
+		System.out.println("\n========== Login ==========");
+		System.out.println("Insira suas credenciais para acessar a plataforma.");
+
+		String email = MenuUtil.readStringInput("E-mail: ");
+		String senha = MenuUtil.readStringInput("Senha: ");
+
+		try {
+			return this.verificarCredenciais(email, senha, clienteService);
+		} catch (DomainException e) {
+			System.out.println("Falha ao realizar Login: " + e.getMessage());
+			return null;
+		} catch (SQLException e) {
+			System.out.println("Erro crítico ao acessar o banco de dados!\n" + e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Acesso verificarCredenciais(String email, String senha, ClienteService clienteService) throws SQLException, DomainException {
+
+		if ( email == null || senha == null || email.isEmpty() || senha.isEmpty()) {
+			throw new DomainException("Email e senha não podem ser vazios!");
+		}
+
+		String query = "SELECT id_cliente FROM Credenciais WHERE email = ? AND senha_hash = ?";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(email);
+		parameters.add(senha);
+
+		try (ResultSet resultSet = this.dbConnector.executeQuery(query, parameters)) {
+
+			if (resultSet.next()) {
+
+				int id = resultSet.getInt("id_cliente");
+
+				Cliente clienteVinculado = clienteService.findById(id);
+
+				if (clienteVinculado == null) {
+					throw new DomainException("Erro de integridade: Cliente vinculado (ID: " + id + ") não encontrado.");
+				}
+
+				Acesso acesso = new Acesso(id, email, senha, clienteVinculado);
+
+				return acesso;
+			}
+
+			throw new DomainException("Credenciais inválidas! E-mail ou senha incorretos.");
+		}
+	}
+
+	// ===============================================
+}
