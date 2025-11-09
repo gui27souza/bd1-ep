@@ -40,10 +40,15 @@ public class Main {
 				break;
 
 				case 1:
+					acessoAtual = cadastroService.cadastro(clienteService);
 				break;
 
 			}
+
+			System.out.println();
 		}
+
+		System.out.println("Acesso realizado com sucesso!");
 
 	}
 }
