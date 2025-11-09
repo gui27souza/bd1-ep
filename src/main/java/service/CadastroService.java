@@ -18,6 +18,25 @@ public class CadastroService {
 		this.dbConnector = connector;
 	}
 
+	public Acesso processarCadastro(
+		String nome, long cpf, String email, String senha,
+		Date dataNascimento, ClienteService clienteService
+	) throws DomainException, SQLException {
+
+		Cliente novoCliente = clienteService.createCliente(nome, cpf, dataNascimento);
+
+		try{
+			createCredenciais(novoCliente.getId(), email, senha);
+		} catch (SQLException e) {
+			clienteService.deleteCliente(novoCliente);
+			throw e;
+		}
+
+		Acesso novoAcesso = new Acesso(novoCliente.getId(), email, senha, novoCliente);
+
+		return novoAcesso;
+	}
+
 	public void createCredenciais(int id, String email, String senha) throws SQLException {
 
 		String query = "INSERT INTO Credenciais (id_cliente, email, senha_hash) VALUES (?, ?, ?)";
@@ -29,6 +48,7 @@ public class CadastroService {
 		int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
 
 		if (rowsAffected == 0) {
+			throw new SQLException("Falha ao criar credenciais para o cliente de ID " + id + "Realizando rollback.");
 		} else if (rowsAffected != 1) {
 			throw new RuntimeException("ERRO DE INTEGRIDADE: Mais de uma credencial criada. Rows affected: " + rowsAffected);
 		}
