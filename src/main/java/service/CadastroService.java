@@ -15,16 +15,19 @@ import java.util.ArrayList;
 public class CadastroService {
 
 	DBConnector dbConnector;
+	ClienteService clienteService;
 
-	public CadastroService(DBConnector connector) {
+	public CadastroService(DBConnector connector, ClienteService clienteService) {
 		this.dbConnector = connector;
+		this.clienteService = clienteService;
+	}
 	}
 
 
 
 	// ==================== CADASTRO ====================
 
-	public Acesso cadastro(ClienteService clienteService) {
+	public Acesso cadastro() {
 
 		System.out.println("\n========== Cadastro ==========");
 		System.out.println("Insira suas credenciais para criar uma conta na plataforma.");
@@ -48,7 +51,7 @@ public class CadastroService {
 			LocalDate localDate = LocalDate.parse(dataNascStr);
 			Date dataNascimento = Date.valueOf(localDate);
 
-			return processarCadastro(nome, cpf, email, senha, dataNascimento, clienteService);
+			return processarCadastro(nome, cpf, email, senha, dataNascimento);
 
 		} catch (java.time.format.DateTimeParseException e) {
 			System.err.println("ERRO: Formato de data inválido. Use YYYY-MM-DD.");
@@ -63,16 +66,15 @@ public class CadastroService {
 	}
 
 	public Acesso processarCadastro(
-		String nome, long cpf, String email, String senha,
-		Date dataNascimento, ClienteService clienteService
+		String nome, String cpf, String email, String senha, Date dataNascimento
 	) throws DomainException, SQLException {
 
-		Cliente novoCliente = clienteService.createCliente(nome, cpf, dataNascimento);
+		Cliente novoCliente = this.clienteService.createCliente(nome, cpf, dataNascimento);
 
 		try{
 			createCredenciais(novoCliente.getId(), email, senha);
 		} catch (SQLException e) {
-			clienteService.deleteCliente(novoCliente);
+			this.clienteService.deleteCliente(novoCliente);
 			throw e;
 		}
 
@@ -105,7 +107,7 @@ public class CadastroService {
 
 	// ==================== LOGIN ====================
 
-	public Acesso login(ClienteService clienteService) {
+	public Acesso login() {
 
 		System.out.println("\n========== Login ==========");
 		System.out.println("Insira suas credenciais para acessar a plataforma.");
@@ -114,7 +116,7 @@ public class CadastroService {
 		String senha = MenuUtil.readStringInput("Senha: ");
 
 		try {
-			return this.verificarCredenciais(email, senha, clienteService);
+			return this.verificarCredenciais(email, senha);
 		} catch (DomainException e) {
 			System.out.println("Falha ao realizar Login: " + e.getMessage());
 			return null;
@@ -125,7 +127,7 @@ public class CadastroService {
 		}
 	}
 
-	public Acesso verificarCredenciais(String email, String senha, ClienteService clienteService) throws SQLException, DomainException {
+	public Acesso verificarCredenciais(String email, String senha) throws SQLException, DomainException {
 
 		if ( email == null || senha == null || email.isEmpty() || senha.isEmpty()) {
 			throw new DomainException("Email e senha não podem ser vazios!");

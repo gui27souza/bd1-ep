@@ -20,8 +20,6 @@ public class Main {
 
 		DBConnector dbConnector = new DBConnector();
 		ClienteService clienteService = new ClienteService(dbConnector);
-		CadastroService cadastroService = new CadastroService(dbConnector);
-
 		Acesso acessoAtual = null;
 
 		while (acessoAtual == null) {
@@ -47,6 +45,7 @@ public class Main {
 
 			System.out.println();
 		}
+		CadastroService cadastroService = new CadastroService(dbConnector, clienteService);
 
 		System.out.println("Acesso realizado com sucesso!");
 
