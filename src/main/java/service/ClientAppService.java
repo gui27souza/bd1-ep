@@ -1,7 +1,10 @@
 package main.java.service;
 
 import main.java.model.acesso.Acesso;
+import main.java.model.grupo.Grupo;
 import main.java.util.menu.MenuUtil;
+
+import java.util.ArrayList;
 
 public class ClientAppService {
 
@@ -34,11 +37,17 @@ public class ClientAppService {
 					menuGrupos();
 				break;
 
-				case 0:
-					System.out.println("Operação ainda não implementada.");
+				case 1:
+					menuTransacoes();
 				break;
 
-				case 1:
+				case 2:
+					System.out.println("Operação ainda não implementada.");
+				break;
+			}
+		}
+	}
+
 
 	public void menuGrupos() {
 
@@ -67,13 +76,34 @@ public class ClientAppService {
 
 	}
 
+
+	public void menuTransacoes() {
+
+		String header = "\n==== Transações ====";
+
+		String[] menuOptions = {
+			"Escolher grupo para ver transações",
+			"Ver todas as transações\n",
+			"Retornar ao menu anterior"
+		};
+
+		while (true) {
+
+
+			int opt = MenuUtil.printOptions(menuOptions, header, true);
+
+			switch (opt) {
+
+				case 0:
+					System.out.println("Operação ainda não implementada.");
+				break;
+
+				case 1:
 					System.out.println("Operação ainda não implementada.");
 				break;
 
 				case 2:
-					System.out.println("Operação ainda não implementada.");
-				break;
-
+					return;
 			}
 
 		}
