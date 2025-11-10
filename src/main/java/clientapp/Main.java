@@ -4,6 +4,7 @@ import main.java.db.DBConnector;
 import main.java.exceptions.DomainException;
 import main.java.model.acesso.Acesso;
 import main.java.service.CadastroService;
+import main.java.service.ClientAppService;
 import main.java.service.ClienteService;
 
 import java.sql.SQLException;
@@ -19,5 +20,7 @@ public class Main {
 		Acesso acessoAtual = cadastroService.menuAcesso();
 		System.out.println("Acesso realizado com sucesso!");
 
+		ClientAppService clientAppService = new ClientAppService(acessoAtual);
+		clientAppService.menu();
 	}
 }
