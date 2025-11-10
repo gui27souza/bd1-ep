@@ -30,9 +30,8 @@ public class ClientAppService {
 
 			switch (opt) {
 
-				case -1:
-					System.out.println("Encerrando programa...");
-					System.exit(0);
+				case 0:
+					menuGrupos();
 				break;
 
 				case 0:
@@ -40,6 +39,34 @@ public class ClientAppService {
 				break;
 
 				case 1:
+
+	public void menuGrupos() {
+
+		ArrayList<Grupo> grupos = this.acessoAtual.getGrupos();
+
+		String header = "\n==== Grupos ====\n";
+
+		String[] menuOptions = new String[grupos.size() + 1];
+		for (int i = 0; i < grupos.size(); i++) {
+			Grupo grupoAux = grupos.get(i);
+			menuOptions[i] = grupoAux.getNome() + " (ID: " + grupoAux.getId() + ")";
+			if (i == grupos.size() - 2) {
+				menuOptions[i] = menuOptions[i].concat("\n");
+			}
+		}
+		menuOptions[grupos.size()] = "Retonar ao menu anteior";
+
+		while (true) {
+
+			int opt = MenuUtil.printOptions(menuOptions, header, true);
+
+			if (grupos.size() == 0 && opt == 0 || opt == grupos.size() - 1) {
+				return;
+			}
+		}
+
+	}
+
 					System.out.println("Operação ainda não implementada.");
 				break;
 
