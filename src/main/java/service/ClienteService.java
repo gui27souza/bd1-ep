@@ -46,41 +46,41 @@ public class ClienteService {
 				case -1:
 					System.out.println("\nEncerrando programa...");
 					System.exit(0);
-				break;
+					break;
 
 				// Ver todos os clientes
 				case 0:
 					MenuUtil.printTabela("CLIENTE", this.dbConnector);
-				break;
+					break;
 
 				// Criar cliente
 				case 1:
 					menuCreate();
-				break;
+					break;
 
 				// Buscar cliente
 				case 2:
 					menuRead();
-				break;
+					break;
 
 				// Atualizar cliente
 				case 3:
 					// menuUpdate();
 					System.out.println("\nOperação ainda não implementada!");
-				break;
+					break;
 
 				// Deletar cliente
 				case 4:
 					menuDelete();
-				break;
+					break;
 
 				// Retornar ao menu principal
-				case 5: return;
+				case 5:
+					return;
 
 			}
 		}
 	}
-
 
 
 	// ==================== CRUD Section ==================== //
@@ -193,42 +193,43 @@ public class ClienteService {
 				case -1:
 					System.out.println("\nEncerrando programa...");
 					System.exit(0);
-				break;
+					break;
 
 				// Busca por Id
 				case 0:
 					int idInput = MenuUtil.readIntInput("Digite o Id a ser buscado: ");
 					clienteBuscado = findById(idInput);
 					if (clienteBuscado == null) {
-						System.out.println("\nNenhum cliente com o Id "+idInput+" encontrado!");
+						System.out.println("\nNenhum cliente com o Id " + idInput + " encontrado!");
 					} else {
 						MenuUtilCliente.printCliente(clienteBuscado);
 					}
-				return clienteBuscado;
+					return clienteBuscado;
 
 				// Busca por nome
 				case 1:
 					String nomeInput = MenuUtil.readStringInput("Digite o nome a ser buscado: ");
 					ArrayList<Cliente> clientesBuscados = findByName(nomeInput);
-					System.out.println(clientesBuscados.size()+" clientes encontrados!\n");
+					System.out.println(clientesBuscados.size() + " clientes encontrados!\n");
 					MenuUtilCliente.printListaCliente(clientesBuscados);
 					clienteBuscado = MenuUtilCliente.chooseClienteFromLista(clientesBuscados);
-				return clienteBuscado;
+					return clienteBuscado;
 
 				// Busca por CPF
 				case 2:
 					String cpfInput = MenuUtil.readStringInput("Digite o CPF a ser buscado: ");
 					clienteBuscado = findByCpf(cpfInput);
 					if (clienteBuscado == null) {
-						System.out.println("\nNenhum cliente com o CPF "+cpfInput+" encontrado!");
+						System.out.println("\nNenhum cliente com o CPF " + cpfInput + " encontrado!");
 					} else {
 						MenuUtilCliente.printCliente(clienteBuscado);
 					}
-				return clienteBuscado;
+					return clienteBuscado;
 
 
 				// Retornar ao menu anterior
-				case 3: return null;
+				case 3:
+					return null;
 			}
 		}
 	}
@@ -240,7 +241,7 @@ public class ClienteService {
 		}
 
 		String query = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente WHERE id = ?";
-		List<Object> parameters =  new ArrayList<>();
+		List<Object> parameters = new ArrayList<>();
 		parameters.add(id);
 
 		try (ResultSet resultSet = this.dbConnector.executeQuery(query, parameters)) {
@@ -262,7 +263,7 @@ public class ClienteService {
 	public ArrayList<Cliente> findByName(String name) throws SQLException {
 
 		String query = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente WHERE nome LIKE ?";
-		List<Object> parameters =  new ArrayList<>();
+		List<Object> parameters = new ArrayList<>();
 		parameters.add("%" + name + "%");
 
 		ArrayList<Cliente> clientesBuscados = new ArrayList<>();
@@ -298,7 +299,7 @@ public class ClienteService {
 		}
 
 		String query = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente WHERE cpf = ?";
-		List<Object> parameters =  new ArrayList<>();
+		List<Object> parameters = new ArrayList<>();
 		parameters.add(cpf);
 
 		try (ResultSet resultSet = this.dbConnector.executeQuery(query, parameters)) {
@@ -364,7 +365,7 @@ public class ClienteService {
 		}
 
 		String query = "DELETE FROM cliente WHERE cliente.id = ?";
-		List<Object> parameters =  new ArrayList<>();
+		List<Object> parameters = new ArrayList<>();
 		parameters.add(cliente.getId());
 
 		int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
