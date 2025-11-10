@@ -13,6 +13,11 @@ public class ClientAppService {
 
 	public void menu() {
 
+		String header =
+			"\n================================" +
+			"\n========== ClienteApp ==========" +
+			"\n\nBem vindo " + this.acessoAtual.getCliente().getNome() + "!\n"
+		;
 		String[] menuOptions = {
 			"Ver grupos",
 			"Ver transações",
@@ -21,11 +26,7 @@ public class ClientAppService {
 
 		while (true) {
 
-			System.out.println("\n================================");
-			System.out.println("========== ClienteApp ==========");
-			System.out.println("Bem vindo " + this.acessoAtual.getClienteVinculado().getNome() + "!\n");
-
-			int opt = MenuUtil.printOptions(menuOptions);
+			int opt = MenuUtil.printOptions(menuOptions, header, true);
 
 			switch (opt) {
 

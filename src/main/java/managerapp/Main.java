@@ -23,6 +23,13 @@ public class Main {
 
 
 		// Menu inicial
+
+
+		String header =
+			"===========================================" +
+			"=============== Manager App ===============" +
+			"===========================================\n"
+		;
 		String[] primeirasOpcoes = {
 			"Ver todas as tabelas",
 			"Buscar tabela específica",
@@ -32,18 +39,9 @@ public class Main {
 
 		while (true) {
 
-			System.out.println("==============================================");
-			System.out.println("=============== Menu Principal ===============");
-			System.out.println("==============================================\n");
-			int opt = MenuUtil.printOptions(primeirasOpcoes);
+			int opt = MenuUtil.printOptions(primeirasOpcoes, header, true);
 
 			switch (opt) {
-
-				// Encerrar o programa
-				case -1:
-					System.out.println("\nEncerrando programa...");
-					System.exit(0);
-				break;
 
 				// Ver todas as tabelas
 				case 0:

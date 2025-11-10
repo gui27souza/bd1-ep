@@ -25,6 +25,12 @@ public class CadastroService {
 
 	public Acesso menuAcesso() {
 
+		String header =
+			"\n========================" +
+			"==== Login/Cadastro ====" +
+			"========================\n"
+		;
+
 		String[] menuOptions = {
 			"Fazer Login",
 			"Fazer cadastro"
@@ -34,14 +40,9 @@ public class CadastroService {
 
 		while (acessoAtual == null) {
 
-			int opt = MenuUtil.printOptions(menuOptions);
+			int opt = MenuUtil.printOptions(menuOptions, header, true);
 
 			switch (opt) {
-
-				case -1:
-					System.out.println("Encerrando programa...");
-					System.exit(0);
-				break;
 
 				case 0:
 					acessoAtual = login();
@@ -50,6 +51,7 @@ public class CadastroService {
 				case 1:
 					acessoAtual = cadastro();
 				break;
+
 			}
 
 			System.out.println();
@@ -62,6 +64,8 @@ public class CadastroService {
 	// ==================== CADASTRO ====================
 
 	public Acesso cadastro() {
+
+		MenuUtil.limparConsole();
 
 		System.out.println("\n========== Cadastro ==========");
 		System.out.println("Insira suas credenciais para criar uma conta na plataforma.");
@@ -142,6 +146,8 @@ public class CadastroService {
 	// ==================== LOGIN ====================
 
 	public Acesso login() {
+
+		MenuUtil.limparConsole();
 
 		System.out.println("\n========== Login ==========");
 		System.out.println("Insira suas credenciais para acessar a plataforma.");

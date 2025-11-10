@@ -28,36 +28,81 @@ public class MenuUtil {
 		return Long.parseLong(opcao.nextLine().trim());
 	}
 
+	public static void limparConsole() {
+
+		//noinspection ConstantValue
+		if (true)
+			return;
+
+		try {
+			final String os = System.getProperty("os.name");
+
+			if (os.contains("Windows")) {
+				new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+			} else {
+				System.out.print("\033[H\033[2J");
+				System.out.flush();
+			}
+		} catch (final Exception ignored) {}
+	}
+
 	/**
 	 * @param options Vetor de Strings que contém as opções a serem impressos
 	 * @return Posição do array OU -1 (usuário quer encerrar o programa)
 	 */
-	public static int printOptions(String[] options) {
+	public static int printOptions(String[] options, String header, boolean clearScreen) {
+
+		if (options.length == 0) {
+			System.out.println("Menu de opções vazio!");
+			throw new RuntimeException();
+		}
+
+		boolean lastInputInvalid = false;
 
 		while (true) {
+
+			if (clearScreen)
+				limparConsole();
+
+			System.out.println(header);
 
 			System.out.println("Selecione uma opção abaixo:\n");
 			for (int i = 0; i < options.length; i++) {
 				System.out.println((i + 1) + " - " + options[i]);
 			}
-			System.out.println("\n0 - Encerrar o programa\n");
+			System.out.println("\n0 - Encerrar o programa");
+
+			if (lastInputInvalid) {
+				System.out.println("Opção inválida!");
+				lastInputInvalid = false;
+			} else {
+				System.out.println();
+			}
+
 			System.out.print("Digite a opção: ");
 
 			int inputOpcao;
 
 			try{
 				String inputLine = opcao.nextLine().trim();
+
+				if (inputLine.isEmpty()) {
+					throw new NumberFormatException();
+				}
+
 				inputOpcao = Integer.parseInt(inputLine);
+
+				if (inputOpcao == 0){
+					System.out.println("Encerrando programa");
+					System.exit(0);
+				}
 
 				if ((inputOpcao - 1) >= options.length || inputOpcao < 0) {
 					throw new NumberFormatException();
 				}
 
 			} catch (InputMismatchException | NumberFormatException e) {
-				System.out.println("Opção inválida!\n");
-				if (e instanceof InputMismatchException) {
-					opcao.next();
-				}
+				lastInputInvalid = true;
 				continue;
 			}
 

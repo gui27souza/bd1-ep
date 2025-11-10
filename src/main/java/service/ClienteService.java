@@ -25,6 +25,11 @@ public class ClienteService {
 
 	public void menu() throws DomainException, SQLException {
 
+		String header =
+			"\n===============================================" +
+			"\n=============== Cliente Service ===============" +
+			"===============================================\n"
+		;
 		String[] menuOptions = {
 			"Ver todos os clientes",
 			"Criar cliente",
@@ -35,18 +40,10 @@ public class ClienteService {
 		};
 
 		while (true) {
-			System.out.println("\n===============================================");
-			System.out.println("=============== Cliente Service ===============");
-			System.out.println("===============================================\n");
-			int opt = MenuUtil.printOptions(menuOptions);
+
+			int opt = MenuUtil.printOptions(menuOptions, header, true);
 
 			switch (opt) {
-
-				// Encerrar o programa
-				case -1:
-					System.out.println("\nEncerrando programa...");
-					System.exit(0);
-					break;
 
 				// Ver todos os clientes
 				case 0:
@@ -77,7 +74,6 @@ public class ClienteService {
 				// Retornar ao menu principal
 				case 5:
 					return;
-
 			}
 		}
 	}
@@ -175,6 +171,7 @@ public class ClienteService {
 
 		Cliente clienteBuscado;
 
+		String header = "\n=============== Busca Cliente ===============\n";
 		String[] menuOptions = {
 			"Id",
 			"Nome",
@@ -184,16 +181,9 @@ public class ClienteService {
 
 		while (true) {
 
-			System.out.println("\n=============== Busca Cliente ===============\n");
-			int opt = MenuUtil.printOptions(menuOptions);
+			int opt = MenuUtil.printOptions(menuOptions, header, false);
 
 			switch (opt) {
-
-				// Encerrar o programa
-				case -1:
-					System.out.println("\nEncerrando programa...");
-					System.exit(0);
-					break;
 
 				// Busca por Id
 				case 0:

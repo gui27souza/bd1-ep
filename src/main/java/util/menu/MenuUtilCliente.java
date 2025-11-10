@@ -20,6 +20,7 @@ public class MenuUtilCliente {
 
 	public static Cliente chooseClienteFromLista(ArrayList<Cliente> listaClientes) {
 
+		String header = "Digite o número do cliente a ser escolhido: ";
 		String[] menuOptions = new String[listaClientes.size()];
 
 		for (int i = 0; i < listaClientes.size(); i++) {
@@ -27,8 +28,7 @@ public class MenuUtilCliente {
 			menuOptions[i] = clienteAux.getNome() + " | CPF: " + clienteAux.getCpf() + " | Id: " + clienteAux.getId();
 		}
 
-		System.out.println("Digite o número do cliente a ser escolhido: ");
-		int opt = MenuUtil.printOptions(menuOptions);
+		int opt = MenuUtil.printOptions(menuOptions, header, false);
 
 		return listaClientes.get(opt);
 	}
