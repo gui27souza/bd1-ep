@@ -21,6 +21,40 @@ public class CadastroService {
 		this.dbConnector = connector;
 		this.clienteService = clienteService;
 	}
+
+
+	public Acesso menuAcesso() {
+
+		String[] menuOptions = {
+			"Fazer Login",
+			"Fazer cadastro"
+		};
+
+		Acesso acessoAtual = null;
+
+		while (acessoAtual == null) {
+
+			int opt = MenuUtil.printOptions(menuOptions);
+
+			switch (opt) {
+
+				case -1:
+					System.out.println("Encerrando programa...");
+					System.exit(0);
+				break;
+
+				case 0:
+					acessoAtual = login();
+				break;
+
+				case 1:
+					acessoAtual = cadastro();
+				break;
+			}
+
+			System.out.println();
+		}
+		return acessoAtual;
 	}
 
 
