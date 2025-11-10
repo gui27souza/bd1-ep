@@ -10,7 +10,7 @@ CREATE TABLE Plano (
 CREATE TABLE Cliente (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
-    cpf BIGINT NOT NULL UNIQUE,
+    cpf VARCHAR(11) NOT NULL UNIQUE,
     data_nasc DATE NOT NULL,
     id_plano INTEGER NOT NULL,
 

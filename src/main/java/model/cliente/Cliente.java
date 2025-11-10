@@ -7,7 +7,7 @@ public class Cliente {
 
 	int id;
 	String nome;
-	long cpf;
+	String cpf;
 	Date dataNascimento;
 	int idPlano;
 
@@ -19,7 +19,7 @@ public class Cliente {
 	 * @param dataNascimento
 	 * @param idPlano
 	 */
-	public Cliente(int id, String nome, long cpf, Date dataNascimento, int idPlano) {
+	public Cliente(int id, String nome, String cpf, Date dataNascimento, int idPlano) {
 		this.id = id;
 		this.nome = nome;
 		this.cpf = cpf;
@@ -34,7 +34,7 @@ public class Cliente {
 	 * @param dataNascimento
 	 * @param idPlano
 	 */
-	public Cliente(String nome, long cpf, Date dataNascimento, int idPlano) {
+	public Cliente(String nome, String cpf, Date dataNascimento, int idPlano) {
 		this.nome = nome;
 		this.cpf = cpf;
 		this.dataNascimento = dataNascimento;
@@ -43,13 +43,13 @@ public class Cliente {
 
 	public int getId() { return this.id; }
 	public String getNome() { return this.nome; }
-	public long getCpf() { return this.cpf; }
+	public String getCpf() { return this.cpf; }
 	public Date getDataNascimento() { return this.dataNascimento; }
 	public int getIdPlano() { return this.idPlano; }
 
 	public void setId(int id) { this.id = id; }
 	public void setNome(String nome) { this.nome = nome; }
-	public void setCpf(long cpf) { this.cpf = cpf; }
+	public void setCpf(String cpf) { this.cpf = cpf; }
 	public void setDataNascimento(Date dataNascimento) {
 		this.dataNascimento = dataNascimento;
 	}

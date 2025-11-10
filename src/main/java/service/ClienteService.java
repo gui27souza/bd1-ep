@@ -94,7 +94,7 @@ public class ClienteService {
 		System.out.println("Digite os dados do cliente a ser inserido:");
 
 		String nome = MenuUtil.readStringInput("\tNome: ");
-		Long cpf = MenuUtil.readLongInput("\tCpf: ");
+		String cpf = MenuUtil.readStringInput("\tCpf: ");
 		String dataNascimentoStr = MenuUtil.readStringInput("\tData de Nascimento (YYYY-MM-DD): ");
 
 		Cliente novoCliente = null;
@@ -119,13 +119,18 @@ public class ClienteService {
 		return novoCliente;
 	}
 
-	public Cliente createCliente(String nome, long cpf, Date dataNascimento) throws SQLException, DomainException {
+	public Cliente createCliente(String nome, String cpf, Date dataNascimento) throws SQLException, DomainException {
 
 		if (nome == null || nome.trim().isEmpty()) {
 			throw new DomainException("O nome do cliente não pode ser vazio.");
 		}
-		if (cpf <= 0 || String.valueOf(cpf).length() != 11) {
-			throw new DomainException("CPF inválido.");
+		if (cpf.length() != 11) {
+			throw new DomainException("CPF inválido, deve conter 11 dígitos numéricos.");
+		}
+		try {
+			Long.parseLong(cpf);
+		} catch (NumberFormatException e) {
+			throw new DomainException("CPF inválido, deve conter 11 dígitos numéricos.");
 		}
 
 		Cliente novoCliente = new Cliente(nome, cpf, dataNascimento, this.idPlanoBasico);
@@ -135,7 +140,7 @@ public class ClienteService {
 		try (PreparedStatement pstmt = this.dbConnector.getConnection().prepareStatement(query)) {
 
 			pstmt.setString(1, novoCliente.getNome());
-			pstmt.setLong(2, novoCliente.getCpf());
+			pstmt.setString(2, novoCliente.getCpf());
 			pstmt.setDate(3, novoCliente.getDataNascimento());
 			pstmt.setInt(4, novoCliente.getIdPlano());
 
@@ -212,7 +217,7 @@ public class ClienteService {
 
 				// Busca por CPF
 				case 2:
-					long cpfInput = MenuUtil.readLongInput("Digite o CPF a ser buscado: ");
+					String cpfInput = MenuUtil.readStringInput("Digite o CPF a ser buscado: ");
 					clienteBuscado = findByCpf(cpfInput);
 					if (clienteBuscado == null) {
 						System.out.println("\nNenhum cliente com o CPF "+cpfInput+" encontrado!");
@@ -242,7 +247,7 @@ public class ClienteService {
 
 			if (resultSet.next()) {
 				String nome = resultSet.getString("nome");
-				long cpf = resultSet.getLong("cpf");
+				String cpf = resultSet.getString("cpf");
 				Date dataNascimento = resultSet.getDate("data_nasc");
 				int idPlano = resultSet.getInt("id_plano");
 				Cliente clienteBuscado = new Cliente(id, nome, cpf, dataNascimento, idPlano);
@@ -268,7 +273,7 @@ public class ClienteService {
 
 				int id = resultSet.getInt("id");
 				String nomeDB = resultSet.getString("nome");
-				long cpf = resultSet.getLong("cpf");
+				String cpf = resultSet.getString("cpf");
 				Date dataNascimento = resultSet.getDate("data_nasc");
 				int idPlano = resultSet.getInt("id_plano");
 
@@ -280,10 +285,16 @@ public class ClienteService {
 		return clientesBuscados;
 	}
 
-	public Cliente findByCpf(long cpf) throws DomainException, SQLException {
+	public Cliente findByCpf(String cpf) throws DomainException, SQLException {
 
-		if (cpf <= 0) {
-			throw new DomainException("CPF inválido, deve ser positivo");
+		if (cpf.length() != 11) {
+			throw new DomainException("CPF inválido, deve conter 11 dígitos.");
+		}
+
+		try {
+			Long.parseLong(cpf);
+		} catch (NumberFormatException e) {
+			throw new DomainException("CPF inválido, deve conter 11 dígitos numéricos.");
 		}
 
 		String query = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente WHERE cpf = ?";
@@ -370,7 +381,7 @@ public class ClienteService {
 
 	}
 
-	public void deleteCliente(long cpf) throws DomainException, SQLException {
+	public void deleteCliente(String cpf) throws DomainException, SQLException {
 
 	}
 }

@@ -29,7 +29,7 @@ public class CadastroService {
 		System.out.println("\n========== Cadastro ==========");
 		System.out.println("Insira suas credenciais para criar uma conta na plataforma.");
 
-		Long cpf = MenuUtil.readLongInput("CPF: ");
+		String cpf = MenuUtil.readStringInput("CPF: ");
 		String email = MenuUtil.readStringInput("E-mail: ");
 		String senha = MenuUtil.readStringInput("Senha: ");
 		String nome = MenuUtil.readStringInput("Nome: ");
@@ -41,7 +41,7 @@ public class CadastroService {
 				throw new DomainException("O nome é obrigatório!");
 			}
 
-			if (String.valueOf(cpf).length() != 11) {
+			if (cpf.length() != 11) {
 				throw new DomainException("O CPF deve conter 11 dígitos!");
 			}
 
@@ -142,7 +142,7 @@ public class CadastroService {
 
 				int id = resultSet.getInt("id_cliente");
 
-				Cliente clienteVinculado = clienteService.findById(id);
+				Cliente clienteVinculado = this.clienteService.findById(id);
 
 				if (clienteVinculado == null) {
 					throw new DomainException("Erro de integridade: Cliente vinculado (ID: " + id + ") não encontrado.");
