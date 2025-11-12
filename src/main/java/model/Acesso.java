@@ -1,8 +1,6 @@
-package main.java.model.acesso;
+package main.java.model;
 
 import main.java.exceptions.DomainException;
-import main.java.model.cliente.Cliente;
-import main.java.model.grupo.Grupo;
 
 import java.util.ArrayList;
 
