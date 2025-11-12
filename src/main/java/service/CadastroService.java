@@ -17,10 +17,12 @@ public class CadastroService {
 
 	DBConnector dbConnector;
 	ClienteService clienteService;
+	GrupoService grupoService;
 
-	public CadastroService(DBConnector connector, ClienteService clienteService) {
+	public CadastroService(DBConnector connector, ClienteService clienteService, GrupoService grupoService) {
 		this.dbConnector = connector;
 		this.clienteService = clienteService;
+		this.grupoService = grupoService;
 	}
 
 
@@ -190,7 +192,9 @@ public class CadastroService {
 					throw new DomainException("Erro de integridade: Cliente vinculado (ID: " + id + ") não encontrado.");
 				}
 
-				Acesso acesso = new Acesso(id, email, senha, clienteVinculado);
+				ArrayList<Grupo> grupos = this.grupoService.getGrupos(clienteVinculado);
+
+				Acesso acesso = new Acesso(id, email, senha, clienteVinculado, grupos);
 
 				return acesso;
 			}

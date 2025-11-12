@@ -16,13 +16,14 @@ public class Main {
 
 		DBConnector dbConnector = new DBConnector();
 		ClienteService clienteService = new ClienteService(dbConnector);
-		CadastroService cadastroService = new CadastroService(dbConnector, clienteService);
+		GrupoService grupoService = new GrupoService(dbConnector);
+		CadastroService cadastroService = new CadastroService(dbConnector, clienteService, grupoService);
 
 		Acesso acessoAtual = cadastroService.menuAcesso();
 		MenuUtil.limparConsole();
 		System.out.println("Acesso realizado com sucesso!");
 
-		ClientAppService clientAppService = new ClientAppService(acessoAtual);
+		ClientAppService clientAppService = new ClientAppService(acessoAtual, grupoService);
 		clientAppService.menu();
 	}
 }
