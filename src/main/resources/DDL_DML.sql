@@ -28,7 +28,7 @@ CREATE TABLE Credenciais (
 CREATE TABLE Grupo (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(40) NOT NULL,
-    status VARCHAR(20) CHECK (status IN ('ativo', 'inativo', 'arquivado')),
+    status VARCHAR(20) CHECK (status IN ('ativo', 'inativo', 'arquivado')) DEFAULT 'ativo',
     data_criacao TIMESTAMP WITH TIME ZONE DEFAULT now(),
     descricao TEXT
 );
