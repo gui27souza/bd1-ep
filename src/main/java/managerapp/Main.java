@@ -26,9 +26,7 @@ public class Main {
 
 
 		String header =
-			"===========================================" +
-			"=============== Manager App ===============" +
-			"===========================================\n"
+			"\n=============== Manager App ===============\n"
 		;
 		String[] primeirasOpcoes = {
 			"Ver todas as tabelas",

@@ -6,6 +6,7 @@ import main.java.model.Acesso;
 import main.java.service.CadastroService;
 import main.java.service.ClientAppService;
 import main.java.service.ClienteService;
+import main.java.service.GrupoService;
 import main.java.util.menu.MenuUtil;
 
 import java.sql.SQLException;
