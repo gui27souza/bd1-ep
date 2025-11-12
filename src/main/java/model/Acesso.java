@@ -20,6 +20,14 @@ public class Acesso {
 		this.grupos = new ArrayList<>();
 	}
 
+	public Acesso(int id, String email, String senha_hash, Cliente cliente, ArrayList<Grupo> grupos) {
+		this.id = id;
+		this.email = email;
+		this.senha_hash = senha_hash;
+		this.cliente = cliente;
+		this.grupos = grupos;
+	}
+
 	public int getId() { return id;	}
 	public String getEmail() { return email; }
 	public Cliente getCliente() { return cliente; }
