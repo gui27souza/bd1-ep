@@ -1,7 +1,7 @@
 package main.java.service;
 
-import main.java.model.acesso.Acesso;
-import main.java.model.grupo.Grupo;
+import main.java.model.Acesso;
+import main.java.model.Grupo;
 import main.java.util.menu.MenuUtil;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package main.java.util.menu;
 
-import main.java.model.cliente.Cliente;
+import main.java.model.Cliente;
 
 import java.util.ArrayList;
 

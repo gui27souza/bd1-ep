@@ -1,7 +1,7 @@
 package main.java.service;
 
 import main.java.util.menu.MenuUtil;
-import main.java.model.cliente.Cliente;
+import main.java.model.Cliente;
 import main.java.db.DBConnector;
 import main.java.exceptions.DomainException;
 import main.java.util.menu.MenuUtilCliente;

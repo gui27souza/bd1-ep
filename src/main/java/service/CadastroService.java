@@ -2,8 +2,9 @@ package main.java.service;
 
 import main.java.db.DBConnector;
 import main.java.exceptions.DomainException;
-import main.java.model.acesso.Acesso;
-import main.java.model.cliente.Cliente;
+import main.java.model.Acesso;
+import main.java.model.Cliente;
+import main.java.model.Grupo;
 import main.java.util.menu.MenuUtil;
 
 import java.sql.Date;

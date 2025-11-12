@@ -2,7 +2,7 @@ package main.java.clientapp;
 
 import main.java.db.DBConnector;
 import main.java.exceptions.DomainException;
-import main.java.model.acesso.Acesso;
+import main.java.model.Acesso;
 import main.java.service.CadastroService;
 import main.java.service.ClientAppService;
 import main.java.service.ClienteService;
