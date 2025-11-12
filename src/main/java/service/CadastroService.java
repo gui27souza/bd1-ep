@@ -28,8 +28,7 @@ public class CadastroService {
 
 		String header =
 			"\n========================" +
-			"==== Login/Cadastro ====" +
-			"========================\n"
+			"\n==== Login/Cadastro ====\n";
 		;
 
 		String[] menuOptions = {
