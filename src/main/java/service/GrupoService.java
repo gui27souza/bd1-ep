@@ -20,6 +20,12 @@ public class GrupoService {
 		this.dbConnector = dbConnector;
 	}
 
+	public Grupo menuGrupos(ArrayList<Grupo> grupos) {
+
+		Grupo grupo = MenuUtilGrupo.chooseGrupoFromLista(grupos);
+
+		return grupo;
+	}
 
 	public Grupo createGrupo(String nome, String descricao) throws DomainException, SQLException {
 

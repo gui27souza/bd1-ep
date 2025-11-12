@@ -8,10 +8,13 @@ import java.util.ArrayList;
 
 public class ClientAppService {
 
+	GrupoService grupoService;
+
 	Acesso acessoAtual;
 
-	public ClientAppService(Acesso acessoAtual) {
+	public ClientAppService(Acesso acessoAtual, GrupoService grupoService) {
 		this.acessoAtual = acessoAtual;
+		this.grupoService = grupoService;
 	}
 
 	public void menu() {
@@ -34,7 +37,8 @@ public class ClientAppService {
 			switch (opt) {
 
 				case 0:
-					menuGrupos();
+					ArrayList<Grupo> grupos = this.acessoAtual.getGrupos();
+					Grupo grupoAtual = this.grupoService.menuGrupos(grupos);
 				break;
 
 				case 1:
@@ -46,34 +50,6 @@ public class ClientAppService {
 				break;
 			}
 		}
-	}
-
-
-	public void menuGrupos() {
-
-		ArrayList<Grupo> grupos = this.acessoAtual.getGrupos();
-
-		String header = "\n==== Grupos ====\n";
-
-		String[] menuOptions = new String[grupos.size() + 1];
-		for (int i = 0; i < grupos.size(); i++) {
-			Grupo grupoAux = grupos.get(i);
-			menuOptions[i] = grupoAux.getNome() + " (ID: " + grupoAux.getId() + ")";
-			if (i == grupos.size() - 2) {
-				menuOptions[i] = menuOptions[i].concat("\n");
-			}
-		}
-		menuOptions[grupos.size()] = "Retonar ao menu anteior";
-
-		while (true) {
-
-			int opt = MenuUtil.printOptions(menuOptions, header, true);
-
-			if (grupos.size() == 0 && opt == 0 || opt == grupos.size() - 1) {
-				return;
-			}
-		}
-
 	}
 
 
