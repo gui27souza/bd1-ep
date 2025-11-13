@@ -93,196 +93,314 @@ CREATE TABLE Convite (
 
 -- DML:
 
+-- Planos diversos
 INSERT INTO Plano (nome, valor, qtd_convites) VALUES
-    ('free', 0, 0),
-    ('admin', 50, 20),
-    ('premium', 100, 50),
-    ('gold', 200, 100),
-    ('silver', 150, 80),
-    ('bronze', 75, 30),
-    ('family', 120, 40),
-    ('student', 30, 10),
-    ('corporate', 500, 200),
-    ('trial', 10, 5);
+    ('free', 0, 5),
+    ('basic', 29.90, 15),
+    ('premium', 59.90, 30),
+    ('family', 89.90, 50),
+    ('business', 149.90, 100);
 
+-- Clientes variados
 INSERT INTO Cliente (nome, cpf, data_nasc, id_plano) VALUES
-     ('João Silva', 11111111111, '1990-01-01', 1),
-     ('Maria Souza', 22222222222, '1992-02-02', 2),
-     ('Pedro Santos', 33333333333, '1988-03-03', 3),
-     ('Ana Oliveira', 44444444444, '1995-04-04', 4),
-     ('Lucas Lima', 55555555555, '2000-05-05', 5),
-     ('Carla Rocha', 66666666666, '1998-06-06', 6),
-     ('Marcos Alves', 77777777777, '1985-07-07', 7),
-     ('Fernanda Costa', 88888888888, '1993-08-08', 8),
-     ('Rafael Gomes', 99999999999, '1991-09-09', 9),
-     ('Patrícia Mendes', 10101010101, '1997-10-10', 10);
+    ('Ana Costa', '12345678901', '1995-03-15', 3),        -- Premium
+    ('Bruno Silva', '23456789012', '1988-07-22', 4),      -- Family
+    ('Carla Mendes', '34567890123', '1992-11-08', 2),     -- Basic
+    ('Daniel Souza', '45678901234', '1990-01-30', 3),     -- Premium
+    ('Elena Rodrigues', '56789012345', '1985-05-12', 5),  -- Business
+    ('Felipe Santos', '67890123456', '1998-09-25', 2),    -- Basic
+    ('Gabriela Lima', '78901234567', '1993-04-18', 1),    -- Free
+    ('Henrique Alves', '89012345678', '1987-12-03', 4),   -- Family
+    ('Isabela Martins', '90123456789', '1996-06-27', 3),  -- Premium
+    ('João Pereira', '01234567890', '1991-08-14', 2),     -- Basic
+    ('Larissa Oliveira', '11234567890', '1994-02-20', 3), -- Premium
+    ('Marcos Ferreira', '12334567890', '1989-10-05', 1),  -- Free
+    ('Natália Gomes', '13234567890', '1997-07-11', 2),    -- Basic
+    ('Paulo Ribeiro', '14234567890', '1986-03-28', 4),    -- Family
+    ('Renata Castro', '15234567890', '1999-12-09', 1);    -- Free
 
+-- Credenciais dos clientes (senha: 1234)
 INSERT INTO Credenciais (id_cliente, email, senha_hash) VALUES
-    (1, 'joao@example.com', 'hash1'),
-    (2, 'maria@example.com', 'hash2'),
-    (3, 'pedro@example.com', 'hash3'),
-    (4, 'ana@example.com', 'hash4'),
-    (5, 'lucas@example.com', 'hash5'),
-    (6, 'carla@example.com', 'hash6'),
-    (7, 'marcos@example.com', 'hash7'),
-    (8, 'fernanda@example.com', 'hash8'),
-    (9, 'rafael@example.com', 'hash9'),
-    (10, 'patricia@example.com', 'hash10');
+    (1, 'ana.costa@email.com', '1234'),
+    (2, 'bruno.silva@email.com', '1234'),
+    (3, 'carla.mendes@email.com', '1234'),
+    (4, 'daniel.souza@email.com', '1234'),
+    (5, 'elena.rodrigues@email.com', '1234'),
+    (6, 'felipe.santos@email.com', '1234'),
+    (7, 'gabriela.lima@email.com', '1234'),
+    (8, 'henrique.alves@email.com', '1234'),
+    (9, 'isabela.martins@email.com', '1234'),
+    (10, 'joao.pereira@email.com', '1234'),
+    (11, 'larissa.oliveira@email.com', '1234'),
+    (12, 'marcos.ferreira@email.com', '1234'),
+    (13, 'natalia.gomes@email.com', '1234'),
+    (14, 'paulo.ribeiro@email.com', '1234'),
+    (15, 'renata.castro@email.com', '1234');
 
+-- Grupos diversos e interessantes
 INSERT INTO Grupo (nome, status, descricao) VALUES
-    ('Família Silva', 'ativo', 'Grupo da família Silva'),
-    ('Trabalho TI', 'ativo', 'Grupo de colegas de TI'),
-    ('Amigos da Faculdade', 'ativo', 'Ex-colegas de faculdade'),
-    ('Projeto XPTO', 'ativo', 'Equipe do projeto XPTO'),
-    ('Investidores', 'inativo', 'Grupo de investidores antigos'),
-    ('Viagem 2025', 'ativo', 'Planejamento da viagem'),
-    ('Condomínio Alpha', 'ativo', 'Gestão do condomínio'),
-    ('Time de Futebol', 'ativo', 'Amigos do futebol de domingo'),
-    ('Voluntariado', 'arquivado', 'Ações sociais antigas'),
-    ('Startup Beta', 'ativo', 'Equipe da startup Beta');
+    ('Família Costa-Silva', 'ativo', 'Despesas compartilhadas da família'),
+    ('República dos Amigos', 'ativo', 'Contas do apartamento compartilhado'),
+    ('Viagem Europa 2025', 'ativo', 'Planejamento financeiro da viagem'),
+    ('Churrasco Mensal', 'ativo', 'Organização dos churrascos de domingo'),
+    ('Projeto Startup', 'ativo', 'Investimentos e despesas da startup'),
+    ('Presente Coletivo Maria', 'ativo', 'Vaquinha para presente de casamento'),
+    ('Condomínio Edifício Sol', 'ativo', 'Gestão de despesas do condomínio'),
+    ('Time de Futebol', 'ativo', 'Mensalidades e equipamentos'),
+    ('Curso de Inglês', 'ativo', 'Divisão de custos do professor particular'),
+    ('Festa de Fim de Ano', 'ativo', 'Organização da confraternização'),
+    ('Passeio Pet', 'arquivado', 'Grupo de passeio com cachorros (encerrado)'),
+    ('Investimento Imóvel', 'ativo', 'Compra conjunta de apartamento');
 
+-- Categorias mais específicas
 INSERT INTO Categoria (nome, descricao) VALUES
-    ('Alimentação', 'Gastos com comida e restaurantes'),
-    ('Transporte', 'Gastos com transporte'),
-    ('Educação', 'Cursos e materiais'),
-    ('Saúde', 'Consultas e remédios'),
-    ('Lazer', 'Cinema, shows, etc.'),
-    ('Viagem', 'Despesas de viagem'),
-    ('Assinaturas', 'Serviços recorrentes'),
-    ('Investimento', 'Aportes financeiros'),
-    ('Utilidades', 'Água, luz, internet'),
-    ('Outros', 'Despesas diversas');
+    ('Alimentação', 'Supermercado, restaurantes e delivery'),
+    ('Moradia', 'Aluguel, condomínio e manutenção'),
+    ('Transporte', 'Combustível, transporte público e apps'),
+    ('Saúde', 'Planos, consultas e medicamentos'),
+    ('Educação', 'Cursos, livros e materiais'),
+    ('Lazer', 'Entretenimento, cinema e eventos'),
+    ('Viagem', 'Passagens, hospedagem e passeios'),
+    ('Vestuário', 'Roupas, calçados e acessórios'),
+    ('Tecnologia', 'Eletrônicos e assinaturas digitais'),
+    ('Pet', 'Veterinário, ração e acessórios'),
+    ('Presente', 'Presentes e comemorações'),
+    ('Investimento', 'Aplicações e aportes financeiros');
 
-INSERT INTO Transacao (descricao, valor, id_cliente, id_grupo, id_categoria) VALUES
-    ('Supermercado', 150.00, 1, 1, 1),
-    ('Uber', 25.00, 2, 2, 2),
-    ('Curso online', 200.00, 3, 3, 3),
-    ('Consulta médica', 300.00, 4, 4, 4),
-    ('Cinema', 50.00, 5, 5, 5),
-    ('Passagem aérea', 800.00, 6, 6, 6),
-    ('Netflix', 40.00, 7, 7, 7),
-    ('Aporte Tesouro', 500.00, 8, 8, 8),
-    ('Conta de luz', 120.00, 9, 9, 9),
-    ('Compra diversa', 60.00, 10, 10, 10);
-
-INSERT INTO Transacao (descricao, valor, id_cliente, id_grupo, id_categoria) VALUES
--- Cliente 1
-('Padaria', 25.00, 1, 1, 1),              -- Alimentação
-('Restaurante', 80.00, 1, 1, 1),          -- Alimentação
-('Farmácia', 60.00, 1, 1, 4),             -- Saúde
-('Posto de gasolina', 150.00, 1, 1, 2),   -- Transporte
-('Roupas', 200.00, 1, 1, 10),             -- Outros
-
--- Cliente 2
-('Mercado', 130.00, 2, 2, 1),             -- Alimentação
-('Streaming', 45.00, 2, 2, 7),            -- Assinaturas
-('Combustível', 90.00, 2, 2, 2),          -- Transporte
-('Academia', 120.00, 2, 2, 4),            -- Saúde
-('Café', 15.00, 2, 2, 1),                 -- Alimentação
-
--- Cliente 3
-('Livraria', 70.00, 3, 3, 3),             -- Educação
-('Supermercado', 140.00, 3, 3, 1),        -- Alimentação
-('Cinema', 50.00, 3, 3, 5),               -- Lazer
-('Aplicativo de transporte', 22.00, 3, 3, 2), -- Transporte
-('Curso de idiomas', 250.00, 3, 3, 3),    -- Educação
-
--- Cliente 4
-('Exame laboratorial', 180.00, 4, 4, 4),  -- Saúde
-('Farmácia', 90.00, 4, 4, 4),             -- Saúde
-('Seguro saúde', 400.00, 4, 4, 4),        -- Saúde
-('Supermercado', 160.00, 4, 4, 1),        -- Alimentação
-('Restaurante', 75.00, 4, 4, 1),          -- Alimentação
-
--- Cliente 5
-('Bar', 60.00, 5, 5, 5),                  -- Lazer
-('Show', 150.00, 5, 5, 5),                -- Lazer
-('Restaurante', 90.00, 5, 5, 1),          -- Alimentação
-('Loja de roupas', 200.00, 5, 5, 10),     -- Outros
-('Streaming', 40.00, 5, 5, 7),            -- Assinaturas
-
--- Cliente 6
-('Hotel', 500.00, 6, 6, 6),               -- Viagem
-('Transporte local', 60.00, 6, 6, 2),     -- Transporte
-('Restaurante', 180.00, 6, 6, 1),         -- Alimentação
-('Bagagem extra', 100.00, 6, 6, 6),       -- Viagem
-('Lembranças de viagem', 90.00, 6, 6, 6), -- Viagem
-
--- Cliente 7
-('Spotify', 35.00, 7, 7, 7),              -- Assinaturas
-('Cinema', 50.00, 7, 7, 5),               -- Lazer
-('Livraria', 80.00, 7, 7, 3),             -- Educação
-('Restaurante', 120.00, 7, 7, 1),         -- Alimentação
-('Games', 200.00, 7, 7, 5),               -- Lazer
-
--- Cliente 8
-('Investimento em ações', 600.00, 8, 8, 8), -- Investimento
-('Aporte CDB', 500.00, 8, 8, 8),            -- Investimento
-('Compra de livros', 120.00, 8, 8, 3),      -- Educação
-('Restaurante', 90.00, 8, 8, 1),            -- Alimentação
-('Café', 18.00, 8, 8, 1),                   -- Alimentação
-
--- Cliente 9
-('Conta de água', 90.00, 9, 9, 9),          -- Utilidades
-('Conta de internet', 130.00, 9, 9, 9),     -- Utilidades
-('Supermercado', 150.00, 9, 9, 1),          -- Alimentação
-('Farmácia', 45.00, 9, 9, 4),               -- Saúde
-('Seguro residência', 200.00, 9, 9, 9),     -- Utilidades
-
--- Cliente 10
-('Loja de eletrônicos', 900.00, 10, 10, 10), -- Outros
-('Supermercado', 130.00, 10, 10, 1),         -- Alimentação
-('Combustível', 100.00, 10, 10, 2),          -- Transporte
-('Restaurante', 85.00, 10, 10, 1),           -- Alimentação
-('Farmácia', 60.00, 10, 10, 4);              -- Saúde
-
-INSERT INTO Pix (id_transacao, chave) VALUES
-    (1, 'chavepix1'),
-    (2, 'chavepix2'),
-    (3, 'chavepix3'),
-    (4, 'chavepix4'),
-    (5, 'chavepix5'),
-    (6, 'chavepix6'),
-    (7, 'chavepix7'),
-    (8, 'chavepix8'),
-    (9, 'chavepix9'),
-    (10, 'chavepix10');
-
-INSERT INTO Cartao (id_transacao, bandeira, digitos_finais) VALUES
-    (1, 'Visa', '1111'),
-    (2, 'Mastercard', '2222'),
-    (3, 'Amex', '3333'),
-    (4, 'Elo', '4444'),
-    (5, 'Hipercard', '5555'),
-    (6, 'Visa', '6666'),
-    (7, 'Mastercard', '7777'),
-    (8, 'Amex', '8888'),
-    (9, 'Elo', '9999'),
-    (10, 'Hipercard', '0000');
-
+-- Membros dos grupos (mix de admins e membros)
 INSERT INTO MembroGrupo (id_cliente, id_grupo, role) VALUES
+    -- Família Costa-Silva (4 membros)
     (1, 1, 'admin'),
-    (2, 1, 'membro'),
-    (3, 2, 'membro'),
-    (4, 2, 'membro'),
-    (5, 3, 'admin'),
-    (6, 3, 'membro'),
-    (7, 4, 'membro'),
-    (8, 4, 'admin'),
-    (9, 5, 'membro'),
-    (10, 6, 'membro');
+    (2, 1, 'admin'),
+    (3, 1, 'membro'),
+    (4, 1, 'membro'),
+    
+    -- República dos Amigos (3 membros)
+    (5, 2, 'admin'),
+    (6, 2, 'membro'),
+    (7, 2, 'membro'),
+    
+    -- Viagem Europa 2025 (5 membros)
+    (1, 3, 'admin'),
+    (4, 3, 'membro'),
+    (9, 3, 'membro'),
+    (11, 3, 'membro'),
+    (13, 3, 'membro'),
+    
+    -- Churrasco Mensal (6 membros)
+    (2, 4, 'admin'),
+    (5, 4, 'membro'),
+    (8, 4, 'membro'),
+    (10, 4, 'membro'),
+    (12, 4, 'membro'),
+    (14, 4, 'membro'),
+    
+    -- Projeto Startup (3 membros)
+    (5, 5, 'admin'),
+    (9, 5, 'admin'),
+    (11, 5, 'membro'),
+    
+    -- Presente Coletivo Maria (7 membros)
+    (1, 6, 'admin'),
+    (3, 6, 'membro'),
+    (6, 6, 'membro'),
+    (8, 6, 'membro'),
+    (10, 6, 'membro'),
+    (12, 6, 'membro'),
+    (14, 6, 'membro'),
+    
+    -- Condomínio (8 membros)
+    (2, 7, 'admin'),
+    (4, 7, 'admin'),
+    (6, 7, 'membro'),
+    (7, 7, 'membro'),
+    (9, 7, 'membro'),
+    (11, 7, 'membro'),
+    (13, 7, 'membro'),
+    (15, 7, 'membro'),
+    
+    -- Time de Futebol (5 membros)
+    (8, 8, 'admin'),
+    (2, 8, 'membro'),
+    (10, 8, 'membro'),
+    (12, 8, 'membro'),
+    (14, 8, 'membro'),
+    
+    -- Curso de Inglês (4 membros)
+    (3, 9, 'admin'),
+    (7, 9, 'membro'),
+    (11, 9, 'membro'),
+    (15, 9, 'membro'),
+    
+    -- Festa Fim de Ano (6 membros)
+    (1, 10, 'admin'),
+    (2, 10, 'admin'),
+    (5, 10, 'membro'),
+    (9, 10, 'membro'),
+    (11, 10, 'membro'),
+    (13, 10, 'membro'),
+    
+    -- Passeio Pet - arquivado (2 membros)
+    (7, 11, 'admin'),
+    (15, 11, 'membro'),
+    
+    -- Investimento Imóvel (3 membros)
+    (5, 12, 'admin'),
+    (9, 12, 'admin'),
+    (14, 12, 'membro');
 
+-- Transações variadas e realistas
+INSERT INTO Transacao (descricao, valor, id_cliente, id_grupo, id_categoria) VALUES
+    -- Família Costa-Silva
+    ('Supermercado Extra - compras do mês', 850.50, 1, 1, 1),
+    ('Conta de luz - Dezembro', 245.80, 2, 1, 2),
+    ('Internet fibra 500MB', 129.90, 1, 1, 2),
+    ('Gás de cozinha', 120.00, 3, 1, 2),
+    ('iFood - Pizza sexta', 95.00, 4, 1, 1),
+    ('Farmácia - remédios', 187.50, 2, 1, 4),
+    
+    -- República dos Amigos
+    ('Aluguel - Novembro', 2400.00, 5, 2, 2),
+    ('Condomínio', 450.00, 6, 2, 2),
+    ('Supermercado Atacadão', 380.00, 7, 2, 1),
+    ('Netflix compartilhado', 55.90, 5, 2, 9),
+    ('Conta de água', 89.00, 6, 2, 2),
+    ('Limpeza do apartamento', 150.00, 7, 2, 2),
+    
+    -- Viagem Europa 2025
+    ('Passagem aérea SP-Lisboa', 3850.00, 1, 3, 7),
+    ('Passagem aérea SP-Lisboa', 3850.00, 4, 3, 7),
+    ('Passagem aérea SP-Lisboa', 3850.00, 9, 3, 7),
+    ('Reserva Airbnb Paris (7 dias)', 2100.00, 1, 3, 7),
+    ('Seguro viagem Europa', 280.00, 4, 3, 7),
+    ('Trem Paris-Amsterdam', 195.00, 9, 3, 7),
+    
+    -- Churrasco Mensal
+    ('Carne Açougue Boi Bravo', 320.00, 2, 4, 1),
+    ('Bebidas e refrigerantes', 180.00, 5, 4, 1),
+    ('Carvão e sal grosso', 45.00, 8, 4, 1),
+    ('Pão de alho e farofa', 38.00, 10, 4, 1),
+    
+    -- Projeto Startup
+    ('Registro de domínio .com', 120.00, 5, 5, 9),
+    ('AWS - hospedagem cloud', 450.00, 9, 5, 9),
+    ('Designer freelancer - logo', 800.00, 5, 5, 12),
+    ('Google Ads - marketing', 1200.00, 11, 5, 12),
+    ('Advogado - contrato social', 2500.00, 5, 5, 12),
+    
+    -- Presente Coletivo Maria
+    ('Cota presente casamento', 150.00, 1, 6, 11),
+    ('Cota presente casamento', 150.00, 3, 6, 11),
+    ('Cota presente casamento', 150.00, 6, 6, 11),
+    ('Cota presente casamento', 150.00, 8, 6, 11),
+    ('Cota presente casamento', 150.00, 10, 6, 11),
+    ('Compra conjunto panelas', 1050.00, 1, 6, 11),
+    
+    -- Condomínio Edifício Sol
+    ('Manutenção elevador', 1800.00, 2, 7, 2),
+    ('Salário porteiro', 2200.00, 4, 7, 2),
+    ('Limpeza áreas comuns', 950.00, 2, 7, 2),
+    ('Conta de luz áreas comuns', 580.00, 6, 7, 2),
+    ('Jardinagem e paisagismo', 420.00, 4, 7, 2),
+    
+    -- Time de Futebol
+    ('Mensalidade quadra', 400.00, 8, 8, 6),
+    ('Camisetas personalizadas', 750.00, 8, 8, 8),
+    ('Bolas profissionais (3 un)', 285.00, 2, 8, 6),
+    ('Churrasco pós-jogo', 220.00, 10, 8, 1),
+    
+    -- Curso de Inglês
+    ('Professor particular - mês 1', 800.00, 3, 9, 5),
+    ('Material didático Oxford', 180.00, 7, 9, 5),
+    ('Assinatura Duolingo Plus', 89.90, 11, 9, 5),
+    
+    -- Festa Fim de Ano
+    ('Buffet completo 50 pessoas', 3200.00, 1, 10, 6),
+    ('Decoração e balões', 450.00, 2, 10, 6),
+    ('DJ profissional', 800.00, 5, 10, 6),
+    ('Bebidas e refrigerantes', 580.00, 9, 10, 1),
+    ('Lembrancinhas personalizadas', 290.00, 1, 10, 11),
+    
+    -- Investimento Imóvel
+    ('Entrada apartamento 20%', 85000.00, 5, 12, 12),
+    ('Entrada apartamento 20%', 85000.00, 9, 12, 12),
+    ('Documentação e ITBI', 12500.00, 5, 12, 12),
+    ('Vistoria e avaliação', 1200.00, 14, 12, 12);
+
+-- Metade das transações via PIX
+INSERT INTO Pix (id_transacao, chave) VALUES
+    (1, 'ana.costa@email.com'),
+    (3, '12345678901'),
+    (5, '11987654321'),
+    (7, 'republica.amigos@pix.com'),
+    (9, 'e7f8g9h0-i1j2-k3l4-m5n6-o7p8q9r0s1t2'),
+    (11, 'felipesantos@email.com'),
+    (13, '23456789012'),
+    (15, 'ana.costa@email.com'),
+    (17, '11998877665'),
+    (19, 'churrascodomengo@pix.com'),
+    (21, 'startup.pix@email.com'),
+    (23, 'd4e5f6g7-h8i9-j0k1-l2m3-n4o5p6q7r8s9'),
+    (25, '12345678901'),
+    (27, '34567890123'),
+    (29, 'presente.maria@pix.com'),
+    (31, 'condominio.sol@pix.com'),
+    (33, 'bruno.silva@email.com'),
+    (35, '11976543210'),
+    (37, 'futebol.time@pix.com'),
+    (39, 'teacher.english@email.com'),
+    (41, '78901234567'),
+    (43, 'festa2025@pix.com'),
+    (45, '11965432109'),
+    (47, 'imovel.invest@pix.com'),
+    (49, '56789012345');
+
+-- Metade das transações via Cartão
+INSERT INTO Cartao (id_transacao, bandeira, digitos_finais) VALUES
+    (2, 'Visa', '4532'),
+    (4, 'Mastercard', '5412'),
+    (6, 'Elo', '6362'),
+    (8, 'Visa', '4916'),
+    (10, 'Mastercard', '5184'),
+    (12, 'Hipercard', '6062'),
+    (14, 'Visa', '4024'),
+    (16, 'Amex', '3782'),
+    (18, 'Mastercard', '5376'),
+    (20, 'Visa', '4539'),
+    (22, 'Elo', '6504'),
+    (24, 'Mastercard', '5463'),
+    (26, 'Visa', '4716'),
+    (28, 'Amex', '3714'),
+    (30, 'Mastercard', '5228'),
+    (32, 'Visa', '4485'),
+    (34, 'Elo', '6367'),
+    (36, 'Mastercard', '5294'),
+    (38, 'Visa', '4532'),
+    (40, 'Amex', '3787'),
+    (42, 'Mastercard', '5412'),
+    (44, 'Visa', '4916'),
+    (46, 'Elo', '6362'),
+    (48, 'Mastercard', '5184'),
+    (50, 'Visa', '4024');
+
+-- Convites pendentes e processados
 INSERT INTO Convite (id_remetente, id_destino, id_grupo, status) VALUES
-    (1, 2, 1, 'pendente'),
-    (2, 3, 2, 'aceito'),
-    (3, 4, 3, 'recusado'),
-    (4, 5, 4, 'pendente'),
-    (5, 6, 5, 'aceito'),
-    (6, 7, 6, 'pendente'),
-    (7, 8, 7, 'recusado'),
-    (8, 9, 8, 'pendente'),
-    (9, 10, 9, 'aceito'),
-    (10, 1, 10, 'pendente');
-
-
-
+    -- Pendentes
+    (1, 5, 1, 'pendente'),      -- Ana convida Elena para Família
+    (5, 1, 2, 'pendente'),      -- Elena convida Ana para República
+    (2, 3, 4, 'pendente'),      -- Bruno convida Carla para Churrasco
+    (9, 6, 5, 'pendente'),      -- Isabela convida Felipe para Startup
+    (1, 15, 6, 'pendente'),     -- Ana convida Renata para Presente
+    
+    -- Aceitos (já são membros)
+    (1, 4, 3, 'aceito'),        -- Ana convidou Daniel para Viagem
+    (2, 5, 4, 'aceito'),        -- Bruno convidou Elena para Churrasco
+    (5, 11, 5, 'aceito'),       -- Elena convidou Larissa para Startup
+    (2, 6, 7, 'aceito'),        -- Bruno convidou Felipe para Condomínio
+    (8, 10, 8, 'aceito'),       -- Henrique convidou João para Futebol
+    
+    -- Recusados
+    (3, 5, 9, 'recusado'),      -- Carla convidou Elena para Inglês (recusou)
+    (7, 1, 11, 'recusado'),     -- Gabriela convidou Ana para Pet (recusou)
+    (1, 7, 10, 'recusado'),     -- Ana convidou Gabriela para Festa (recusou)
+    (5, 3, 12, 'recusado');     -- Elena convidou Carla para Imóvel (recusou)
