@@ -229,4 +229,28 @@ public class GrupoService {
 			throw new SQLException("Falha ao atualizar status do grupo.");
 		}
 	}
+	
+	/**
+	 * Deleta um grupo (marca como inativo)
+	 * Apenas administradores podem deletar
+	 */
+	public void deletarGrupo(int idGrupo, int idCliente) throws DomainException, SQLException {
+		alterarStatusGrupo(idGrupo, "inativo", idCliente);
+	}
+	
+	/**
+	 * Arquiva um grupo
+	 * Apenas administradores podem arquivar
+	 */
+	public void arquivarGrupo(int idGrupo, int idCliente) throws DomainException, SQLException {
+		alterarStatusGrupo(idGrupo, "arquivado", idCliente);
+	}
+	
+	/**
+	 * Desarquiva um grupo (volta para ativo)
+	 * Apenas administradores podem desarquivar
+	 */
+	public void desarquivarGrupo(int idGrupo, int idCliente) throws DomainException, SQLException {
+		alterarStatusGrupo(idGrupo, "ativo", idCliente);
+	}
 }

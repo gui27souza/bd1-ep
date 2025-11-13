@@ -266,17 +266,30 @@ public class GruposFrame extends JFrame {
                 adminPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 
                 if (grupo.getStatus().equals("ativo")) {
-                    JButton btnArquivar = UIHelper.createButton("📦 Arquivar Grupo", new Color(255, 152, 0), 150, 35);
-                    btnArquivar.addActionListener(e -> alterarStatusGrupo(grupo, "arquivado"));
+                    JButton btnArquivar = UIHelper.createButton("📦 Arquivar", new Color(255, 152, 0), 130, 35);
+                    btnArquivar.addActionListener(e -> arquivarGrupo(grupo));
+                    
+                    JButton btnDeletar = UIHelper.createButton("🗑️ Deletar", new Color(244, 67, 54), 130, 35);
+                    btnDeletar.addActionListener(e -> deletarGrupo(grupo));
+                    
                     adminPanel.add(btnArquivar);
+                    adminPanel.add(btnDeletar);
+                    
                 } else if (grupo.getStatus().equals("arquivado")) {
-                    JButton btnDesarquivar = UIHelper.createButton("✅ Desarquivar Grupo", UIHelper.GREEN, 160, 35);
-                    btnDesarquivar.addActionListener(e -> alterarStatusGrupo(grupo, "ativo"));
+                    JButton btnDesarquivar = UIHelper.createButton("✅ Desarquivar", UIHelper.GREEN, 160, 35);
+                    btnDesarquivar.addActionListener(e -> desarquivarGrupo(grupo));
+                    
+                    JButton btnDeletar = UIHelper.createButton("🗑️ Deletar", new Color(244, 67, 54), 130, 35);
+                    btnDeletar.addActionListener(e -> deletarGrupo(grupo));
+                    
                     adminPanel.add(btnDesarquivar);
+                    adminPanel.add(btnDeletar);
+                    
                 } else if (grupo.getStatus().equals("inativo")) {
-                    JButton btnAtivar = UIHelper.createButton("✅ Ativar Grupo", UIHelper.GREEN, 140, 35);
-                    btnAtivar.addActionListener(e -> alterarStatusGrupo(grupo, "ativo"));
-                    adminPanel.add(btnAtivar);
+                    JLabel lblDeletado = new JLabel("❌ Este grupo foi deletado");
+                    lblDeletado.setFont(new Font("Arial", Font.BOLD, 13));
+                    lblDeletado.setForeground(new Color(244, 67, 54));
+                    adminPanel.add(lblDeletado);
                 }
                 
                 detailsPanel.add(adminPanel, BorderLayout.SOUTH);
@@ -475,55 +488,103 @@ public class GruposFrame extends JFrame {
         }
     }
     
-    private void alterarStatusGrupo(Grupo grupo, String novoStatus) {
-        String acao = switch (novoStatus) {
-            case "arquivado" -> "arquivar";
-            case "ativo" -> grupo.getStatus().equals("arquivado") ? "desarquivar" : "ativar";
-            case "inativo" -> "inativar";
-            default -> "alterar";
-        };
-        
+    private void arquivarGrupo(Grupo grupo) {
         int confirm = JOptionPane.showConfirmDialog(this,
-            String.format("Tem certeza que deseja %s o grupo '%s'?", acao, grupo.getNome()),
-            "Confirmar",
-            JOptionPane.YES_NO_OPTION);
+            String.format("<html><b>Arquivar o grupo '%s'?</b><br><br>" +
+                "O grupo ficará marcado como arquivado mas não será deletado.<br>" +
+                "Você poderá desarquivá-lo posteriormente.</html>", grupo.getNome()),
+            "Confirmar Arquivamento",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
         
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                grupoService.alterarStatusGrupo(grupo.getId(), novoStatus, acessoAtual.getCliente().getId());
-                
-                // Atualizar o status local do grupo
-                grupo.setStatus(novoStatus);
-                
-                // Recarregar a lista de grupos
-                ArrayList<Grupo> gruposAtualizados = grupoService.getGrupos(acessoAtual.getCliente());
-                acessoAtual.setGrupos(gruposAtualizados);
-                carregarGrupos();
-                
-                // Reselecionar o grupo para atualizar os detalhes
-                int index = grupos.indexOf(grupo);
-                if (index >= 0) {
-                    gruposList.setSelectedIndex(index);
-                }
-                
-                String mensagemSucesso = switch (novoStatus) {
-                    case "arquivado" -> "Grupo arquivado com sucesso! Ele ainda aparecerá na lista mas marcado como arquivado.";
-                    case "ativo" -> "Grupo ativado com sucesso!";
-                    case "inativo" -> "Grupo inativado com sucesso!";
-                    default -> "Status alterado com sucesso!";
-                };
+                grupoService.arquivarGrupo(grupo.getId(), acessoAtual.getCliente().getId());
+                atualizarGrupoELista(grupo);
                 
                 JOptionPane.showMessageDialog(this,
-                    mensagemSucesso,
+                    "Grupo arquivado com sucesso!",
                     "Sucesso",
                     JOptionPane.INFORMATION_MESSAGE);
                     
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this,
-                    "Erro ao alterar status do grupo: " + e.getMessage(),
+                    "Erro ao arquivar grupo: " + e.getMessage(),
                     "Erro",
                     JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
+            }
+        }
+    }
+    
+    private void desarquivarGrupo(Grupo grupo) {
+        int confirm = JOptionPane.showConfirmDialog(this,
+            String.format("Deseja desarquivar o grupo '%s'?", grupo.getNome()),
+            "Confirmar Desarquivamento",
+            JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                grupoService.desarquivarGrupo(grupo.getId(), acessoAtual.getCliente().getId());
+                atualizarGrupoELista(grupo);
+                
+                JOptionPane.showMessageDialog(this,
+                    "Grupo desarquivado com sucesso!",
+                    "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE);
+                    
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                    "Erro ao desarquivar grupo: " + e.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private void deletarGrupo(Grupo grupo) {
+        int confirm = JOptionPane.showConfirmDialog(this,
+            String.format("<html><b style='color: red;'>ATENÇÃO: Deletar o grupo '%s'?</b><br><br>" +
+                "Esta ação marcará o grupo como INATIVO (deletado).<br>" +
+                "O grupo não será removido do banco, mas não poderá ser usado.<br><br>" +
+                "<b>Deseja continuar?</b></html>", grupo.getNome()),
+            "⚠️ Confirmar Exclusão",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                grupoService.deletarGrupo(grupo.getId(), acessoAtual.getCliente().getId());
+                atualizarGrupoELista(grupo);
+                
+                JOptionPane.showMessageDialog(this,
+                    "<html><b>Grupo deletado com sucesso!</b><br>" +
+                    "O grupo foi marcado como inativo.</html>",
+                    "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE);
+                    
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                    "Erro ao deletar grupo: " + e.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private void atualizarGrupoELista(Grupo grupo) throws Exception {
+        // Atualizar a lista de grupos
+        ArrayList<Grupo> gruposAtualizados = grupoService.getGrupos(acessoAtual.getCliente());
+        acessoAtual.setGrupos(gruposAtualizados);
+        carregarGrupos();
+        
+        // Reselecionar o grupo para atualizar os detalhes
+        for (int i = 0; i < grupos.size(); i++) {
+            if (grupos.get(i).getId() == grupo.getId()) {
+                gruposList.setSelectedIndex(i);
+                break;
             }
         }
     }
