@@ -62,13 +62,17 @@ public class RelatoriosFrame extends JFrame {
 		JButton btn4 = createReportButton("4. 👥 Divisão de Gastos por Membro", new Color(26, 188, 156));  // BTN_INFO
 		JButton btn5 = createReportButton("5. 📈 Estatísticas dos Grupos", new Color(77, 182, 172));     // BTN_LIGHT
 		JButton btn6 = createReportButton("6. 📅 Resumo Financeiro por Período", new Color(38, 198, 218)); // BTN_SUCCESS
-		JButton btn7 = createReportButton("7. 🔄 Grupos Ativos vs Inativos", new Color(41, 182, 246));  // BTN_SECONDARY		btn1.addActionListener(e -> exibirRelatorio1());
+		JButton btn7 = createReportButton("7. 🔄 Grupos Ativos vs Inativos", new Color(41, 182, 246));  // BTN_SECONDARY
+		
+		btn1.addActionListener(e -> exibirRelatorio1());
 		btn2.addActionListener(e -> exibirRelatorio2());
 		btn3.addActionListener(e -> exibirRelatorio3());
 		btn4.addActionListener(e -> exibirRelatorio4());
 		btn5.addActionListener(e -> exibirRelatorio5());
 		btn6.addActionListener(e -> exibirRelatorio6());
-		btn7.addActionListener(e -> exibirRelatorio7());		centerPanel.add(btn1);
+		btn7.addActionListener(e -> exibirRelatorio7());
+		
+		centerPanel.add(btn1);
 		centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		centerPanel.add(btn2);
 		centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -130,38 +134,46 @@ public class RelatoriosFrame extends JFrame {
     }
 
     private void exibirRelatorio1() {
-        List<Map<String, Object>> dados = relatorioService.maioresGastos(acessoAtual.getCliente().getId());
-        if (dados.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "Nenhuma transação foi encontrada.",
-                "Sem Resultados",
-                JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        String[] colunas = {"Data", "Grupo", "Cliente", "Categoria", "Valor"};
-        DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
+        try {
+            List<Map<String, Object>> dados = relatorioService.maioresGastos(acessoAtual.getCliente().getId());
+            if (dados.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                    "Nenhuma transação foi encontrada.",
+                    "Sem Resultados",
+                    JOptionPane.INFORMATION_MESSAGE);
+                return;
             }
-        };
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        for (Map<String, Object> row : dados) {
-            String dataFormatada = "";
-            if (row.get("data_transacao") != null) {
-                dataFormatada = dateFormat.format(row.get("data_transacao"));
-            }
-            double valor = ((Number) row.get("valor")).doubleValue();
-            Object[] rowData = {
-                dataFormatada,
-                row.get("grupo"),
-                row.get("cliente"),
-                row.get("categoria"),
-                String.format("R$ %.2f", valor)
+            String[] colunas = {"Data", "Grupo", "Cliente", "Categoria", "Valor"};
+            DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
             };
-			tableModel.addRow(rowData);
-		}
-		mostrarTabelaRelatorio(tableModel, "💰 Maiores Gastos");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            for (Map<String, Object> row : dados) {
+                String dataFormatada = "";
+                if (row.get("data_transacao") != null) {
+                    dataFormatada = dateFormat.format(row.get("data_transacao"));
+                }
+                double valor = ((Number) row.get("valor")).doubleValue();
+                Object[] rowData = {
+                    dataFormatada,
+                    row.get("grupo"),
+                    row.get("cliente"),
+                    row.get("categoria"),
+                    String.format("R$ %.2f", valor)
+                };
+			    tableModel.addRow(rowData);
+		    }
+		    mostrarTabelaRelatorio(tableModel, "💰 Maiores Gastos");
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                "Erro ao gerar relatório: " + e.getMessage(),
+                "Erro",
+                JOptionPane.ERROR_MESSAGE);
+        }
 	}	private void exibirRelatorio2() {
 		List<Map<String, Object>> dados = relatorioService.maioresContribuicoes(acessoAtual.getCliente().getId());
 		if (dados.isEmpty()) {
