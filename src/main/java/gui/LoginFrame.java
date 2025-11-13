@@ -26,9 +26,6 @@ public class LoginFrame extends JFrame {
         this.grupoService = grupoService;
         
         initComponents();
-        
-        // Garantir visibilidade em todos os sistemas
-        UIHelper.ensureVisibility(this);
     }
     
     private void initComponents() {
