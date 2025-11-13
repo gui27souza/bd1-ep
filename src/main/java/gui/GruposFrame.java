@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class GruposFrame extends JFrame {
@@ -209,13 +210,31 @@ public class GruposFrame extends JFrame {
         lblData.setFont(new Font("Arial", Font.PLAIN, 11));
         lblData.setForeground(Color.GRAY);
         
-        infoPanel.add(lblNome);
-        infoPanel.add(Box.createVerticalStrut(5));
-        infoPanel.add(lblDescricao);
-        infoPanel.add(Box.createVerticalStrut(5));
-        infoPanel.add(lblStatus);
-        infoPanel.add(Box.createVerticalStrut(3));
-        infoPanel.add(lblData);
+        // Calcular e exibir saldo do grupo
+        try {
+            float saldo = grupoService.getSaldoGrupo(grupo.getId());
+            JLabel lblSaldo = new JLabel(String.format("Saldo: R$ %.2f", saldo));
+            lblSaldo.setFont(new Font("Arial", Font.BOLD, 14));
+            lblSaldo.setForeground(saldo >= 0 ? new Color(0, 150, 0) : new Color(220, 20, 60));
+            
+            infoPanel.add(lblNome);
+            infoPanel.add(Box.createVerticalStrut(5));
+            infoPanel.add(lblDescricao);
+            infoPanel.add(Box.createVerticalStrut(5));
+            infoPanel.add(lblStatus);
+            infoPanel.add(Box.createVerticalStrut(3));
+            infoPanel.add(lblData);
+            infoPanel.add(Box.createVerticalStrut(8));
+            infoPanel.add(lblSaldo);
+        } catch (SQLException e) {
+            infoPanel.add(lblNome);
+            infoPanel.add(Box.createVerticalStrut(5));
+            infoPanel.add(lblDescricao);
+            infoPanel.add(Box.createVerticalStrut(5));
+            infoPanel.add(lblStatus);
+            infoPanel.add(Box.createVerticalStrut(3));
+            infoPanel.add(lblData);
+        }
         
         detailsPanel.add(infoPanel, BorderLayout.NORTH);
         
@@ -297,13 +316,15 @@ public class GruposFrame extends JFrame {
                     SwingConstants.CENTER);
                 panel.add(lblVazio, BorderLayout.CENTER);
             } else {
-                String[] colunas = {"ID", "Valor", "Descrição", "Categoria"};
+                String[] colunas = {"Data", "Valor", "Descrição", "Categoria"};
                 DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
                     @Override
                     public boolean isCellEditable(int row, int column) {
                         return false;
                     }
                 };
+                
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 
                 for (Transacao t : transacoes) {
                     String tipoTransacao = "";
@@ -315,8 +336,13 @@ public class GruposFrame extends JFrame {
                         tipoTransacao = "Outro";
                     }
                     
+                    String dataFormatada = "";
+                    if (t.getDataTransacao() != null) {
+                        dataFormatada = dateFormat.format(t.getDataTransacao());
+                    }
+                    
                     Object[] row = {
-                        t.getId(),
+                        dataFormatada,
                         String.format("R$ %.2f", t.getValor()),
                         t.getDescricao(),
                         t.getCategoria().getNome() + " (" + tipoTransacao + ")"

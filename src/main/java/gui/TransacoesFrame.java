@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class TransacoesFrame extends JFrame {
@@ -195,7 +196,7 @@ public class TransacoesFrame extends JFrame {
             panel.add(msgLabel, BorderLayout.CENTER);
         } else {
             // Criar tabela
-            String[] colunas = {"ID", "Valor", "Descrição", "Categoria", "Tipo"};
+            String[] colunas = {"Data", "Valor", "Descrição", "Categoria", "Tipo"};
             DefaultTableModel model = new DefaultTableModel(colunas, 0) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
@@ -203,9 +204,16 @@ public class TransacoesFrame extends JFrame {
                 }
             };
             
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            
             for (Transacao t : transacoes) {
+                String dataFormatada = "";
+                if (t.getDataTransacao() != null) {
+                    dataFormatada = dateFormat.format(t.getDataTransacao());
+                }
+                
                 model.addRow(new Object[]{
-                    t.getId(),
+                    dataFormatada,
                     String.format("R$ %.2f", t.getValor()),
                     t.getDescricao() != null ? t.getDescricao() : "",
                     t.getCategoria().getNome(),

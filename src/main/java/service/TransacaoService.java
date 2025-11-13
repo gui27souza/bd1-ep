@@ -7,6 +7,7 @@ import main.java.model.transacao.TransacaoPix;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class TransacaoService {
@@ -20,12 +21,12 @@ public class TransacaoService {
 	public ArrayList<Transacao> getTransacoesPorGrupo(int idGrupo) throws SQLException {
 		
 		String query = """
-			SELECT t.id, t.descricao, t.valor, t.id_cliente, t.id_grupo, t.id_categoria,
+			SELECT t.id, t.descricao, t.valor, t.data_transacao, t.id_cliente, t.id_grupo, t.id_categoria,
 			       c.nome as categoria_nome, c.descricao as categoria_desc
 			FROM Transacao t
 			JOIN Categoria c ON t.id_categoria = c.id
 			WHERE t.id_grupo = ?
-			ORDER BY t.id
+			ORDER BY t.data_transacao DESC
 		""";
 		
 		ArrayList<Object> parameters = new ArrayList<>();
@@ -37,12 +38,12 @@ public class TransacaoService {
 	public ArrayList<Transacao> getTodasTransacoes(int idCliente) throws SQLException {
 		
 		String query = """
-			SELECT t.id, t.descricao, t.valor, t.id_cliente, t.id_grupo, t.id_categoria,
+			SELECT t.id, t.descricao, t.valor, t.data_transacao, t.id_cliente, t.id_grupo, t.id_categoria,
 			       c.nome as categoria_nome, c.descricao as categoria_desc
 			FROM Transacao t
 			JOIN Categoria c ON t.id_categoria = c.id
 			WHERE t.id_cliente = ?
-			ORDER BY t.id
+			ORDER BY t.data_transacao DESC
 		""";
 		
 		ArrayList<Object> parameters = new ArrayList<>();
@@ -61,6 +62,7 @@ public class TransacaoService {
 				int id = rs.getInt("id");
 				String descricao = rs.getString("descricao");
 				float valor = rs.getFloat("valor");
+				java.sql.Timestamp dataTransacao = rs.getTimestamp("data_transacao");
 				int idCliente = rs.getInt("id_cliente");
 				int idGrupo = rs.getInt("id_grupo");
 				int idCategoria = rs.getInt("id_categoria");
@@ -70,7 +72,7 @@ public class TransacaoService {
 				CategoriaTransacao categoria = new CategoriaTransacao(idCategoria, categoriaNome, categoriaDesc);
 				
 				// Por enquanto cria como TransacaoPix generica
-				Transacao transacao = new TransacaoPix(id, idCliente, idGrupo, valor, categoria, descricao);
+				Transacao transacao = new TransacaoPix(id, idCliente, idGrupo, valor, categoria, descricao, dataTransacao);
 				transacoes.add(transacao);
 			}
 		}
@@ -85,9 +87,14 @@ public class TransacaoService {
 			return;
 		}
 		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		
 		System.out.println("\n========== TRANSAÇÕES ==========");
 		for (Transacao t : transacoes) {
 			System.out.println("\nID: " + t.getId());
+			if (t.getDataTransacao() != null) {
+				System.out.println("Data: " + dateFormat.format(t.getDataTransacao()));
+			}
 			System.out.println("Descrição: " + t.getDescricao());
 			System.out.println("Valor: R$ " + String.format("%.2f", t.getValor()));
 			System.out.println("Categoria: " + t.getCategoria().getNome());

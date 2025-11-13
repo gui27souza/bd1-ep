@@ -43,6 +43,7 @@ CREATE TABLE Transacao (
     id SERIAL PRIMARY KEY,
     descricao TEXT,
     valor DECIMAL(10, 2) NOT NULL,
+    data_transacao TIMESTAMP WITH TIME ZONE DEFAULT now(),
     id_cliente INTEGER NOT NULL,
     id_grupo INTEGER NOT NULL,
     id_categoria INTEGER NOT NULL,
@@ -249,83 +250,129 @@ INSERT INTO MembroGrupo (id_cliente, id_grupo, role) VALUES
     (9, 12, 'admin'),
     (14, 12, 'membro');
 
--- Transações variadas e realistas
-INSERT INTO Transacao (descricao, valor, id_cliente, id_grupo, id_categoria) VALUES
-    -- Família Costa-Silva
-    ('Supermercado Extra - compras do mês', 850.50, 1, 1, 1),
-    ('Conta de luz - Dezembro', 245.80, 2, 1, 2),
-    ('Internet fibra 500MB', 129.90, 1, 1, 2),
-    ('Gás de cozinha', 120.00, 3, 1, 2),
-    ('iFood - Pizza sexta', 95.00, 4, 1, 1),
-    ('Farmácia - remédios', 187.50, 2, 1, 4),
+-- Transações variadas e realistas (valores negativos = gastos, positivos = ganhos)
+INSERT INTO Transacao (descricao, valor, data_transacao, id_cliente, id_grupo, id_categoria) VALUES
+    -- Família Costa-Silva (com rateio de contas e contribuições)
+    ('Supermercado Extra - compras do mês', -850.50, '2025-11-01 10:30:00', 1, 1, 1),
+    ('Conta de luz - Dezembro', -245.80, '2025-11-02 14:20:00', 2, 1, 2),
+    ('Internet fibra 500MB', -129.90, '2025-11-03 09:15:00', 1, 1, 2),
+    ('Gás de cozinha', -120.00, '2025-11-04 16:45:00', 3, 1, 2),
+    ('iFood - Pizza sexta', -95.00, '2025-11-08 20:30:00', 4, 1, 1),
+    ('Farmácia - remédios', -187.50, '2025-11-10 11:00:00', 2, 1, 4),
+    ('Contribuição mensal - Ana', 500.00, '2025-11-01 08:00:00', 1, 1, 2),
+    ('Contribuição mensal - Bruno', 500.00, '2025-11-01 08:05:00', 2, 1, 2),
     
-    -- República dos Amigos
-    ('Aluguel - Novembro', 2400.00, 5, 2, 2),
-    ('Condomínio', 450.00, 6, 2, 2),
-    ('Supermercado Atacadão', 380.00, 7, 2, 1),
-    ('Netflix compartilhado', 55.90, 5, 2, 9),
-    ('Conta de água', 89.00, 6, 2, 2),
-    ('Limpeza do apartamento', 150.00, 7, 2, 2),
+    -- República dos Amigos (rateio de despesas compartilhadas)
+    ('Aluguel - Novembro', -2400.00, '2025-11-01 08:00:00', 5, 2, 2),
+    ('Condomínio', -450.00, '2025-11-01 08:05:00', 6, 2, 2),
+    ('Supermercado Atacadão', -380.00, '2025-11-05 15:30:00', 7, 2, 1),
+    ('Netflix compartilhado', -55.90, '2025-11-06 10:00:00', 5, 2, 9),
+    ('Conta de água', -89.00, '2025-11-07 13:45:00', 6, 2, 2),
+    ('Limpeza do apartamento', -150.00, '2025-11-09 09:00:00', 7, 2, 2),
+    ('Rateio mensal - Elena', 1200.00, '2025-11-01 09:00:00', 5, 2, 2),
+    ('Rateio mensal - Felipe', 1200.00, '2025-11-01 09:05:00', 6, 2, 2),
+    ('Rateio mensal - Gabriela', 1200.00, '2025-11-01 09:10:00', 7, 2, 2),
     
-    -- Viagem Europa 2025
-    ('Passagem aérea SP-Lisboa', 3850.00, 1, 3, 7),
-    ('Passagem aérea SP-Lisboa', 3850.00, 4, 3, 7),
-    ('Passagem aérea SP-Lisboa', 3850.00, 9, 3, 7),
-    ('Reserva Airbnb Paris (7 dias)', 2100.00, 1, 3, 7),
-    ('Seguro viagem Europa', 280.00, 4, 3, 7),
-    ('Trem Paris-Amsterdam', 195.00, 9, 3, 7),
+    -- Viagem Europa 2025 (economia coletiva para viagem)
+    ('Passagem aérea SP-Lisboa', -3850.00, '2025-10-15 14:00:00', 1, 3, 7),
+    ('Passagem aérea SP-Lisboa', -3850.00, '2025-10-15 14:05:00', 4, 3, 7),
+    ('Passagem aérea SP-Lisboa', -3850.00, '2025-10-15 14:10:00', 9, 3, 7),
+    ('Reserva Airbnb Paris (7 dias)', -2100.00, '2025-10-20 16:30:00', 1, 3, 7),
+    ('Seguro viagem Europa', -280.00, '2025-10-22 11:15:00', 4, 3, 7),
+    ('Trem Paris-Amsterdam', -195.00, '2025-10-25 09:45:00', 9, 3, 7),
+    ('Economia mensal - Ana', 2000.00, '2025-09-01 10:00:00', 1, 3, 7),
+    ('Economia mensal - Ana', 2000.00, '2025-10-01 10:00:00', 1, 3, 7),
+    ('Economia mensal - Daniel', 2000.00, '2025-09-01 10:05:00', 4, 3, 7),
+    ('Economia mensal - Daniel', 2000.00, '2025-10-01 10:05:00', 4, 3, 7),
+    ('Economia mensal - Isabela', 2000.00, '2025-09-01 10:10:00', 9, 3, 7),
+    ('Economia mensal - Isabela', 2000.00, '2025-10-01 10:10:00', 9, 3, 7),
     
-    -- Churrasco Mensal
-    ('Carne Açougue Boi Bravo', 320.00, 2, 4, 1),
-    ('Bebidas e refrigerantes', 180.00, 5, 4, 1),
-    ('Carvão e sal grosso', 45.00, 8, 4, 1),
-    ('Pão de alho e farofa', 38.00, 10, 4, 1),
+    -- Churrasco Mensal (vaquinha para evento)
+    ('Carne Açougue Boi Bravo', -320.00, '2025-11-02 08:30:00', 2, 4, 1),
+    ('Bebidas e refrigerantes', -180.00, '2025-11-02 09:00:00', 5, 4, 1),
+    ('Carvão e sal grosso', -45.00, '2025-11-02 09:30:00', 8, 4, 1),
+    ('Pão de alho e farofa', -38.00, '2025-11-02 10:00:00', 10, 4, 1),
+    ('Vaquinha - Bruno', 100.00, '2025-11-01 08:00:00', 2, 4, 1),
+    ('Vaquinha - Elena', 100.00, '2025-11-01 08:05:00', 5, 4, 1),
+    ('Vaquinha - Henrique', 100.00, '2025-11-01 08:10:00', 8, 4, 1),
+    ('Vaquinha - João', 100.00, '2025-11-01 08:15:00', 10, 4, 1),
+    ('Vaquinha - Marcos', 100.00, '2025-11-01 08:20:00', 12, 4, 1),
+    ('Vaquinha - Paulo', 100.00, '2025-11-01 08:25:00', 14, 4, 1),
     
-    -- Projeto Startup
-    ('Registro de domínio .com', 120.00, 5, 5, 9),
-    ('AWS - hospedagem cloud', 450.00, 9, 5, 9),
-    ('Designer freelancer - logo', 800.00, 5, 5, 12),
-    ('Google Ads - marketing', 1200.00, 11, 5, 12),
-    ('Advogado - contrato social', 2500.00, 5, 5, 12),
+    -- Projeto Startup (investimento coletivo)
+    ('Registro de domínio .com', -120.00, '2025-10-01 10:00:00', 5, 5, 9),
+    ('AWS - hospedagem cloud', -450.00, '2025-10-05 14:30:00', 9, 5, 9),
+    ('Designer freelancer - logo', -800.00, '2025-10-10 16:00:00', 5, 5, 12),
+    ('Google Ads - marketing', -1200.00, '2025-10-15 11:00:00', 11, 5, 12),
+    ('Advogado - contrato social', -2500.00, '2025-10-20 09:30:00', 5, 5, 12),
+    ('Investimento inicial - Elena', 5000.00, '2025-09-15 10:00:00', 5, 5, 12),
+    ('Investimento inicial - Isabela', 5000.00, '2025-09-15 10:05:00', 9, 5, 12),
+    ('Investimento inicial - Larissa', 3000.00, '2025-09-15 10:10:00', 11, 5, 12),
     
-    -- Presente Coletivo Maria
-    ('Cota presente casamento', 150.00, 1, 6, 11),
-    ('Cota presente casamento', 150.00, 3, 6, 11),
-    ('Cota presente casamento', 150.00, 6, 6, 11),
-    ('Cota presente casamento', 150.00, 8, 6, 11),
-    ('Cota presente casamento', 150.00, 10, 6, 11),
-    ('Compra conjunto panelas', 1050.00, 1, 6, 11),
+    -- Presente Coletivo Maria (vaquinha finalizada)
+    ('Cota presente casamento', 150.00, '2025-10-28 14:00:00', 1, 6, 11),
+    ('Cota presente casamento', 150.00, '2025-10-28 14:15:00', 3, 6, 11),
+    ('Cota presente casamento', 150.00, '2025-10-28 14:30:00', 6, 6, 11),
+    ('Cota presente casamento', 150.00, '2025-10-28 14:45:00', 8, 6, 11),
+    ('Cota presente casamento', 150.00, '2025-10-28 15:00:00', 10, 6, 11),
+    ('Compra conjunto panelas', -1050.00, '2025-10-30 10:00:00', 1, 6, 11),
     
-    -- Condomínio Edifício Sol
-    ('Manutenção elevador', 1800.00, 2, 7, 2),
-    ('Salário porteiro', 2200.00, 4, 7, 2),
-    ('Limpeza áreas comuns', 950.00, 2, 7, 2),
-    ('Conta de luz áreas comuns', 580.00, 6, 7, 2),
-    ('Jardinagem e paisagismo', 420.00, 4, 7, 2),
+    -- Condomínio Edifício Sol (despesas coletivas e rateio)
+    ('Manutenção elevador', -1800.00, '2025-11-01 09:00:00', 2, 7, 2),
+    ('Salário porteiro', -2200.00, '2025-11-01 09:30:00', 4, 7, 2),
+    ('Limpeza áreas comuns', -950.00, '2025-11-03 08:00:00', 2, 7, 2),
+    ('Conta de luz áreas comuns', -580.00, '2025-11-05 15:00:00', 6, 7, 2),
+    ('Jardinagem e paisagismo', -420.00, '2025-11-07 10:30:00', 4, 7, 2),
+    ('Rateio condomínio - Bruno', 800.00, '2025-11-01 08:00:00', 2, 7, 2),
+    ('Rateio condomínio - Daniel', 800.00, '2025-11-01 08:05:00', 4, 7, 2),
+    ('Rateio condomínio - Felipe', 800.00, '2025-11-01 08:10:00', 6, 7, 2),
+    ('Rateio condomínio - Gabriela', 800.00, '2025-11-01 08:15:00', 7, 7, 2),
+    ('Rateio condomínio - Isabela', 800.00, '2025-11-01 08:20:00', 9, 7, 2),
+    ('Rateio condomínio - Larissa', 800.00, '2025-11-01 08:25:00', 11, 7, 2),
+    ('Rateio condomínio - Natália', 800.00, '2025-11-01 08:30:00', 13, 7, 2),
+    ('Rateio condomínio - Renata', 800.00, '2025-11-01 08:35:00', 15, 7, 2),
     
-    -- Time de Futebol
-    ('Mensalidade quadra', 400.00, 8, 8, 6),
-    ('Camisetas personalizadas', 750.00, 8, 8, 8),
-    ('Bolas profissionais (3 un)', 285.00, 2, 8, 6),
-    ('Churrasco pós-jogo', 220.00, 10, 8, 1),
+    -- Time de Futebol (mensalidade e despesas)
+    ('Mensalidade quadra', -400.00, '2025-11-01 07:00:00', 8, 8, 6),
+    ('Camisetas personalizadas', -750.00, '2025-10-25 13:00:00', 8, 8, 8),
+    ('Bolas profissionais (3 un)', -285.00, '2025-10-26 14:30:00', 2, 8, 6),
+    ('Churrasco pós-jogo', -220.00, '2025-11-03 17:00:00', 10, 8, 1),
+    ('Mensalidade - Henrique', 150.00, '2025-11-01 08:00:00', 8, 8, 6),
+    ('Mensalidade - Bruno', 150.00, '2025-11-01 08:05:00', 2, 8, 6),
+    ('Mensalidade - João', 150.00, '2025-11-01 08:10:00', 10, 8, 6),
+    ('Mensalidade - Marcos', 150.00, '2025-11-01 08:15:00', 12, 8, 6),
+    ('Mensalidade - Paulo', 150.00, '2025-11-01 08:20:00', 14, 8, 6),
     
-    -- Curso de Inglês
-    ('Professor particular - mês 1', 800.00, 3, 9, 5),
-    ('Material didático Oxford', 180.00, 7, 9, 5),
-    ('Assinatura Duolingo Plus', 89.90, 11, 9, 5),
+    -- Curso de Inglês (rateio do professor)
+    ('Professor particular - mês 1', -800.00, '2025-11-01 18:00:00', 3, 9, 5),
+    ('Material didático Oxford', -180.00, '2025-11-02 12:00:00', 7, 9, 5),
+    ('Assinatura Duolingo Plus', -89.90, '2025-11-04 19:00:00', 11, 9, 5),
+    ('Rateio curso - Carla', 300.00, '2025-11-01 08:00:00', 3, 9, 5),
+    ('Rateio curso - Gabriela', 300.00, '2025-11-01 08:05:00', 7, 9, 5),
+    ('Rateio curso - Larissa', 300.00, '2025-11-01 08:10:00', 11, 9, 5),
+    ('Rateio curso - Renata', 300.00, '2025-11-01 08:15:00', 15, 9, 5),
     
-    -- Festa Fim de Ano
-    ('Buffet completo 50 pessoas', 3200.00, 1, 10, 6),
-    ('Decoração e balões', 450.00, 2, 10, 6),
-    ('DJ profissional', 800.00, 5, 10, 6),
-    ('Bebidas e refrigerantes', 580.00, 9, 10, 1),
-    ('Lembrancinhas personalizadas', 290.00, 1, 10, 11),
+    -- Festa Fim de Ano (vaquinha para evento)
+    ('Buffet completo 50 pessoas', -3200.00, '2025-10-18 10:00:00', 1, 10, 6),
+    ('Decoração e balões', -450.00, '2025-10-19 11:30:00', 2, 10, 6),
+    ('DJ profissional', -800.00, '2025-10-20 14:00:00', 5, 10, 6),
+    ('Bebidas e refrigerantes', -580.00, '2025-10-21 16:00:00', 9, 10, 1),
+    ('Lembrancinhas personalizadas', -290.00, '2025-10-22 13:00:00', 1, 10, 11),
+    ('Vaquinha - Ana', 1000.00, '2025-10-15 10:00:00', 1, 10, 6),
+    ('Vaquinha - Bruno', 1000.00, '2025-10-15 10:05:00', 2, 10, 6),
+    ('Vaquinha - Elena', 1000.00, '2025-10-15 10:10:00', 5, 10, 6),
+    ('Vaquinha - Isabela', 1000.00, '2025-10-15 10:15:00', 9, 10, 6),
+    ('Vaquinha - Larissa', 1000.00, '2025-10-15 10:20:00', 11, 10, 6),
+    ('Vaquinha - Natália', 500.00, '2025-10-15 10:25:00', 13, 10, 6),
     
-    -- Investimento Imóvel
-    ('Entrada apartamento 20%', 85000.00, 5, 12, 12),
-    ('Entrada apartamento 20%', 85000.00, 9, 12, 12),
-    ('Documentação e ITBI', 12500.00, 5, 12, 12),
-    ('Vistoria e avaliação', 1200.00, 14, 12, 12);
+    -- Investimento Imóvel (contribuições e despesas)
+    ('Entrada apartamento 20%', -85000.00, '2025-09-15 10:00:00', 5, 12, 12),
+    ('Entrada apartamento 20%', -85000.00, '2025-09-15 10:05:00', 9, 12, 12),
+    ('Documentação e ITBI', -12500.00, '2025-09-20 14:00:00', 5, 12, 12),
+    ('Vistoria e avaliação', -1200.00, '2025-09-25 11:00:00', 14, 12, 12),
+    ('Investimento - Elena', 90000.00, '2025-09-10 10:00:00', 5, 12, 12),
+    ('Investimento - Isabela', 90000.00, '2025-09-10 10:05:00', 9, 12, 12),
+    ('Investimento - Paulo', 10000.00, '2025-09-10 10:10:00', 14, 12, 12);
 
 -- Metade das transações via PIX
 INSERT INTO Pix (id_transacao, chave) VALUES

@@ -4,9 +4,7 @@ import main.java.db.DBConnector;
 import main.java.exceptions.DomainException;
 import main.java.model.Cliente;
 import main.java.model.Grupo;
-import main.java.util.menu.MenuUtilGrupo;
 
-import java.awt.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,13 +16,6 @@ public class GrupoService {
 
 	public GrupoService(DBConnector dbConnector) {
 		this.dbConnector = dbConnector;
-	}
-
-	public Grupo menuGrupos(ArrayList<Grupo> grupos) {
-
-		Grupo grupo = MenuUtilGrupo.chooseGrupoFromLista(grupos);
-
-		return grupo;
 	}
 
 	public Grupo createGrupo(String nome, String descricao) throws DomainException, SQLException {
@@ -170,5 +161,26 @@ public class GrupoService {
 		}
 
 		return membros;
+	}
+
+	/**
+	 * Calcula o saldo do grupo (soma de todas as transações)
+	 * Valores negativos representam gastos, positivos representam ganhos
+	 */
+	public float getSaldoGrupo(int idGrupo) throws SQLException {
+		String query = """
+				SELECT COALESCE(SUM(valor), 0) as saldo
+				FROM Transacao
+				WHERE id_grupo = ?
+		""";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idGrupo);
+
+		try (ResultSet resultSet = this.dbConnector.executeQuery(query, parameters)) {
+			if (resultSet.next()) {
+				return resultSet.getFloat("saldo");
+			}
+			return 0;
+		}
 	}
 }

@@ -1,5 +1,7 @@
 package main.java.model.transacao;
 
+import java.sql.Timestamp;
+
 public abstract class Transacao {
 
 	int id;
@@ -8,9 +10,10 @@ public abstract class Transacao {
 	float valor;
 	CategoriaTransacao categoria;
 	String descricao;
+	Timestamp dataTransacao;
 
 	public Transacao(
-		int id, int id_cliente, int id_grupo, float valor, CategoriaTransacao categoria, String descricao
+		int id, int id_cliente, int id_grupo, float valor, CategoriaTransacao categoria, String descricao, Timestamp dataTransacao
 	) {
 		this.id = id;
 		this.id_cliente = id_cliente;
@@ -18,16 +21,18 @@ public abstract class Transacao {
 		this.valor = valor;
 		this.categoria = categoria;
 		this.descricao = descricao;
+		this.dataTransacao = dataTransacao;
 	}
 
 	public Transacao(
-		int id_cliente, int id_grupo, float valor, CategoriaTransacao categoria, String descricao
+		int id_cliente, int id_grupo, float valor, CategoriaTransacao categoria, String descricao, Timestamp dataTransacao
 	) {
 		this.id_cliente = id_cliente;
 		this.id_grupo = id_grupo;
 		this.valor = valor;
 		this.categoria = categoria;
 		this.descricao = descricao;
+		this.dataTransacao = dataTransacao;
 	}
 
 	public int getId() { return id; }
@@ -42,4 +47,6 @@ public abstract class Transacao {
 	public void setCategoria(CategoriaTransacao categoria) { this.categoria = categoria; }
 	public String getDescricao() { return descricao; }
 	public void setDescricao(String descricao) { this.descricao = descricao; }
+	public Timestamp getDataTransacao() { return dataTransacao; }
+	public void setDataTransacao(Timestamp dataTransacao) { this.dataTransacao = dataTransacao; }
 }

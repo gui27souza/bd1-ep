@@ -5,12 +5,10 @@ import main.java.exceptions.DomainException;
 import main.java.model.Acesso;
 import main.java.model.Cliente;
 import main.java.model.Grupo;
-import main.java.util.menu.MenuUtil;
 
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class CadastroService {
@@ -25,85 +23,7 @@ public class CadastroService {
 		this.grupoService = grupoService;
 	}
 
-
-	public Acesso menuAcesso() {
-
-		String header =
-			"\n========================" +
-			"\n==== Login/Cadastro ====\n";
-		;
-
-		String[] menuOptions = {
-			"Fazer Login",
-			"Fazer cadastro"
-		};
-
-		Acesso acessoAtual = null;
-
-		while (acessoAtual == null) {
-
-			int opt = MenuUtil.printOptions(menuOptions, header, true);
-
-			switch (opt) {
-
-				case 0:
-					acessoAtual = login();
-				break;
-
-				case 1:
-					acessoAtual = cadastro();
-				break;
-
-			}
-
-			System.out.println();
-		}
-		return acessoAtual;
-	}
-
-
-
 	// ==================== CADASTRO ====================
-
-	public Acesso cadastro() {
-
-		MenuUtil.limparConsole();
-
-		System.out.println("\n========== Cadastro ==========");
-		System.out.println("Insira suas credenciais para criar uma conta na plataforma.");
-
-		String cpf = MenuUtil.readStringInput("CPF: ");
-		String email = MenuUtil.readStringInput("E-mail: ");
-		String senha = MenuUtil.readStringInput("Senha: ");
-		String nome = MenuUtil.readStringInput("Nome: ");
-		String dataNascStr = MenuUtil.readStringInput("Data de Nascimento (YYYY-MM-DD): ");
-
-		try {
-
-			if (nome.trim().isEmpty()) {
-				throw new DomainException("O nome é obrigatório!");
-			}
-
-			if (cpf.length() != 11) {
-				throw new DomainException("O CPF deve conter 11 dígitos!");
-			}
-
-			LocalDate localDate = LocalDate.parse(dataNascStr);
-			Date dataNascimento = Date.valueOf(localDate);
-
-			return processarCadastro(nome, cpf, email, senha, dataNascimento);
-
-		} catch (java.time.format.DateTimeParseException e) {
-			System.err.println("ERRO: Formato de data inválido. Use YYYY-MM-DD.");
-		} catch (DomainException e) {
-			System.err.println("Falha no Cadastro: " + e.getMessage());
-		} catch (SQLException e) {
-			System.err.println("Erro crítico ao acessar o banco de dados." + e.getMessage());
-			e.printStackTrace();
-		}
-
-		return null;
-	}
 
 	public Acesso processarCadastro(
 		String nome, String cpf, String email, String senha, Date dataNascimento
@@ -153,28 +73,6 @@ public class CadastroService {
 
 
 	// ==================== LOGIN ====================
-
-	public Acesso login() {
-
-		MenuUtil.limparConsole();
-
-		System.out.println("\n========== Login ==========");
-		System.out.println("Insira suas credenciais para acessar a plataforma.");
-
-		String email = MenuUtil.readStringInput("E-mail: ");
-		String senha = MenuUtil.readStringInput("Senha: ");
-
-		try {
-			return this.verificarCredenciais(email, senha);
-		} catch (DomainException e) {
-			System.out.println("Falha ao realizar Login: " + e.getMessage());
-			return null;
-		} catch (SQLException e) {
-			System.out.println("Erro crítico ao acessar o banco de dados!\n" + e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
-	}
 
 	public Acesso verificarCredenciais(String email, String senha) throws SQLException, DomainException {
 

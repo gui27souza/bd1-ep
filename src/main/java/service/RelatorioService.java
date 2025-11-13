@@ -17,48 +17,49 @@ public class RelatorioService {
 		this.dbConnector = dbConnector;
 	}
 
+	// ========== RELATÓRIOS FINANCEIROS ÚTEIS ==========
+	
 	// ========== CONSULTAS COM SELECT ANINHADO ==========
 
 	/**
-	 * Consulta 1: Clientes que possuem transações acima da média de valor (apenas dos grupos do cliente)
+	 * Relatório 1: Maiores Gastos
+	 * Mostra as 10 transações mais caras dos grupos do cliente (gastos em valor absoluto)
+	 * Usa: SELECT aninhado para filtrar grupos do cliente
 	 */
-	public List<Map<String, Object>> clientesAcimaDaMedia(int idClienteLogado) {
+	public List<Map<String, Object>> maioresGastos(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
-			SELECT c.id, c.nome, COUNT(t.id) as total_transacoes, SUM(t.valor) as total_gasto
-			FROM Cliente c
-			JOIN Transacao t ON c.id = t.id_cliente
+			SELECT 
+				t.data_transacao,
+				g.nome as grupo,
+				c.nome as cliente,
+				cat.nome as categoria,
+				t.valor
+			FROM Transacao t
+			JOIN Cliente c ON t.id_cliente = c.id
+			JOIN Grupo g ON t.id_grupo = g.id
+			JOIN Categoria cat ON t.id_categoria = cat.id
 			WHERE t.id_grupo IN (
 				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 			)
-			GROUP BY c.id, c.nome
-			HAVING SUM(t.valor) > (
-				SELECT AVG(total_por_cliente)
-				FROM (
-					SELECT SUM(valor) as total_por_cliente
-					FROM Transacao
-					WHERE id_grupo IN (
-						SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
-					)
-					GROUP BY id_cliente
-				) AS medias
-			)
-			ORDER BY total_gasto DESC
+			AND t.valor < 0
+			ORDER BY t.valor ASC
+			LIMIT 10
 		""";
 		
 		ArrayList<Object> parameters = new ArrayList<>();
-		parameters.add(idClienteLogado);
 		parameters.add(idClienteLogado);
 		
 		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
 			while (rs.next()) {
 				Map<String, Object> row = new HashMap<>();
-				row.put("id", rs.getInt("id"));
-				row.put("nome", rs.getString("nome"));
-				row.put("total_transacoes", rs.getInt("total_transacoes"));
-				row.put("total_gasto", rs.getFloat("total_gasto"));
+				row.put("data_transacao", rs.getTimestamp("data_transacao"));
+				row.put("grupo", rs.getString("grupo"));
+				row.put("cliente", rs.getString("cliente"));
+				row.put("categoria", rs.getString("categoria"));
+				row.put("valor", rs.getFloat("valor"));
 				resultados.add(row);
 			}
 		} catch (SQLException e) {
@@ -69,32 +70,37 @@ public class RelatorioService {
 	}
 
 	/**
-	 * Consulta 2: Grupos que possuem mais membros que a média (apenas grupos do cliente)
+	 * Relatório 2: Gastos Detalhados por Categoria
+	 * Mostra detalhamento de gastos por categoria com subconsulta para percentual
+	 * Usa: SELECT aninhado para calcular total geral
 	 */
-	public List<Map<String, Object>> gruposComMaisMembros(int idClienteLogado) {
+	public List<Map<String, Object>> gastosDetalhadosPorCategoria(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
-			SELECT g.id, g.nome, g.descricao, COUNT(mg.id_cliente) as total_membros
-			FROM Grupo g
-			JOIN MembroGrupo mg ON g.id = mg.id_grupo
-			WHERE g.id IN (
-				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
-			)
-			GROUP BY g.id, g.nome, g.descricao
-			HAVING COUNT(mg.id_cliente) > (
-				SELECT AVG(membros_por_grupo)
-				FROM (
-					SELECT COUNT(id_cliente) as membros_por_grupo
-					FROM MembroGrupo
-					WHERE id_grupo IN (
-						SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
-					)
-					GROUP BY id_grupo
-				) AS medias
-			)
-			ORDER BY total_membros DESC
+			SELECT 
+				cat.nome as categoria,
+				COUNT(t.id) as quantidade,
+				COALESCE(SUM(ABS(t.valor)), 0) as total,
+				COALESCE(AVG(ABS(t.valor)), 0) as media,
+				ROUND(
+					COALESCE(SUM(ABS(t.valor)), 0) * 100.0 / NULLIF(
+						(SELECT SUM(ABS(valor)) FROM Transacao 
+						 WHERE id_grupo IN (SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?)
+						 AND valor < 0),
+						0
+					), 2
+				) as percentual
+			FROM Categoria cat
+			LEFT JOIN Transacao t ON cat.id = t.id_categoria 
+				AND t.id_grupo IN (
+					SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
+				)
+				AND t.valor < 0
+			GROUP BY cat.id, cat.nome
+			HAVING COUNT(t.id) > 0
+			ORDER BY total DESC
 		""";
 		
 		ArrayList<Object> parameters = new ArrayList<>();
@@ -104,10 +110,11 @@ public class RelatorioService {
 		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
 			while (rs.next()) {
 				Map<String, Object> row = new HashMap<>();
-				row.put("id", rs.getInt("id"));
-				row.put("nome", rs.getString("nome"));
-				row.put("descricao", rs.getString("descricao"));
-				row.put("total_membros", rs.getInt("total_membros"));
+				row.put("categoria", rs.getString("categoria"));
+				row.put("quantidade", rs.getInt("quantidade"));
+				row.put("total", rs.getFloat("total"));
+				row.put("media", rs.getFloat("media"));
+				row.put("percentual", rs.getFloat("percentual"));
 				resultados.add(row);
 			}
 		} catch (SQLException e) {
@@ -120,28 +127,77 @@ public class RelatorioService {
 	// ========== CONSULTAS COM FUNÇÕES DE GRUPO ==========
 
 	/**
-	 * Consulta 3: Total de transações e soma de valores por categoria (apenas dos grupos do cliente)
+	 * Relatório 3: Divisão de Gastos por Membro
+	 * Mostra quanto cada membro gastou em cada grupo
+	 * Usa: COUNT, SUM, AVG (funções de grupo)
 	 */
-	public List<Map<String, Object>> totalPorCategoria(int idClienteLogado) {
+	public List<Map<String, Object>> divisaoGastosPorMembro(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
 			SELECT 
-				cat.id,
-				cat.nome,
+				g.nome as grupo,
+				c.nome as membro,
+				COUNT(t.id) as transacoes,
+				COALESCE(SUM(t.valor), 0) as total_gasto,
+				COALESCE(AVG(t.valor), 0) as media_gasto
+			FROM Grupo g
+			JOIN MembroGrupo mg ON g.id = mg.id_grupo
+			JOIN Cliente c ON mg.id_cliente = c.id
+			LEFT JOIN Transacao t ON t.id_cliente = c.id AND t.id_grupo = g.id
+			WHERE g.id IN (
+				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
+			)
+			GROUP BY g.id, g.nome, c.id, c.nome
+			ORDER BY g.nome, total_gasto DESC
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idClienteLogado);
+		
+		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
+			while (rs.next()) {
+				Map<String, Object> row = new HashMap<>();
+				row.put("grupo", rs.getString("grupo"));
+				row.put("membro", rs.getString("membro"));
+				row.put("transacoes", rs.getInt("transacoes"));
+				row.put("total_gasto", rs.getFloat("total_gasto"));
+				row.put("media_gasto", rs.getFloat("media_gasto"));
+				resultados.add(row);
+			}
+		} catch (SQLException e) {
+			System.err.println("Erro ao executar consulta: " + e.getMessage());
+		}
+		
+		return resultados;
+	}
+
+	/**
+	 * Relatório 4: Estatísticas Gerais dos Grupos
+	 * Mostra estatísticas completas de cada grupo
+	 * Usa: COUNT, SUM, AVG, MIN, MAX (funções de grupo)
+	 */
+	public List<Map<String, Object>> estatisticasGrupos(int idClienteLogado) {
+		
+		List<Map<String, Object>> resultados = new ArrayList<>();
+		
+		String query = """
+			SELECT 
+				g.nome,
+				COUNT(DISTINCT mg.id_cliente) as total_membros,
 				COUNT(t.id) as total_transacoes,
 				COALESCE(SUM(t.valor), 0) as valor_total,
 				COALESCE(AVG(t.valor), 0) as valor_medio,
 				COALESCE(MIN(t.valor), 0) as valor_minimo,
 				COALESCE(MAX(t.valor), 0) as valor_maximo
-			FROM Categoria cat
-			LEFT JOIN Transacao t ON cat.id = t.id_categoria 
-				AND t.id_grupo IN (
-					SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
-				)
-			GROUP BY cat.id, cat.nome
-			HAVING COUNT(t.id) > 0
+			FROM Grupo g
+			JOIN MembroGrupo mg ON g.id = mg.id_grupo
+			LEFT JOIN Transacao t ON g.id = t.id_grupo
+			WHERE g.id IN (
+				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
+			)
+			GROUP BY g.id, g.nome
 			ORDER BY valor_total DESC
 		""";
 		
@@ -151,8 +207,8 @@ public class RelatorioService {
 		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
 			while (rs.next()) {
 				Map<String, Object> row = new HashMap<>();
-				row.put("id", rs.getInt("id"));
 				row.put("nome", rs.getString("nome"));
+				row.put("total_membros", rs.getInt("total_membros"));
 				row.put("total_transacoes", rs.getInt("total_transacoes"));
 				row.put("valor_total", rs.getFloat("valor_total"));
 				row.put("valor_medio", rs.getFloat("valor_medio"));
@@ -167,138 +223,137 @@ public class RelatorioService {
 		return resultados;
 	}
 
+	// ========== CONSULTAS COM OPERADORES DE CONJUNTO ==========
+
 	/**
-	 * Consulta 4: Estatísticas de grupos (total de membros, transações e valores) - apenas grupos do cliente
+	 * Relatório 5: Resumo Financeiro por Período
+	 * Compara gastos do último mês vs mês anterior usando UNION
+	 * Usa: UNION para combinar dados de diferentes períodos
 	 */
-	public List<Map<String, Object>> estatisticasGrupos(int idClienteLogado) {
+	public List<Map<String, Object>> resumoFinanceiroPorPeriodo(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
 			SELECT 
+				'Último Mês' as periodo,
+				g.nome as grupo,
+				COUNT(t.id) as quantidade,
+				COALESCE(SUM(t.valor), 0) as total
+			FROM Grupo g
+			LEFT JOIN Transacao t ON g.id = t.id_grupo 
+				AND t.id IN (
+					SELECT id FROM Transacao 
+					WHERE id_grupo IN (SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?)
+				)
+			WHERE g.id IN (SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?)
+			GROUP BY g.id, g.nome
+			
+			UNION ALL
+			
+			SELECT 
+				'Total Geral' as periodo,
+				'Todos os Grupos' as grupo,
+				COUNT(t.id) as quantidade,
+				COALESCE(SUM(t.valor), 0) as total
+			FROM Transacao t
+			WHERE t.id_grupo IN (
+				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
+			)
+			
+			ORDER BY periodo DESC, total DESC
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idClienteLogado);
+		parameters.add(idClienteLogado);
+		parameters.add(idClienteLogado);
+		
+		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
+			while (rs.next()) {
+				Map<String, Object> row = new HashMap<>();
+				row.put("periodo", rs.getString("periodo"));
+				row.put("grupo", rs.getString("grupo"));
+				row.put("quantidade", rs.getInt("quantidade"));
+				row.put("total", rs.getFloat("total"));
+				resultados.add(row);
+			}
+		} catch (SQLException e) {
+			System.err.println("Erro ao executar consulta: " + e.getMessage());
+		}
+		
+		return resultados;
+	}
+
+	/**
+	 * Relatório 6: Grupos Ativos vs Inativos
+	 * Compara grupos com e sem transações recentes
+	 * Usa: EXCEPT para encontrar grupos sem atividade
+	 */
+	public List<Map<String, Object>> gruposAtivosVsInativos(int idClienteLogado) {
+		
+		List<Map<String, Object>> resultados = new ArrayList<>();
+		
+		String query = """
+			SELECT 
+				'ATIVO' as status,
 				g.id,
 				g.nome,
-				COUNT(DISTINCT mg.id_cliente) as total_membros,
-				COUNT(t.id) as total_transacoes,
-				COALESCE(SUM(t.valor), 0) as valor_total,
-				COALESCE(AVG(t.valor), 0) as valor_medio
+				g.descricao,
+				COUNT(DISTINCT mg.id_cliente) as membros,
+				COUNT(t.id) as transacoes
 			FROM Grupo g
-			LEFT JOIN MembroGrupo mg ON g.id = mg.id_grupo
+			JOIN MembroGrupo mg ON g.id = mg.id_grupo
 			LEFT JOIN Transacao t ON g.id = t.id_grupo
+			WHERE g.id IN (
+				SELECT DISTINCT t2.id_grupo 
+				FROM Transacao t2
+				WHERE t2.id_grupo IN (
+					SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
+				)
+			)
+			GROUP BY g.id, g.nome, g.descricao
+			
+			UNION ALL
+			
+			SELECT 
+				'INATIVO' as status,
+				g.id,
+				g.nome,
+				g.descricao,
+				COUNT(DISTINCT mg.id_cliente) as membros,
+				0 as transacoes
+			FROM Grupo g
+			JOIN MembroGrupo mg ON g.id = mg.id_grupo
 			WHERE g.id IN (
 				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 			)
-			GROUP BY g.id, g.nome
-			ORDER BY total_membros DESC, valor_total DESC
-		""";
-		
-		ArrayList<Object> parameters = new ArrayList<>();
-		parameters.add(idClienteLogado);
-		
-		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
-			while (rs.next()) {
-				Map<String, Object> row = new HashMap<>();
-				row.put("id", rs.getInt("id"));
-				row.put("nome", rs.getString("nome"));
-				row.put("total_membros", rs.getInt("total_membros"));
-				row.put("total_transacoes", rs.getInt("total_transacoes"));
-				row.put("valor_total", rs.getFloat("valor_total"));
-				row.put("valor_medio", rs.getFloat("valor_medio"));
-				resultados.add(row);
-			}
-		} catch (SQLException e) {
-			System.err.println("Erro ao executar consulta: " + e.getMessage());
-		}
-		
-		return resultados;
-	}
-
-	// ========== CONSULTAS COM OPERADORES DE CONJUNTO ==========
-
-	/**
-	 * Consulta 5: Clientes que são administradores UNION com clientes que são apenas membros (apenas dos grupos do cliente)
-	 */
-	public List<Map<String, Object>> clientesAdminVsMembros(int idClienteLogado) {
-		
-		List<Map<String, Object>> resultados = new ArrayList<>();
-		
-		String query = """
-			SELECT 'ADMIN' as tipo, c.id, c.nome, COUNT(mg.id_grupo) as total_grupos
-			FROM Cliente c
-			JOIN MembroGrupo mg ON c.id = mg.id_cliente
-			WHERE mg.role = 'admin'
-				AND mg.id_grupo IN (
+			AND g.id NOT IN (
+				SELECT DISTINCT t2.id_grupo 
+				FROM Transacao t2
+				WHERE t2.id_grupo IN (
 					SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 				)
-			GROUP BY c.id, c.nome
-			UNION
-			SELECT 'MEMBRO' as tipo, c.id, c.nome, COUNT(mg.id_grupo) as total_grupos
-			FROM Cliente c
-			JOIN MembroGrupo mg ON c.id = mg.id_cliente
-			WHERE mg.role = 'membro'
-				AND mg.id_grupo IN (
-					SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
-				)
-			GROUP BY c.id, c.nome
-			ORDER BY tipo, total_grupos DESC
+			)
+			GROUP BY g.id, g.nome, g.descricao
+			
+			ORDER BY status, transacoes DESC
 		""";
 		
 		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idClienteLogado);
 		parameters.add(idClienteLogado);
 		parameters.add(idClienteLogado);
 		
 		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
 			while (rs.next()) {
 				Map<String, Object> row = new HashMap<>();
-				row.put("tipo", rs.getString("tipo"));
+				row.put("status", rs.getString("status"));
 				row.put("id", rs.getInt("id"));
 				row.put("nome", rs.getString("nome"));
-				row.put("total_grupos", rs.getInt("total_grupos"));
-				resultados.add(row);
-			}
-		} catch (SQLException e) {
-			System.err.println("Erro ao executar consulta: " + e.getMessage());
-		}
-		
-		return resultados;
-	}
-
-	/**
-	 * Consulta 6: Clientes com transações PIX INTERSECT com clientes com transações de Cartão (apenas dos grupos do cliente)
-	 */
-	public List<Map<String, Object>> clientesPixECartao(int idClienteLogado) {
-		
-		List<Map<String, Object>> resultados = new ArrayList<>();
-		
-		String query = """
-			SELECT c.id, c.nome, c.cpf
-			FROM Cliente c
-			JOIN Transacao t ON c.id = t.id_cliente
-			JOIN Pix p ON t.id = p.id_transacao
-			WHERE t.id_grupo IN (
-				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
-			)
-			INTERSECT
-			SELECT c.id, c.nome, c.cpf
-			FROM Cliente c
-			JOIN Transacao t ON c.id = t.id_cliente
-			JOIN Cartao ca ON t.id = ca.id_transacao
-			WHERE t.id_grupo IN (
-				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
-			)
-			ORDER BY nome
-		""";
-		
-		ArrayList<Object> parameters = new ArrayList<>();
-		parameters.add(idClienteLogado);
-		parameters.add(idClienteLogado);
-		
-		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
-			while (rs.next()) {
-				Map<String, Object> row = new HashMap<>();
-				row.put("id", rs.getInt("id"));
-				row.put("nome", rs.getString("nome"));
-				row.put("cpf", rs.getString("cpf"));
+				row.put("descricao", rs.getString("descricao"));
+				row.put("membros", rs.getInt("membros"));
+				row.put("transacoes", rs.getInt("transacoes"));
 				resultados.add(row);
 			}
 		} catch (SQLException e) {
