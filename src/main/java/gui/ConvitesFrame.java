@@ -19,6 +19,7 @@ public class ConvitesFrame extends JFrame {
     private ConviteService conviteService;
     private GrupoService grupoService;
     private ClienteService clienteService;
+    private JPanel centerPanel;
     
     public ConvitesFrame(MainFrame mainFrame, Acesso acessoAtual, ConviteService conviteService,
                         GrupoService grupoService, ClienteService clienteService) {
@@ -60,49 +61,12 @@ public class ConvitesFrame extends JFrame {
         
         mainPanel.add(titlePanel, BorderLayout.NORTH);
         
-        // Painel central com instruções
-        JPanel centerPanel = new JPanel(new GridBagLayout());
+        // Painel central com instruções (será substituído pela lista de convites)
+        centerPanel = new JPanel(new GridBagLayout());
         centerPanel.setBackground(Color.WHITE);
         centerPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         
-        JLabel instrucaoLabel = new JLabel("<html><center>" +
-            "<h2>Gerenciar Convites</h2>" +
-            "<p>Visualize convites recebidos ou envie novos convites para membros.</p>" +
-            "</center></html>");
-        instrucaoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        // Adicionar informa\u00e7\u00e3o sobre convites dispon\u00edveis
-        JLabel convitesInfoLabel = new JLabel();
-        convitesInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        convitesInfoLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        
-        try {
-            ConviteService.ConvitesStatus status = conviteService.getConvitesStatus(acessoAtual.getCliente().getId());
-            if (status.limite == -1) {
-                convitesInfoLabel.setText("✅ Convites Ilimitados neste mês");
-                convitesInfoLabel.setForeground(new Color(76, 175, 80));
-            } else if (status.limite == 0) {
-                convitesInfoLabel.setText("❌ Seu plano não permite enviar convites");
-                convitesInfoLabel.setForeground(Color.RED);
-            } else {
-                String texto = String.format("📊 Convites: %d enviados / %d disponíveis (%d restantes)", 
-                    status.enviados, status.limite, status.disponiveis);
-                convitesInfoLabel.setText(texto);
-                convitesInfoLabel.setForeground(status.disponiveis > 0 ? new Color(33, 150, 243) : Color.RED);
-            }
-        } catch (Exception e) {
-            convitesInfoLabel.setText("Erro ao carregar status de convites");
-            convitesInfoLabel.setForeground(Color.RED);
-        }
-        
-        JPanel centerContentPanel = new JPanel();
-        centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setBackground(Color.WHITE);
-        centerContentPanel.add(instrucaoLabel);
-        centerContentPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        centerContentPanel.add(convitesInfoLabel);
-        
-        centerPanel.add(centerContentPanel);
+        exibirInstrucoes();
         
         mainPanel.add(centerPanel, BorderLayout.CENTER);
         
@@ -151,6 +115,53 @@ public class ConvitesFrame extends JFrame {
         add(mainPanel);
     }
     
+    private void exibirInstrucoes() {
+        centerPanel.removeAll();
+        centerPanel.setLayout(new GridBagLayout());
+        centerPanel.setBackground(Color.WHITE);
+        
+        JLabel instrucaoLabel = new JLabel("<html><center>" +
+            "<h2>Gerenciar Convites</h2>" +
+            "<p>Visualize convites recebidos ou envie novos convites para membros.</p>" +
+            "</center></html>");
+        instrucaoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        // Adicionar informação sobre convites disponíveis
+        JLabel convitesInfoLabel = new JLabel();
+        convitesInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        convitesInfoLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        
+        try {
+            ConviteService.ConvitesStatus status = conviteService.getConvitesStatus(acessoAtual.getCliente().getId());
+            if (status.limite == -1) {
+                convitesInfoLabel.setText("✅ Convites Ilimitados neste mês");
+                convitesInfoLabel.setForeground(new Color(76, 175, 80));
+            } else if (status.limite == 0) {
+                convitesInfoLabel.setText("❌ Seu plano não permite enviar convites");
+                convitesInfoLabel.setForeground(Color.RED);
+            } else {
+                String texto = String.format("📊 Convites: %d enviados / %d disponíveis (%d restantes)", 
+                    status.enviados, status.limite, status.disponiveis);
+                convitesInfoLabel.setText(texto);
+                convitesInfoLabel.setForeground(status.disponiveis > 0 ? new Color(33, 150, 243) : Color.RED);
+            }
+        } catch (Exception e) {
+            convitesInfoLabel.setText("Erro ao carregar status de convites");
+            convitesInfoLabel.setForeground(Color.RED);
+        }
+        
+        JPanel centerContentPanel = new JPanel();
+        centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
+        centerContentPanel.setBackground(Color.WHITE);
+        centerContentPanel.add(instrucaoLabel);
+        centerContentPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        centerContentPanel.add(convitesInfoLabel);
+        
+        centerPanel.add(centerContentPanel);
+        centerPanel.revalidate();
+        centerPanel.repaint();
+    }
+    
     private void verConvitesRecebidos() {
         try {
             ArrayList<ConviteService.ConviteInfo> convites = conviteService.listarConvitesPendentes(
@@ -162,105 +173,11 @@ public class ConvitesFrame extends JFrame {
                     "Você não tem convites pendentes.", 
                     "Convites", 
                     JOptionPane.INFORMATION_MESSAGE);
+                exibirInstrucoes();
                 return;
             }
             
-            // Criar dialog para mostrar convites
-            JDialog dialog = new JDialog(this, "Convites Recebidos", true);
-            dialog.setSize(600, 400);
-            dialog.setLocationRelativeTo(this);
-            
-            JPanel panel = new JPanel(new BorderLayout(10, 10));
-            panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-            
-            DefaultListModel<String> listModel = new DefaultListModel<>();
-            for (ConviteService.ConviteInfo conv : convites) {
-                listModel.addElement(String.format("Grupo: %s - Convidado por: %s", 
-                    conv.nomeGrupo, conv.nomeRemetente));
-            }
-            
-            JList<String> convitesList = new JList<>(listModel);
-            convitesList.setFont(new Font("Arial", Font.PLAIN, 13));
-            convitesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            
-            JScrollPane scrollPane = new JScrollPane(convitesList);
-            panel.add(scrollPane, BorderLayout.CENTER);
-            
-            JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-            
-            JButton btnAceitar = new JButton("Aceitar");
-            btnAceitar.setBackground(new Color(76, 175, 80));
-            btnAceitar.setForeground(Color.WHITE);
-            btnAceitar.setFocusPainted(false);
-            
-            JButton btnRecusar = new JButton("Recusar");
-            btnRecusar.setBackground(new Color(244, 67, 54));
-            btnRecusar.setForeground(Color.WHITE);
-            btnRecusar.setFocusPainted(false);
-            
-            JButton btnFechar = new JButton("Fechar");
-            btnFechar.setBackground(new Color(158, 158, 158));
-            btnFechar.setForeground(Color.WHITE);
-            btnFechar.setFocusPainted(false);
-            
-            btnAceitar.addActionListener(e -> {
-                int idx = convitesList.getSelectedIndex();
-                if (idx == -1) {
-                    JOptionPane.showMessageDialog(dialog, "Selecione um convite.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-                
-                try {
-                    conviteService.aceitarConvite(convites.get(idx).id, acessoAtual.getCliente().getId());
-                    
-                    // Atualiza lista de grupos
-                    ArrayList<Grupo> gruposAtualizados = grupoService.getGrupos(acessoAtual.getCliente());
-                    acessoAtual.setGrupos(gruposAtualizados);
-                    
-                    JOptionPane.showMessageDialog(dialog, 
-                        "Convite aceito! Você agora é membro do grupo.", 
-                        "Sucesso", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    dialog.dispose();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(dialog, 
-                        "Erro: " + ex.getMessage(), 
-                        "Erro", 
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            });
-            
-            btnRecusar.addActionListener(e -> {
-                int idx = convitesList.getSelectedIndex();
-                if (idx == -1) {
-                    JOptionPane.showMessageDialog(dialog, "Selecione um convite.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-                
-                try {
-                    conviteService.recusarConvite(convites.get(idx).id, acessoAtual.getCliente().getId());
-                    JOptionPane.showMessageDialog(dialog, 
-                        "Convite recusado.", 
-                        "Sucesso", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    dialog.dispose();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(dialog, 
-                        "Erro: " + ex.getMessage(), 
-                        "Erro", 
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            });
-            
-            btnFechar.addActionListener(e -> dialog.dispose());
-            
-            btnPanel.add(btnAceitar);
-            btnPanel.add(btnRecusar);
-            btnPanel.add(btnFechar);
-            
-            panel.add(btnPanel, BorderLayout.SOUTH);
-            dialog.add(panel);
-            dialog.setVisible(true);
+            exibirConvites(convites);
             
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, 
@@ -268,6 +185,115 @@ public class ConvitesFrame extends JFrame {
                 "Erro", 
                 JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    private void exibirConvites(ArrayList<ConviteService.ConviteInfo> convites) {
+        centerPanel.removeAll();
+        centerPanel.setLayout(new BorderLayout(10, 10));
+        centerPanel.setBackground(Color.WHITE);
+        
+        // Título
+        JLabel titleLabel = new JLabel("Convites Recebidos");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        centerPanel.add(titleLabel, BorderLayout.NORTH);
+        
+        // Lista de convites
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        for (ConviteService.ConviteInfo conv : convites) {
+            listModel.addElement(String.format("Grupo: %s - Convidado por: %s", 
+                conv.nomeGrupo, conv.nomeRemetente));
+        }
+        
+        JList<String> convitesList = new JList<>(listModel);
+        convitesList.setFont(new Font("Arial", Font.PLAIN, 14));
+        convitesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        convitesList.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
+        JScrollPane scrollPane = new JScrollPane(convitesList);
+        scrollPane.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder(10, 10, 10, 10),
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY)
+        ));
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Painel de botões
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        btnPanel.setBackground(Color.WHITE);
+        
+        JButton btnAceitar = new JButton("✅ Aceitar");
+        btnAceitar.setBackground(new Color(76, 175, 80));
+        btnAceitar.setForeground(Color.WHITE);
+        btnAceitar.setFocusPainted(false);
+        btnAceitar.setFont(new Font("Arial", Font.BOLD, 13));
+        
+        JButton btnRecusar = new JButton("❌ Recusar");
+        btnRecusar.setBackground(new Color(244, 67, 54));
+        btnRecusar.setForeground(Color.WHITE);
+        btnRecusar.setFocusPainted(false);
+        btnRecusar.setFont(new Font("Arial", Font.BOLD, 13));
+        
+        btnAceitar.addActionListener(e -> {
+            int idx = convitesList.getSelectedIndex();
+            if (idx == -1) {
+                JOptionPane.showMessageDialog(this, "Selecione um convite.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            try {
+                conviteService.aceitarConvite(convites.get(idx).id, acessoAtual.getCliente().getId());
+                
+                // Atualiza lista de grupos
+                ArrayList<Grupo> gruposAtualizados = grupoService.getGrupos(acessoAtual.getCliente());
+                acessoAtual.setGrupos(gruposAtualizados);
+                
+                JOptionPane.showMessageDialog(this, 
+                    "Convite aceito! Você agora é membro do grupo.", 
+                    "Sucesso", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                // Retorna às instruções após aceitar
+                exibirInstrucoes();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, 
+                    "Erro: " + ex.getMessage(), 
+                    "Erro", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        btnRecusar.addActionListener(e -> {
+            int idx = convitesList.getSelectedIndex();
+            if (idx == -1) {
+                JOptionPane.showMessageDialog(this, "Selecione um convite.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            try {
+                conviteService.recusarConvite(convites.get(idx).id, acessoAtual.getCliente().getId());
+                JOptionPane.showMessageDialog(this, 
+                    "Convite recusado.", 
+                    "Sucesso", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                // Retorna às instruções após recusar
+                exibirInstrucoes();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, 
+                    "Erro: " + ex.getMessage(), 
+                    "Erro", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        btnPanel.add(btnAceitar);
+        btnPanel.add(btnRecusar);
+        
+        centerPanel.add(btnPanel, BorderLayout.SOUTH);
+        
+        centerPanel.revalidate();
+        centerPanel.repaint();
     }
     
     private void enviarConvite() {

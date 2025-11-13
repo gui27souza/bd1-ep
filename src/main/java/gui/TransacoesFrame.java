@@ -20,6 +20,7 @@ public class TransacoesFrame extends JFrame {
     private Acesso acessoAtual;
     private TransacaoService transacaoService;
     private GrupoService grupoService;
+    private JPanel centerPanel;
     
     public TransacoesFrame(MainFrame mainFrame, Acesso acessoAtual, 
                           TransacaoService transacaoService, GrupoService grupoService) {
@@ -111,10 +112,22 @@ public class TransacoesFrame extends JFrame {
         buttonPanel.add(btnPorCategoria);
         buttonPanel.add(btnVoltar);
         
-        // Painel central com instruções
-        JPanel centerPanel = new JPanel(new GridBagLayout());
+        // Painel central com instruções (será substituído pela tabela)
+        centerPanel = new JPanel(new GridBagLayout());
         centerPanel.setBackground(Color.WHITE);
         centerPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        
+        exibirInstrucoes();
+        
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        add(mainPanel);
+    }
+    
+    private void exibirInstrucoes() {
+        centerPanel.removeAll();
+        centerPanel.setLayout(new GridBagLayout());
         
         JLabel instrucaoLabel = new JLabel("<html><center>" +
             "<h2>Escolha uma opção</h2>" +
@@ -125,10 +138,8 @@ public class TransacoesFrame extends JFrame {
         instrucaoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(instrucaoLabel);
         
-        mainPanel.add(centerPanel, BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
-        add(mainPanel);
+        centerPanel.revalidate();
+        centerPanel.repaint();
     }
     
     private void verTransacoesPorCategoria() {
@@ -189,10 +200,11 @@ public class TransacoesFrame extends JFrame {
                     "Nenhuma transação encontrada para a categoria " + categoria.getNome() + ".",
                     "Informação",
                     JOptionPane.INFORMATION_MESSAGE);
+                exibirInstrucoes();
                 return;
             }
             
-            // Exibir tabela de transações
+            // Exibir tabela de transações no painel central
             exibirTransacoes(transacoes, "Categoria: " + categoria.getNome());
             
         } catch (Exception e) {
@@ -245,6 +257,16 @@ public class TransacoesFrame extends JFrame {
         if (grupoSelecionado != null) {
             try {
                 ArrayList<Transacao> transacoes = transacaoService.getTransacoesPorGrupo(grupoSelecionado.getId());
+                
+                if (transacoes.isEmpty()) {
+                    JOptionPane.showMessageDialog(this,
+                        "Nenhuma transação encontrada para este grupo.",
+                        "Informação",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    exibirInstrucoes();
+                    return;
+                }
+                
                 exibirTransacoes(transacoes, "Transações do Grupo: " + grupoSelecionado.getNome());
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, 
@@ -258,6 +280,16 @@ public class TransacoesFrame extends JFrame {
     private void verTodasTransacoes() {
         try {
             ArrayList<Transacao> transacoes = transacaoService.getTodasTransacoes(acessoAtual.getCliente().getId());
+            
+            if (transacoes.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                    "Você ainda não possui transações.",
+                    "Informação",
+                    JOptionPane.INFORMATION_MESSAGE);
+                exibirInstrucoes();
+                return;
+            }
+            
             exibirTransacoes(transacoes, "Todas as Minhas Transações");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, 
@@ -268,62 +300,65 @@ public class TransacoesFrame extends JFrame {
     }
     
     private void exibirTransacoes(ArrayList<Transacao> transacoes, String titulo) {
-        JDialog dialog = new JDialog(this, titulo, true);
-        dialog.setSize(900, 500);
-        dialog.setLocationRelativeTo(this);
+        // Limpar painel central
+        centerPanel.removeAll();
+        centerPanel.setLayout(new BorderLayout(10, 10));
+        centerPanel.setBackground(Color.WHITE);
         
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        // Título
+        JLabel lblTitulo = new JLabel(titulo);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
+        lblTitulo.setForeground(new Color(76, 175, 80));
+        lblTitulo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        centerPanel.add(lblTitulo, BorderLayout.NORTH);
         
-        if (transacoes.isEmpty()) {
-            JLabel msgLabel = new JLabel("Nenhuma transação encontrada.");
-            msgLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-            msgLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            panel.add(msgLabel, BorderLayout.CENTER);
-        } else {
-            // Criar tabela
-            String[] colunas = {"Data", "Valor", "Descrição", "Categoria", "Tipo"};
-            DefaultTableModel model = new DefaultTableModel(colunas, 0) {
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return false;
-                }
-            };
-            
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            
-            for (Transacao t : transacoes) {
-                String dataFormatada = "";
-                if (t.getDataTransacao() != null) {
-                    dataFormatada = dateFormat.format(t.getDataTransacao());
-                }
-                
-                model.addRow(new Object[]{
-                    dataFormatada,
-                    String.format("R$ %.2f", t.getValor()),
-                    t.getDescricao() != null ? t.getDescricao() : "",
-                    t.getCategoria().getNome(),
-                    t.getClass().getSimpleName().replace("Transacao", "")
-                });
+        // Criar tabela
+        String[] colunas = {"Data", "Valor", "Descrição", "Categoria", "Tipo"};
+        DefaultTableModel model = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        
+        for (Transacao t : transacoes) {
+            String dataFormatada = "";
+            if (t.getDataTransacao() != null) {
+                dataFormatada = dateFormat.format(t.getDataTransacao());
             }
             
-            JTable table = new JTable(model);
-            table.setFont(new Font("Arial", Font.PLAIN, 12));
-            table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
-            table.setRowHeight(25);
-            
-            JScrollPane scrollPane = new JScrollPane(table);
-            panel.add(scrollPane, BorderLayout.CENTER);
+            Object[] row = {
+                dataFormatada,
+                String.format("R$ %.2f", t.getValor()),
+                t.getDescricao() != null ? t.getDescricao() : "-",
+                t.getCategoria().getNome(),
+                t.getClass().getSimpleName().replace("Transacao", "")
+            };
+            model.addRow(row);
         }
         
-        JButton btnFechar = new JButton("Fechar");
-        btnFechar.addActionListener(e -> dialog.dispose());
-        JPanel btnPanel = new JPanel();
-        btnPanel.add(btnFechar);
-        panel.add(btnPanel, BorderLayout.SOUTH);
+        JTable table = new JTable(model);
+        table.setFont(new Font("Arial", Font.PLAIN, 12));
+        table.setRowHeight(25);
+        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        table.getTableHeader().setBackground(new Color(76, 175, 80));
+        table.getTableHeader().setForeground(Color.WHITE);
+        table.setSelectionBackground(new Color(200, 230, 201));
         
-        dialog.add(panel);
-        dialog.setVisible(true);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Informação de total
+        JLabel lblTotal = new JLabel(String.format("Total de transações: %d", transacoes.size()));
+        lblTotal.setFont(new Font("Arial", Font.BOLD, 12));
+        lblTotal.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        centerPanel.add(lblTotal, BorderLayout.SOUTH);
+        
+        centerPanel.revalidate();
+        centerPanel.repaint();
     }
     
     private void voltar() {
