@@ -63,10 +63,10 @@ public class TransacoesFrame extends JFrame {
         
         mainPanel.add(titlePanel, BorderLayout.NORTH);
         
-        // Painel de botões
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        // Painel de botões com GridLayout para acomodar todos os botões
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 3, 15, 10));
         buttonPanel.setBackground(new Color(240, 240, 240));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         
         JButton btnPorGrupo = new JButton("Ver por Grupo");
         btnPorGrupo.setFont(new Font("Arial", Font.BOLD, 14));
@@ -75,7 +75,6 @@ public class TransacoesFrame extends JFrame {
         btnPorGrupo.setFocusPainted(false);
         btnPorGrupo.setBorderPainted(false);
         btnPorGrupo.setOpaque(true);
-        btnPorGrupo.setPreferredSize(new Dimension(170, 45));
         
         JButton btnTodas = new JButton("Ver Todas");
         btnTodas.setFont(new Font("Arial", Font.BOLD, 14));
@@ -84,7 +83,6 @@ public class TransacoesFrame extends JFrame {
         btnTodas.setFocusPainted(false);
         btnTodas.setBorderPainted(false);
         btnTodas.setOpaque(true);
-        btnTodas.setPreferredSize(new Dimension(170, 45));
         
         JButton btnPorCategoria = new JButton("Ver por Categoria");
         btnPorCategoria.setFont(new Font("Arial", Font.BOLD, 14));
@@ -93,7 +91,14 @@ public class TransacoesFrame extends JFrame {
         btnPorCategoria.setFocusPainted(false);
         btnPorCategoria.setBorderPainted(false);
         btnPorCategoria.setOpaque(true);
-        btnPorCategoria.setPreferredSize(new Dimension(190, 45));
+        
+        JButton btnNova = new JButton("➕ Nova Transação");
+        btnNova.setFont(new Font("Arial", Font.BOLD, 14));
+        btnNova.setBackground(new Color(156, 39, 176));
+        btnNova.setForeground(Color.WHITE);
+        btnNova.setFocusPainted(false);
+        btnNova.setBorderPainted(false);
+        btnNova.setOpaque(true);
         
         JButton btnVoltar = new JButton("Voltar");
         btnVoltar.setFont(new Font("Arial", Font.BOLD, 14));
@@ -102,17 +107,6 @@ public class TransacoesFrame extends JFrame {
         btnVoltar.setFocusPainted(false);
         btnVoltar.setBorderPainted(false);
         btnVoltar.setOpaque(true);
-        btnVoltar.setPreferredSize(new Dimension(120, 45));
-        
-        // Botões CRUD
-        JButton btnNova = new JButton("➕ Nova Transação");
-        btnNova.setFont(new Font("Arial", Font.BOLD, 14));
-        btnNova.setBackground(new Color(156, 39, 176));
-        btnNova.setForeground(Color.WHITE);
-        btnNova.setFocusPainted(false);
-        btnNova.setBorderPainted(false);
-        btnNova.setOpaque(true);
-        btnNova.setPreferredSize(new Dimension(190, 45));
         
         btnPorGrupo.addActionListener(e -> verTransacoesPorGrupo());
         btnTodas.addActionListener(e -> verTodasTransacoes());
@@ -120,11 +114,15 @@ public class TransacoesFrame extends JFrame {
         btnNova.addActionListener(e -> novaTransacao());
         btnVoltar.addActionListener(e -> voltar());
         
+        // Primeira linha: 3 botões de visualização
         buttonPanel.add(btnPorGrupo);
         buttonPanel.add(btnTodas);
         buttonPanel.add(btnPorCategoria);
+        
+        // Segunda linha: Nova transação e Voltar (com um espaço vazio)
         buttonPanel.add(btnNova);
         buttonPanel.add(btnVoltar);
+        buttonPanel.add(new JLabel("")); // Espaço vazio para manter o layout
         
         // Painel central com instruções (será substituído pela tabela)
         centerPanel = new JPanel(new GridBagLayout());
