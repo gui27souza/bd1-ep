@@ -137,4 +137,48 @@ public class TransacaoService {
 		}
 		System.out.println("\n================================\n");
 	}
+
+	public void criarTransacao(Transacao transacao) throws SQLException {
+		String query = """
+			INSERT INTO Transacao (id_cliente, id_grupo, id_categoria, valor, descricao, data_transacao)
+			VALUES (?, ?, ?, ?, ?, ?)
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(transacao.getId_cliente());
+		parameters.add(transacao.getId_grupo());
+		parameters.add(transacao.getCategoria().getId());
+		parameters.add(transacao.getValor());
+		parameters.add(transacao.getDescricao());
+		parameters.add(transacao.getDataTransacao());
+		
+		dbConnector.executeUpdate(query, parameters);
+	}
+
+	public void editarTransacao(Transacao transacao) throws SQLException {
+		String query = """
+			UPDATE Transacao
+			SET id_grupo = ?, id_categoria = ?, valor = ?, descricao = ?, data_transacao = ?
+			WHERE id = ?
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(transacao.getId_grupo());
+		parameters.add(transacao.getCategoria().getId());
+		parameters.add(transacao.getValor());
+		parameters.add(transacao.getDescricao());
+		parameters.add(transacao.getDataTransacao());
+		parameters.add(transacao.getId());
+		
+		dbConnector.executeUpdate(query, parameters);
+	}
+
+	public void deletarTransacao(int idTransacao) throws SQLException {
+		String query = "DELETE FROM Transacao WHERE id = ?";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idTransacao);
+		
+		dbConnector.executeUpdate(query, parameters);
+	}
 }
