@@ -86,6 +86,7 @@ CREATE TABLE Convite (
     id_destino INTEGER,
     id_grupo INTEGER NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'pendente' CHECK (status IN ('pendente', 'aceito', 'recusado')),
+    data_criacao TIMESTAMP WITH TIME ZONE DEFAULT now(),
 
     CONSTRAINT fk_remetente FOREIGN KEY(id_remetente) REFERENCES Cliente(id),
     CONSTRAINT fk_destino FOREIGN KEY(id_destino) REFERENCES Cliente(id),

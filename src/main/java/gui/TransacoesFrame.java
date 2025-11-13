@@ -472,7 +472,7 @@ public class TransacoesFrame extends JFrame {
         centerPanel.add(lblTitulo, BorderLayout.NORTH);
         
         // Criar tabela
-        String[] colunas = {"ID", "Data", "Valor", "Descrição", "Categoria", "Tipo"};
+        String[] colunas = {"ID", "Data", "Valor", "Descrição", "Categoria", "Tipo Pagamento"};
         DefaultTableModel model = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -488,13 +488,21 @@ public class TransacoesFrame extends JFrame {
                 dataFormatada = dateFormat.format(t.getDataTransacao());
             }
             
+            // Buscar tipo de pagamento do banco
+            String tipoPagamento = "-";
+            try {
+                tipoPagamento = transacaoService.getTipoTransacao(t.getId());
+            } catch (SQLException e) {
+                // Se falhar, mantém "-"
+            }
+            
             Object[] row = {
                 t.getId(),
                 dataFormatada,
                 String.format("R$ %.2f", t.getValor()),
                 t.getDescricao() != null ? t.getDescricao() : "-",
                 t.getCategoria().getNome(),
-                t.getClass().getSimpleName().replace("Transacao", "")
+                tipoPagamento
             };
             model.addRow(row);
         }
@@ -816,9 +824,29 @@ public class TransacoesFrame extends JFrame {
         }
         panel.add(cbCategoria, gbc);
         
-        // Valor
+        // Tipo de Pagamento
         gbc.gridx = 0;
         gbc.gridy = 2;
+        panel.add(new JLabel("Tipo de Pagamento:"), gbc);
+        
+        gbc.gridx = 1;
+        JComboBox<String> cbTipoPagamento = new JComboBox<>(new String[]{"PIX", "CARTAO"});
+        // Definir tipo atual
+        try {
+            String tipoAtual = transacaoService.getTipoTransacao(transacao.getId());
+            if (tipoAtual.equals("CARTAO")) {
+                cbTipoPagamento.setSelectedIndex(1);
+            } else {
+                cbTipoPagamento.setSelectedIndex(0);
+            }
+        } catch (SQLException ex) {
+            cbTipoPagamento.setSelectedIndex(0);
+        }
+        panel.add(cbTipoPagamento, gbc);
+        
+        // Valor
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         panel.add(new JLabel("Valor (R$):"), gbc);
         
         gbc.gridx = 1;
@@ -826,7 +854,7 @@ public class TransacoesFrame extends JFrame {
         panel.add(txtValor, gbc);
         
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.gridwidth = 2;
         JLabel lblInfo = new JLabel("<html><i>Dica: Use valores negativos para gastos e positivos para receitas/contribuições</i></html>");
         lblInfo.setFont(new Font("Arial", Font.PLAIN, 10));
@@ -836,7 +864,7 @@ public class TransacoesFrame extends JFrame {
         
         // Descrição
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         panel.add(new JLabel("Descrição:"), gbc);
         
         gbc.gridx = 1;
@@ -845,7 +873,7 @@ public class TransacoesFrame extends JFrame {
         
         // Botões
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(20, 5, 5, 5);
         
@@ -880,6 +908,7 @@ public class TransacoesFrame extends JFrame {
                 // Buscar grupo e categoria selecionados
                 Grupo grupoSelecionado = grupos.get(cbGrupo.getSelectedIndex());
                 CategoriaTransacao categoriaSelecionada = finalCategorias.get(cbCategoria.getSelectedIndex());
+                String tipoTransacao = (String) cbTipoPagamento.getSelectedItem();
                 
                 // Atualizar transação
                 finalTransacao.setId_grupo(grupoSelecionado.getId());
@@ -887,7 +916,7 @@ public class TransacoesFrame extends JFrame {
                 finalTransacao.setValor(valor);
                 finalTransacao.setDescricao(descricao);
                 
-                transacaoService.editarTransacao(finalTransacao);
+                transacaoService.editarTransacao(finalTransacao, tipoTransacao);
                 
                 JOptionPane.showMessageDialog(dialog,
                     "Transação atualizada com sucesso!",

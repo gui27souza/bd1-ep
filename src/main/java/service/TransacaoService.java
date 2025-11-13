@@ -224,4 +224,82 @@ public class TransacaoService {
 		
 		dbConnector.executeUpdate(query, parameters);
 	}
+
+	public String getTipoTransacao(int idTransacao) throws SQLException {
+		// Verificar se existe em Pix
+		String queryPix = "SELECT id_transacao FROM Pix WHERE id_transacao = ?";
+		ArrayList<Object> paramsPix = new ArrayList<>();
+		paramsPix.add(idTransacao);
+		
+		ResultSet rsPix = dbConnector.executeQuery(queryPix, paramsPix);
+		if (rsPix.next()) {
+			rsPix.close();
+			return "PIX";
+		}
+		rsPix.close();
+		
+		// Verificar se existe em Cartao
+		String queryCartao = "SELECT id_transacao FROM Cartao WHERE id_transacao = ?";
+		ArrayList<Object> paramsCartao = new ArrayList<>();
+		paramsCartao.add(idTransacao);
+		
+		ResultSet rsCartao = dbConnector.executeQuery(queryCartao, paramsCartao);
+		if (rsCartao.next()) {
+			rsCartao.close();
+			return "CARTAO";
+		}
+		rsCartao.close();
+		
+		return "N/A";
+	}
+
+	public void editarTransacao(Transacao transacao, String novoTipo) throws SQLException {
+		// Primeiro, atualizar a transação base
+		String query = """
+			UPDATE Transacao
+			SET id_grupo = ?, id_categoria = ?, valor = ?, descricao = ?, data_transacao = ?
+			WHERE id = ?
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(transacao.getId_grupo());
+		parameters.add(transacao.getCategoria().getId());
+		parameters.add(transacao.getValor());
+		parameters.add(transacao.getDescricao());
+		parameters.add(transacao.getDataTransacao());
+		parameters.add(transacao.getId());
+		
+		dbConnector.executeUpdate(query, parameters);
+		
+		// Se tipo foi fornecido, atualizar especialização
+		if (novoTipo != null && !novoTipo.isEmpty()) {
+			int idTransacao = transacao.getId();
+			
+			// Remover de ambas as tabelas
+			String deletePix = "DELETE FROM Pix WHERE id_transacao = ?";
+			String deleteCartao = "DELETE FROM Cartao WHERE id_transacao = ?";
+			
+			ArrayList<Object> paramsDel = new ArrayList<>();
+			paramsDel.add(idTransacao);
+			
+			dbConnector.executeUpdate(deletePix, paramsDel);
+			dbConnector.executeUpdate(deleteCartao, paramsDel);
+			
+			// Inserir no tipo correto
+			if (novoTipo.equals("PIX")) {
+				String insertPix = "INSERT INTO Pix (id_transacao, chave) VALUES (?, ?)";
+				ArrayList<Object> paramsIns = new ArrayList<>();
+				paramsIns.add(idTransacao);
+				paramsIns.add("chave.generica@pix.com");
+				dbConnector.executeUpdate(insertPix, paramsIns);
+			} else if (novoTipo.equals("CARTAO")) {
+				String insertCartao = "INSERT INTO Cartao (id_transacao, bandeira, digitos_finais) VALUES (?, ?, ?)";
+				ArrayList<Object> paramsIns = new ArrayList<>();
+				paramsIns.add(idTransacao);
+				paramsIns.add("Visa");
+				paramsIns.add("0000");
+				dbConnector.executeUpdate(insertCartao, paramsIns);
+			}
+		}
+	}
 }
