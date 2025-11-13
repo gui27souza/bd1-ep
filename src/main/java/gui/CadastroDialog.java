@@ -115,7 +115,7 @@ public class CadastroDialog extends JDialog {
         buttonPanel.setBackground(new Color(240, 240, 240));
         
         JButton btnCadastrar = new JButton("Cadastrar");
-        btnCadastrar.setBackground(new Color(76, 175, 80));
+        btnCadastrar.setBackground(new Color(33, 150, 243));   // BTN_PRIMARY
         btnCadastrar.setForeground(Color.WHITE);
         btnCadastrar.setFocusPainted(false);
         btnCadastrar.setBorderPainted(false);
@@ -123,7 +123,7 @@ public class CadastroDialog extends JDialog {
         btnCadastrar.setPreferredSize(new Dimension(120, 35));
         
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(244, 67, 54));
+        btnCancelar.setBackground(new Color(244, 67, 54));     // BTN_DANGER
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFocusPainted(false);
         btnCancelar.setBorderPainted(false);

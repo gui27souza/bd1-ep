@@ -52,7 +52,7 @@ public class ConvitesFrame extends JFrame {
         
         // Painel de título
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(255, 152, 0));
+        titlePanel.setBackground(new Color(38, 198, 218));     // BTN_SUCCESS
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
         JLabel titleLabel = new JLabel("📨 Convites");
@@ -78,7 +78,7 @@ public class ConvitesFrame extends JFrame {
         
         JButton btnVerConvites = new JButton("Ver Convites Recebidos");
         btnVerConvites.setFont(new Font("Arial", Font.BOLD, 14));
-        btnVerConvites.setBackground(new Color(33, 150, 243));
+        btnVerConvites.setBackground(new Color(33, 150, 243)); // BTN_PRIMARY
         btnVerConvites.setForeground(Color.WHITE);
         btnVerConvites.setFocusPainted(false);
         btnVerConvites.setBorderPainted(false);
@@ -87,7 +87,7 @@ public class ConvitesFrame extends JFrame {
         
         JButton btnEnviarConvite = new JButton("Enviar Convite");
         btnEnviarConvite.setFont(new Font("Arial", Font.BOLD, 14));
-        btnEnviarConvite.setBackground(new Color(76, 175, 80));
+        btnEnviarConvite.setBackground(new Color(77, 182, 172)); // BTN_LIGHT
         btnEnviarConvite.setForeground(Color.WHITE);
         btnEnviarConvite.setFocusPainted(false);
         btnEnviarConvite.setBorderPainted(false);
@@ -96,7 +96,7 @@ public class ConvitesFrame extends JFrame {
         
         JButton btnVoltar = new JButton("Voltar");
         btnVoltar.setFont(new Font("Arial", Font.BOLD, 14));
-        btnVoltar.setBackground(new Color(158, 158, 158));
+        btnVoltar.setBackground(new Color(158, 158, 158));     // BTN_NEUTRAL
         btnVoltar.setForeground(Color.WHITE);
         btnVoltar.setFocusPainted(false);
         btnVoltar.setBorderPainted(false);
@@ -231,13 +231,13 @@ public class ConvitesFrame extends JFrame {
         btnPanel.setBackground(Color.WHITE);
         
         JButton btnAceitar = new JButton("✅ Aceitar");
-        btnAceitar.setBackground(new Color(76, 175, 80));
+        btnAceitar.setBackground(new Color(26, 188, 156));     // BTN_INFO
         btnAceitar.setForeground(Color.WHITE);
         btnAceitar.setFocusPainted(false);
         btnAceitar.setFont(new Font("Arial", Font.BOLD, 13));
         
         JButton btnRecusar = new JButton("❌ Recusar");
-        btnRecusar.setBackground(new Color(244, 67, 54));
+        btnRecusar.setBackground(new Color(244, 67, 54));      // BTN_DANGER
         btnRecusar.setForeground(Color.WHITE);
         btnRecusar.setFocusPainted(false);
         btnRecusar.setFont(new Font("Arial", Font.BOLD, 13));

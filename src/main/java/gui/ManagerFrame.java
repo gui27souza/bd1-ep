@@ -42,7 +42,7 @@ public class ManagerFrame extends JFrame {
         
         // Painel superior com título
         JPanel painelTitulo = new JPanel();
-        painelTitulo.setBackground(UIHelper.BLUE);
+        painelTitulo.setBackground(new Color(33, 150, 243));   // BTN_PRIMARY
         JLabel lblTitulo = new JLabel("Gerenciamento Administrativo");
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 20));
         lblTitulo.setForeground(Color.WHITE);
@@ -61,16 +61,16 @@ public class ManagerFrame extends JFrame {
         carregarNomesTabelas();
         
         // Botões
-        JButton btnVerTabela = UIHelper.createButton("Ver Tabela", UIHelper.BLUE, 120, 35);
+        JButton btnVerTabela = UIHelper.createButton("Ver Tabela", new Color(33, 150, 243), 120, 35);    // BTN_PRIMARY
         btnVerTabela.addActionListener(e -> visualizarTabela());
         
-        JButton btnVerClientes = UIHelper.createButton("Ver Clientes", UIHelper.GREEN, 120, 35);
+        JButton btnVerClientes = UIHelper.createButton("Ver Clientes", new Color(41, 182, 246), 120, 35); // BTN_SECONDARY
         btnVerClientes.addActionListener(e -> visualizarClientes());
         
-        JButton btnListarTabelas = UIHelper.createButton("Listar Tabelas", UIHelper.PURPLE, 130, 35);
+        JButton btnListarTabelas = UIHelper.createButton("Listar Tabelas", new Color(38, 198, 218), 130, 35); // BTN_SUCCESS
         btnListarTabelas.addActionListener(e -> listarTabelas());
         
-        JButton btnLimpar = UIHelper.createButton("Limpar", UIHelper.GRAY, 100, 35);
+        JButton btnLimpar = UIHelper.createButton("Limpar", new Color(158, 158, 158), 100, 35);        // BTN_NEUTRAL
         btnLimpar.addActionListener(e -> areaResultados.setText(""));
         
         painelControles.add(lblTabela);
@@ -87,7 +87,7 @@ public class ManagerFrame extends JFrame {
         areaResultados.setBackground(Color.WHITE);
         areaResultados.setForeground(Color.BLACK);
         JScrollPane scrollResultados = new JScrollPane(areaResultados);
-        scrollResultados.setBorder(BorderFactory.createLineBorder(UIHelper.GRAY));
+        scrollResultados.setBorder(BorderFactory.createLineBorder(new Color(158, 158, 158))); // BTN_NEUTRAL
         
         // Montagem
         painelPrincipal.add(painelTitulo, BorderLayout.NORTH);

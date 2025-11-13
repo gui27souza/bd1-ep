@@ -53,7 +53,7 @@ public class TransacoesFrame extends JFrame {
         
         // Painel de título
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(76, 175, 80));
+        titlePanel.setBackground(new Color(33, 150, 243));     // BTN_PRIMARY
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
         JLabel titleLabel = new JLabel("💰 Transações");
@@ -70,7 +70,7 @@ public class TransacoesFrame extends JFrame {
         
         JButton btnPorGrupo = new JButton("Ver por Grupo");
         btnPorGrupo.setFont(new Font("Arial", Font.BOLD, 14));
-        btnPorGrupo.setBackground(new Color(33, 150, 243));
+        btnPorGrupo.setBackground(new Color(33, 150, 243));    // BTN_PRIMARY
         btnPorGrupo.setForeground(Color.WHITE);
         btnPorGrupo.setFocusPainted(false);
         btnPorGrupo.setBorderPainted(false);
@@ -78,7 +78,7 @@ public class TransacoesFrame extends JFrame {
         
         JButton btnTodas = new JButton("Ver Todas");
         btnTodas.setFont(new Font("Arial", Font.BOLD, 14));
-        btnTodas.setBackground(new Color(76, 175, 80));
+        btnTodas.setBackground(new Color(41, 182, 246));       // BTN_SECONDARY
         btnTodas.setForeground(Color.WHITE);
         btnTodas.setFocusPainted(false);
         btnTodas.setBorderPainted(false);
@@ -86,7 +86,7 @@ public class TransacoesFrame extends JFrame {
         
         JButton btnPorCategoria = new JButton("Ver por Categoria");
         btnPorCategoria.setFont(new Font("Arial", Font.BOLD, 14));
-        btnPorCategoria.setBackground(new Color(255, 152, 0));
+        btnPorCategoria.setBackground(new Color(38, 198, 218)); // BTN_SUCCESS
         btnPorCategoria.setForeground(Color.WHITE);
         btnPorCategoria.setFocusPainted(false);
         btnPorCategoria.setBorderPainted(false);
@@ -94,7 +94,7 @@ public class TransacoesFrame extends JFrame {
         
         JButton btnPorPeriodo = new JButton("📅 Ver por Período");
         btnPorPeriodo.setFont(new Font("Arial", Font.BOLD, 14));
-        btnPorPeriodo.setBackground(new Color(103, 58, 183));
+        btnPorPeriodo.setBackground(new Color(26, 188, 156));  // BTN_INFO
         btnPorPeriodo.setForeground(Color.WHITE);
         btnPorPeriodo.setFocusPainted(false);
         btnPorPeriodo.setBorderPainted(false);
@@ -102,7 +102,7 @@ public class TransacoesFrame extends JFrame {
         
         JButton btnNova = new JButton("➕ Nova Transação");
         btnNova.setFont(new Font("Arial", Font.BOLD, 14));
-        btnNova.setBackground(new Color(156, 39, 176));
+        btnNova.setBackground(new Color(77, 182, 172));        // BTN_LIGHT
         btnNova.setForeground(Color.WHITE);
         btnNova.setFocusPainted(false);
         btnNova.setBorderPainted(false);
@@ -110,7 +110,7 @@ public class TransacoesFrame extends JFrame {
         
         JButton btnVoltar = new JButton("Voltar");
         btnVoltar.setFont(new Font("Arial", Font.BOLD, 14));
-        btnVoltar.setBackground(new Color(158, 158, 158));
+        btnVoltar.setBackground(new Color(158, 158, 158));     // BTN_NEUTRAL
         btnVoltar.setForeground(Color.WHITE);
         btnVoltar.setFocusPainted(false);
         btnVoltar.setBorderPainted(false);
@@ -369,7 +369,7 @@ public class TransacoesFrame extends JFrame {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         
         JButton btnBuscar = new JButton("🔍 Buscar");
-        btnBuscar.setBackground(new Color(76, 175, 80));
+        btnBuscar.setBackground(new Color(33, 150, 243));      // BTN_PRIMARY
         btnBuscar.setForeground(Color.WHITE);
         btnBuscar.setFocusPainted(false);
         btnBuscar.setPreferredSize(new Dimension(120, 35));
@@ -511,7 +511,7 @@ public class TransacoesFrame extends JFrame {
         tabelaTransacoes.setFont(new Font("Arial", Font.PLAIN, 12));
         tabelaTransacoes.setRowHeight(25);
         tabelaTransacoes.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
-        tabelaTransacoes.getTableHeader().setBackground(new Color(76, 175, 80));
+        tabelaTransacoes.getTableHeader().setBackground(new Color(33, 150, 243)); // BTN_PRIMARY
         tabelaTransacoes.getTableHeader().setForeground(Color.WHITE);
         tabelaTransacoes.setSelectionBackground(new Color(200, 230, 201));
         
@@ -534,14 +534,14 @@ public class TransacoesFrame extends JFrame {
         
         JButton btnEditar = new JButton("✏️ Editar");
         btnEditar.setFont(new Font("Arial", Font.BOLD, 12));
-        btnEditar.setBackground(new Color(255, 152, 0));
+        btnEditar.setBackground(new Color(38, 198, 218));      // BTN_SUCCESS
         btnEditar.setForeground(Color.WHITE);
         btnEditar.setFocusPainted(false);
         btnEditar.setPreferredSize(new Dimension(110, 35));
         
         JButton btnDeletar = new JButton("🗑️ Deletar");
         btnDeletar.setFont(new Font("Arial", Font.BOLD, 12));
-        btnDeletar.setBackground(new Color(244, 67, 54));
+        btnDeletar.setBackground(new Color(244, 67, 54));      // BTN_DANGER
         btnDeletar.setForeground(Color.WHITE);
         btnDeletar.setFocusPainted(false);
         btnDeletar.setPreferredSize(new Dimension(110, 35));

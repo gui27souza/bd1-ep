@@ -43,7 +43,7 @@ public class RelatoriosFrame extends JFrame {
         
         // Painel de título
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(233, 30, 99));
+        titlePanel.setBackground(new Color(26, 188, 156));     // BTN_INFO
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
         JLabel titleLabel = new JLabel("📊 Relatórios e Consultas");
@@ -101,7 +101,7 @@ public class RelatoriosFrame extends JFrame {
         
         JButton btnVoltar = new JButton("Voltar");
         btnVoltar.setFont(new Font("Arial", Font.BOLD, 13));
-        btnVoltar.setBackground(new Color(158, 158, 158));
+        btnVoltar.setBackground(new Color(158, 158, 158));     // BTN_NEUTRAL
         btnVoltar.setForeground(Color.WHITE);
         btnVoltar.setFocusPainted(false);
         btnVoltar.setPreferredSize(new Dimension(100, 40));
@@ -375,7 +375,7 @@ public class RelatoriosFrame extends JFrame {
         // Título
         JLabel lblTitulo = new JLabel(titulo);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
-        lblTitulo.setForeground(UIHelper.PINK);
+        lblTitulo.setForeground(new Color(26, 188, 156));      // BTN_INFO
         lblTitulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         mainPanel.add(lblTitulo, BorderLayout.NORTH);
         

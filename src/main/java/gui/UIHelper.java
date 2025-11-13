@@ -15,13 +15,14 @@ public class UIHelper {
     public static final Color TEXT_GRAY = new Color(100, 100, 100);
     public static final Color FIELD_BACKGROUND = Color.WHITE;
     
-    // Cores dos botões
-    public static final Color BLUE = new Color(33, 150, 243);
-    public static final Color GREEN = new Color(76, 175, 80);
-    public static final Color ORANGE = new Color(255, 152, 0);
-    public static final Color PURPLE = new Color(156, 39, 176);
-    public static final Color PINK = new Color(233, 30, 99);
-    public static final Color GRAY = new Color(158, 158, 158);
+    // Paleta de gradiente Azul → Verde-Água
+    public static final Color BTN_PRIMARY = new Color(33, 150, 243);      // Azul primário
+    public static final Color BTN_SECONDARY = new Color(41, 182, 246);    // Azul claro
+    public static final Color BTN_SUCCESS = new Color(38, 198, 218);      // Ciano
+    public static final Color BTN_INFO = new Color(26, 188, 156);         // Turquesa
+    public static final Color BTN_LIGHT = new Color(77, 182, 172);        // Verde-água
+    public static final Color BTN_DANGER = new Color(244, 67, 54);        // Vermelho (para delete/cancelar)
+    public static final Color BTN_NEUTRAL = new Color(158, 158, 158);     // Cinza
     
     /**
      * Configura um label com cores explícitas para cross-platform
@@ -76,7 +77,7 @@ public class UIHelper {
     public static void configureList(JList<?> list) {
         list.setBackground(FIELD_BACKGROUND);
         list.setForeground(TEXT_BLACK);
-        list.setSelectionBackground(BLUE);
+        list.setSelectionBackground(BTN_PRIMARY);
         list.setSelectionForeground(TEXT_WHITE);
     }
     
@@ -86,7 +87,7 @@ public class UIHelper {
     public static void configureTable(JTable table) {
         table.setBackground(FIELD_BACKGROUND);
         table.setForeground(TEXT_BLACK);
-        table.setSelectionBackground(BLUE);
+        table.setSelectionBackground(BTN_PRIMARY);
         table.setSelectionForeground(TEXT_WHITE);
         table.setGridColor(new Color(200, 200, 200));
         table.getTableHeader().setBackground(new Color(220, 220, 220));

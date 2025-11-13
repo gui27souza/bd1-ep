@@ -63,12 +63,12 @@ public class MainFrame extends JFrame {
         mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
         
         // Botões do menu
-        JButton btnGrupos = createMenuButton("👥 Gerenciar Grupos", new Color(33, 150, 243));
-        JButton btnTransacoes = createMenuButton("💰 Ver Transações", new Color(76, 175, 80));
-        JButton btnConvites = createMenuButton("📨 Ver Convites", new Color(255, 152, 0));
-        JButton btnCadastro = createMenuButton("👤 Ver/Editar Cadastro", new Color(156, 39, 176));
-        JButton btnRelatorios = createMenuButton("📊 Relatórios e Consultas", new Color(233, 30, 99));
-        JButton btnSair = createMenuButton("🚪 Sair", new Color(96, 125, 139));
+        JButton btnGrupos = createMenuButton("👥 Gerenciar Grupos", new Color(33, 150, 243));      // BTN_PRIMARY
+        JButton btnTransacoes = createMenuButton("💰 Ver Transações", new Color(41, 182, 246));  // BTN_SECONDARY
+        JButton btnConvites = createMenuButton("📨 Ver Convites", new Color(38, 198, 218));      // BTN_SUCCESS
+        JButton btnCadastro = createMenuButton("👤 Ver Meus Dados", new Color(77, 182, 172));    // BTN_LIGHT
+        JButton btnRelatorios = createMenuButton("📊 Relatórios e Consultas", new Color(26, 188, 156)); // BTN_INFO
+        JButton btnSair = createMenuButton("🚪 Sair", new Color(158, 158, 158));                 // BTN_NEUTRAL
         
         // Eventos dos botões
         btnGrupos.addActionListener(e -> abrirGrupos());

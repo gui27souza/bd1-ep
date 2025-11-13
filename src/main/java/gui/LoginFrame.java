@@ -101,8 +101,8 @@ public class LoginFrame extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         buttonPanel.setBackground(new Color(240, 240, 240));
         
-        JButton btnLogin = UIHelper.createButton("Entrar", UIHelper.BLUE, 140, 40);
-        JButton btnCadastro = UIHelper.createButton("Criar Conta", UIHelper.GREEN, 140, 40);
+        JButton btnLogin = UIHelper.createButton("Entrar", new Color(33, 150, 243), 140, 40);      // BTN_PRIMARY
+        JButton btnCadastro = UIHelper.createButton("Criar Conta", new Color(26, 188, 156), 140, 40); // BTN_INFO
         
         btnLogin.addActionListener(e -> fazerLogin());
         btnCadastro.addActionListener(e -> fazerCadastro());

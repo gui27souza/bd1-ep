@@ -61,7 +61,7 @@ public class GruposFrame extends JFrame {
         
         // Painel de título
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(33, 150, 243));
+        titlePanel.setBackground(new Color(33, 150, 243));     // BTN_PRIMARY
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
         JLabel titleLabel = new JLabel("👥 Meus Grupos");
@@ -152,8 +152,8 @@ public class GruposFrame extends JFrame {
         buttonPanel.setBackground(new Color(240, 240, 240));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        JButton btnCriarGrupo = UIHelper.createButton("Criar Novo Grupo", UIHelper.GREEN, 180, 45);
-        JButton btnVoltar = UIHelper.createButton("Voltar", UIHelper.GRAY, 120, 45);
+        JButton btnCriarGrupo = UIHelper.createButton("Criar Novo Grupo", new Color(77, 182, 172), 180, 45); // BTN_LIGHT
+        JButton btnVoltar = UIHelper.createButton("Voltar", new Color(158, 158, 158), 120, 45);         // BTN_NEUTRAL
         
         btnCriarGrupo.addActionListener(e -> criarNovoGrupo());
         btnVoltar.addActionListener(e -> voltar());
@@ -237,7 +237,7 @@ public class GruposFrame extends JFrame {
         
         JLabel lblNome = new JLabel(grupo.getNome());
         lblNome.setFont(new Font("Arial", Font.BOLD, 18));
-        lblNome.setForeground(UIHelper.BLUE);
+        lblNome.setForeground(new Color(33, 150, 243));        // BTN_PRIMARY
         
         JLabel lblDescricao = new JLabel(
             (grupo.getDescricao() != null && !grupo.getDescricao().isEmpty()) 
@@ -249,7 +249,7 @@ public class GruposFrame extends JFrame {
         
         JLabel lblStatus = new JLabel("Status: " + grupo.getStatus().toUpperCase());
         lblStatus.setFont(new Font("Arial", Font.PLAIN, 12));
-        lblStatus.setForeground(grupo.getStatus().equals("ativo") ? UIHelper.GREEN : Color.RED);
+        lblStatus.setForeground(grupo.getStatus().equals("ativo") ? new Color(26, 188, 156) : Color.RED); // BTN_INFO
         
         JLabel lblData = new JLabel("Criado em: " + grupo.getDataCriacao());
         lblData.setFont(new Font("Arial", Font.PLAIN, 11));
@@ -316,7 +316,7 @@ public class GruposFrame extends JFrame {
                     adminPanel.add(btnDeletar);
                     
                 } else if (grupo.getStatus().equals("arquivado")) {
-                    JButton btnDesarquivar = UIHelper.createButton("✅ Desarquivar", UIHelper.GREEN, 160, 35);
+                    JButton btnDesarquivar = UIHelper.createButton("✅ Desarquivar", new Color(26, 188, 156), 160, 35); // BTN_INFO
                     btnDesarquivar.addActionListener(e -> desarquivarGrupo(grupo));
                     
                     JButton btnDeletar = UIHelper.createButton("🗑️ Deletar", new Color(244, 67, 54), 130, 35);
@@ -690,14 +690,14 @@ public class GruposFrame extends JFrame {
         btnPanel.setBackground(Color.WHITE);
         
         JButton btnRemover = new JButton("🗑️ Remover");
-        btnRemover.setBackground(new Color(244, 67, 54));
+        btnRemover.setBackground(new Color(244, 67, 54));      // BTN_DANGER
         btnRemover.setForeground(Color.WHITE);
         btnRemover.setFocusPainted(false);
         btnRemover.setFont(new Font("Arial", Font.BOLD, 13));
         btnRemover.setPreferredSize(new Dimension(130, 35));
         
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(158, 158, 158));
+        btnCancelar.setBackground(new Color(158, 158, 158));   // BTN_NEUTRAL
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFocusPainted(false);
         btnCancelar.setFont(new Font("Arial", Font.BOLD, 13));

@@ -50,7 +50,7 @@ public class CadastroFrame extends JFrame {
         
         // Painel de título
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(156, 39, 176));
+        titlePanel.setBackground(new Color(77, 182, 172));     // BTN_LIGHT
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
         JLabel titleLabel = new JLabel("👤 Meu Cadastro");
@@ -104,7 +104,7 @@ public class CadastroFrame extends JFrame {
         
         JButton btnVoltar = new JButton("Voltar");
         btnVoltar.setFont(new Font("Arial", Font.BOLD, 13));
-        btnVoltar.setBackground(new Color(158, 158, 158));
+        btnVoltar.setBackground(new Color(158, 158, 158));     // BTN_NEUTRAL
         btnVoltar.setForeground(Color.WHITE);
         btnVoltar.setFocusPainted(false);
         btnVoltar.setPreferredSize(new Dimension(100, 40));
@@ -193,7 +193,7 @@ public class CadastroFrame extends JFrame {
             
             JButton btnFechar = new JButton("Fechar");
             btnFechar.setFont(new Font("Arial", Font.BOLD, 13));
-            btnFechar.setBackground(new Color(156, 39, 176));
+            btnFechar.setBackground(new Color(33, 150, 243));  // BTN_PRIMARY
             btnFechar.setForeground(Color.WHITE);
             btnFechar.setFocusPainted(false);
             btnFechar.setPreferredSize(new Dimension(120, 35));
@@ -357,12 +357,12 @@ public class CadastroFrame extends JFrame {
             JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
             
             JButton btnSelecionar = new JButton("Selecionar");
-            btnSelecionar.setBackground(new Color(76, 175, 80));
+            btnSelecionar.setBackground(new Color(33, 150, 243)); // BTN_PRIMARY
             btnSelecionar.setForeground(Color.WHITE);
             btnSelecionar.setFocusPainted(false);
             
             JButton btnCancelar = new JButton("Cancelar");
-            btnCancelar.setBackground(new Color(158, 158, 158));
+            btnCancelar.setBackground(new Color(158, 158, 158));   // BTN_NEUTRAL
             btnCancelar.setForeground(Color.WHITE);
             btnCancelar.setFocusPainted(false);
             
