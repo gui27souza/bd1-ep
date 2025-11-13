@@ -127,10 +127,16 @@ public class DBConnector {
 						pstmt.setInt(index, (Integer) param);
 					} else if (param instanceof Long) {
 						pstmt.setLong(index, (Long) param);
+					} else if (param instanceof Float) {
+						pstmt.setFloat(index, (Float) param);
 					} else if (param instanceof Double) {
 						pstmt.setDouble(index, (Double) param);
 					} else if (param instanceof Boolean) {
 						pstmt.setBoolean(index, (Boolean) param);
+					} else if (param instanceof java.sql.Timestamp) {
+						pstmt.setTimestamp(index, (java.sql.Timestamp) param);
+					} else if (param instanceof java.sql.Date) {
+						pstmt.setDate(index, (java.sql.Date) param);
 					} else if (param == null) {
 						pstmt.setNull(index, java.sql.Types.VARCHAR);
 					}
