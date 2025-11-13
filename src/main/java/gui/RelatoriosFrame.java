@@ -151,12 +151,13 @@ public class RelatoriosFrame extends JFrame {
             if (row.get("data_transacao") != null) {
                 dataFormatada = dateFormat.format(row.get("data_transacao"));
             }
+            double valor = ((Number) row.get("valor")).doubleValue();
             Object[] rowData = {
                 dataFormatada,
                 row.get("grupo"),
                 row.get("cliente"),
                 row.get("categoria"),
-                String.format("R$ %.2f", (Float) row.get("valor"))
+                String.format("R$ %.2f", valor)
             };
 			tableModel.addRow(rowData);
 		}
@@ -183,12 +184,13 @@ public class RelatoriosFrame extends JFrame {
 			if (row.get("data_transacao") != null) {
 				dataFormatada = dateFormat.format(row.get("data_transacao"));
 			}
+			double valor = ((Number) row.get("valor")).doubleValue();
 			Object[] rowData = {
 				dataFormatada,
 				row.get("grupo"),
 				row.get("cliente"),
 				row.get("categoria"),
-				String.format("R$ %.2f", (Float) row.get("valor"))
+				String.format("R$ %.2f", valor)
 			};
 			tableModel.addRow(rowData);
 		}
@@ -211,11 +213,13 @@ public class RelatoriosFrame extends JFrame {
             }
         };
         for (Map<String, Object> row : dados) {
+            double total = ((Number) row.get("total")).doubleValue();
+            double percentual = ((Number) row.get("percentual")).doubleValue();
             Object[] rowData = {
                 row.get("categoria"),
                 row.get("quantidade"),
-                String.format("R$ %.2f", (Float) row.get("total")),
-                String.format("%.1f%%", (Float) row.get("percentual"))
+                String.format("R$ %.2f", total),
+                String.format("%.1f%%", percentual)
             };
             tableModel.addRow(rowData);
         }
@@ -238,12 +242,14 @@ public class RelatoriosFrame extends JFrame {
             }
         };
         for (Map<String, Object> row : dados) {
+            double totalGasto = ((Number) row.get("total_gasto")).doubleValue();
+            double mediaGasto = ((Number) row.get("media_gasto")).doubleValue();
             Object[] rowData = {
                 row.get("grupo"),
                 row.get("membro"),
                 row.get("transacoes"),
-                String.format("R$ %.2f", (Float) row.get("total_gasto")),
-                String.format("R$ %.2f", (Float) row.get("media_gasto"))
+                String.format("R$ %.2f", totalGasto),
+                String.format("R$ %.2f", mediaGasto)
             };
             tableModel.addRow(rowData);
         }
@@ -266,14 +272,18 @@ public class RelatoriosFrame extends JFrame {
             }
         };
         for (Map<String, Object> row : dados) {
+            double valorTotal = ((Number) row.get("valor_total")).doubleValue();
+            double valorMedio = ((Number) row.get("valor_medio")).doubleValue();
+            double valorMinimo = ((Number) row.get("valor_minimo")).doubleValue();
+            double valorMaximo = ((Number) row.get("valor_maximo")).doubleValue();
             Object[] rowData = {
                 row.get("nome"),
                 row.get("total_membros"),
                 row.get("total_transacoes"),
-                String.format("R$ %.2f", (Float) row.get("valor_total")),
-                String.format("R$ %.2f", (Float) row.get("valor_medio")),
-                String.format("R$ %.2f", (Float) row.get("valor_minimo")),
-                String.format("R$ %.2f", (Float) row.get("valor_maximo"))
+                String.format("R$ %.2f", valorTotal),
+                String.format("R$ %.2f", valorMedio),
+                String.format("R$ %.2f", valorMinimo),
+                String.format("R$ %.2f", valorMaximo)
             };
             tableModel.addRow(rowData);
         }
@@ -296,12 +306,15 @@ public class RelatoriosFrame extends JFrame {
             }
         };
         for (Map<String, Object> row : dados) {
+            double totalGastos = ((Number) row.get("total_gastos")).doubleValue();
+            double totalReceitas = ((Number) row.get("total_receitas")).doubleValue();
+            double saldo = ((Number) row.get("saldo")).doubleValue();
             Object[] rowData = {
                 row.get("periodo"),
                 row.get("quantidade_transacoes"),
-                String.format("R$ %.2f", (Float) row.get("total_gastos")),
-                String.format("R$ %.2f", (Float) row.get("total_receitas")),
-                String.format("R$ %.2f", (Float) row.get("saldo"))
+                String.format("R$ %.2f", totalGastos),
+                String.format("R$ %.2f", totalReceitas),
+                String.format("R$ %.2f", saldo)
             };
             tableModel.addRow(rowData);
         }
