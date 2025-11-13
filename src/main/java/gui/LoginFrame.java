@@ -26,6 +26,9 @@ public class LoginFrame extends JFrame {
         this.grupoService = grupoService;
         
         initComponents();
+        
+        // Garantir visibilidade em todos os sistemas
+        UIHelper.ensureVisibility(this);
     }
     
     private void initComponents() {
@@ -67,12 +70,15 @@ public class LoginFrame extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         JLabel lblEmail = new JLabel("E-mail:");
         lblEmail.setFont(new Font("Arial", Font.BOLD, 14));
+        lblEmail.setForeground(Color.BLACK);
         mainPanel.add(lblEmail, gbc);
         
         gbc.gridx = 1;
         txtEmail = new JTextField(20);
         txtEmail.setFont(new Font("Arial", Font.PLAIN, 14));
         txtEmail.setPreferredSize(new Dimension(250, 30));
+        txtEmail.setBackground(Color.WHITE);
+        txtEmail.setForeground(Color.BLACK);
         mainPanel.add(txtEmail, gbc);
         
         // Senha
@@ -80,12 +86,15 @@ public class LoginFrame extends JFrame {
         gbc.gridy = 3;
         JLabel lblSenha = new JLabel("Senha:");
         lblSenha.setFont(new Font("Arial", Font.BOLD, 14));
+        lblSenha.setForeground(Color.BLACK);
         mainPanel.add(lblSenha, gbc);
         
         gbc.gridx = 1;
         txtSenha = new JPasswordField(20);
         txtSenha.setFont(new Font("Arial", Font.PLAIN, 14));
         txtSenha.setPreferredSize(new Dimension(250, 30));
+        txtSenha.setBackground(Color.WHITE);
+        txtSenha.setForeground(Color.BLACK);
         mainPanel.add(txtSenha, gbc);
         
         // Botões

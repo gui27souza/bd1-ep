@@ -13,11 +13,23 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		// Configurar look and feel do sistema
+		// Configurar look and feel cross-platform (Metal) para consistência entre sistemas
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			// Usar Metal Look and Feel (padrão Java, funciona igual em todos os SOs)
+			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+			
+			// Configurações adicionais para garantir visibilidade dos componentes
+			UIManager.put("Button.background", new java.awt.Color(238, 238, 238));
+			UIManager.put("Panel.background", new java.awt.Color(240, 240, 240));
+			UIManager.put("OptionPane.background", new java.awt.Color(240, 240, 240));
+			UIManager.put("TextField.background", java.awt.Color.WHITE);
+			UIManager.put("PasswordField.background", java.awt.Color.WHITE);
+			UIManager.put("TextArea.background", java.awt.Color.WHITE);
+			UIManager.put("List.background", java.awt.Color.WHITE);
+			UIManager.put("Table.background", java.awt.Color.WHITE);
+			
 		} catch (Exception e) {
-			// Usar look and feel padrão se falhar
+			System.err.println("Erro ao configurar Look and Feel: " + e.getMessage());
 		}
 		
 		// Iniciar interface gráfica
