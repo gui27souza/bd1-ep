@@ -309,7 +309,7 @@ public class GruposFrame extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
         try {
-            ArrayList<Cliente> membros = grupoService.getMembros(grupo.getId());
+            ArrayList<GrupoService.MembroInfo> membros = grupoService.getMembrosComRole(grupo.getId());
             
             if (membros.isEmpty()) {
                 JLabel lblVazio = new JLabel("<html><div style='text-align: center; color: gray;'>" +
@@ -317,10 +317,15 @@ public class GruposFrame extends JFrame {
                 panel.add(lblVazio, BorderLayout.CENTER);
             } else {
                 DefaultListModel<String> membrosModel = new DefaultListModel<>();
-                for (Cliente membro : membros) {
+                for (GrupoService.MembroInfo membroInfo : membros) {
+                    Cliente membro = membroInfo.cliente;
+                    String role = membroInfo.role;
                     String cpfMasked = membro.getCpf().substring(0, 3) + ".***.***-" + 
                                       membro.getCpf().substring(membro.getCpf().length() - 2);
-                    membrosModel.addElement("👤 " + membro.getNome() + " (" + cpfMasked + ")");
+                    
+                    String roleIcon = role.equals("admin") ? "👑" : "👤";
+                    String roleText = role.equals("admin") ? " [ADMIN]" : "";
+                    membrosModel.addElement(roleIcon + " " + membro.getNome() + roleText + " (" + cpfMasked + ")");
                 }
                 
                 JList<String> membrosList = new JList<>(membrosModel);
@@ -332,11 +337,24 @@ public class GruposFrame extends JFrame {
                 JScrollPane scrollPane = new JScrollPane(membrosList);
                 scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
                 
+                // Painel superior com total e botão de remover (se for admin)
+                JPanel topPanel = new JPanel(new BorderLayout(10, 5));
+                topPanel.setBackground(Color.WHITE);
+                
                 JLabel lblTotal = new JLabel("Total: " + membros.size() + " membro(s)");
                 lblTotal.setFont(new Font("Arial", Font.BOLD, 12));
                 lblTotal.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                topPanel.add(lblTotal, BorderLayout.WEST);
                 
-                panel.add(lblTotal, BorderLayout.NORTH);
+                // Adicionar botão de remover se for admin e grupo estiver ativo
+                boolean isAdmin = grupoService.isAdmin(acessoAtual.getCliente().getId(), grupo.getId());
+                if (isAdmin && grupo.getStatus().equals("ativo")) {
+                    JButton btnRemover = UIHelper.createButton("➖ Remover Membro", new Color(244, 67, 54), 160, 30);
+                    btnRemover.addActionListener(e -> removerMembroDialog(grupo, membros));
+                    topPanel.add(btnRemover, BorderLayout.EAST);
+                }
+                
+                panel.add(topPanel, BorderLayout.NORTH);
                 panel.add(scrollPane, BorderLayout.CENTER);
             }
         } catch (Exception e) {
@@ -572,6 +590,134 @@ public class GruposFrame extends JFrame {
                 e.printStackTrace();
             }
         }
+    }
+    
+    private void removerMembroDialog(Grupo grupo, ArrayList<GrupoService.MembroInfo> membros) {
+        // Filtrar apenas membros não-admin para remover
+        ArrayList<GrupoService.MembroInfo> membrosRemoveveis = new ArrayList<>();
+        for (GrupoService.MembroInfo membroInfo : membros) {
+            // Não pode remover admin nem a si mesmo
+            if (!membroInfo.role.equals("admin") && 
+                membroInfo.cliente.getId() != acessoAtual.getCliente().getId()) {
+                membrosRemoveveis.add(membroInfo);
+            }
+        }
+        
+        if (membrosRemoveveis.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Não há membros disponíveis para remoção.\n" +
+                "Administradores não podem ser removidos.",
+                "Aviso",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Criar dialog de seleção
+        JDialog dialog = new JDialog(this, "Remover Membro do Grupo", true);
+        dialog.setSize(450, 350);
+        dialog.setLocationRelativeTo(this);
+        
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        panel.setBackground(Color.WHITE);
+        
+        // Título
+        JLabel lblTitulo = new JLabel("<html><b>Selecione o membro para remover:</b></html>");
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
+        lblTitulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        panel.add(lblTitulo, BorderLayout.NORTH);
+        
+        // Lista de membros
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        for (GrupoService.MembroInfo membroInfo : membrosRemoveveis) {
+            Cliente membro = membroInfo.cliente;
+            String cpfMasked = membro.getCpf().substring(0, 3) + ".***.***-" + 
+                              membro.getCpf().substring(membro.getCpf().length() - 2);
+            listModel.addElement("👤 " + membro.getNome() + " (" + cpfMasked + ")");
+        }
+        
+        JList<String> membrosList = new JList<>(listModel);
+        membrosList.setFont(new Font("Arial", Font.PLAIN, 13));
+        membrosList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        membrosList.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
+        JScrollPane scrollPane = new JScrollPane(membrosList);
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        panel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Painel de botões
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        btnPanel.setBackground(Color.WHITE);
+        
+        JButton btnRemover = new JButton("🗑️ Remover");
+        btnRemover.setBackground(new Color(244, 67, 54));
+        btnRemover.setForeground(Color.WHITE);
+        btnRemover.setFocusPainted(false);
+        btnRemover.setFont(new Font("Arial", Font.BOLD, 13));
+        btnRemover.setPreferredSize(new Dimension(130, 35));
+        
+        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.setBackground(new Color(158, 158, 158));
+        btnCancelar.setForeground(Color.WHITE);
+        btnCancelar.setFocusPainted(false);
+        btnCancelar.setFont(new Font("Arial", Font.BOLD, 13));
+        btnCancelar.setPreferredSize(new Dimension(130, 35));
+        
+        btnRemover.addActionListener(e -> {
+            int selectedIndex = membrosList.getSelectedIndex();
+            if (selectedIndex == -1) {
+                JOptionPane.showMessageDialog(dialog,
+                    "Selecione um membro para remover.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            GrupoService.MembroInfo membroSelecionado = membrosRemoveveis.get(selectedIndex);
+            
+            // Confirmação
+            int confirm = JOptionPane.showConfirmDialog(dialog,
+                String.format("Tem certeza que deseja remover '%s' do grupo '%s'?",
+                    membroSelecionado.cliente.getNome(), grupo.getNome()),
+                "Confirmar Remoção",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    grupoService.removerMembro(
+                        grupo.getId(),
+                        membroSelecionado.cliente.getId(),
+                        acessoAtual.getCliente().getId()
+                    );
+                    
+                    JOptionPane.showMessageDialog(dialog,
+                        "Membro removido com sucesso!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    
+                    dialog.dispose();
+                    
+                    // Atualizar visualização do grupo
+                    atualizarGrupoELista(grupo);
+                    
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(dialog,
+                        "Erro ao remover membro: " + ex.getMessage(),
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        
+        btnCancelar.addActionListener(e -> dialog.dispose());
+        
+        btnPanel.add(btnRemover);
+        btnPanel.add(btnCancelar);
+        panel.add(btnPanel, BorderLayout.SOUTH);
+        
+        dialog.add(panel);
+        dialog.setVisible(true);
     }
     
     private void atualizarGrupoELista(Grupo grupo) throws Exception {

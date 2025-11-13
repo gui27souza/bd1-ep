@@ -253,4 +253,90 @@ public class GrupoService {
 	public void desarquivarGrupo(int idGrupo, int idCliente) throws DomainException, SQLException {
 		alterarStatusGrupo(idGrupo, "ativo", idCliente);
 	}
+	
+	/**
+	 * Remove um membro do grupo
+	 * Apenas administradores podem remover membros
+	 * Validações:
+	 * - Admin não pode se remover
+	 * - Não pode remover outro admin
+	 * - Grupo deve ter pelo menos 1 membro após remoção
+	 */
+	public void removerMembro(int idGrupo, int idClienteRemover, int idClienteAdmin) throws DomainException, SQLException {
+		
+		// Verificar se quem está removendo é admin
+		if (!isAdmin(idClienteAdmin, idGrupo)) {
+			throw new DomainException("Apenas administradores podem remover membros do grupo.");
+		}
+		
+		// Admin não pode se remover
+		if (idClienteRemover == idClienteAdmin) {
+			throw new DomainException("Administradores não podem se remover do grupo.");
+		}
+		
+		// Verificar se o membro a ser removido é admin
+		if (isAdmin(idClienteRemover, idGrupo)) {
+			throw new DomainException("Não é possível remover outro administrador do grupo.");
+		}
+		
+		// Verificar se o grupo terá pelo menos 1 membro após remoção
+		ArrayList<Cliente> membros = getMembros(idGrupo);
+		if (membros.size() <= 1) {
+			throw new DomainException("Não é possível remover o último membro do grupo.");
+		}
+		
+		// Remover membro
+		String query = "DELETE FROM MembroGrupo WHERE id_cliente = ? AND id_grupo = ?";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idClienteRemover);
+		parameters.add(idGrupo);
+
+		int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
+
+		if (rowsAffected == 0) {
+			throw new SQLException("Falha ao remover membro do grupo.");
+		}
+	}
+	
+	/**
+	 * Retorna informação completa de membros incluindo seu papel (admin/membro)
+	 */
+	public static class MembroInfo {
+		public Cliente cliente;
+		public String role;
+		
+		public MembroInfo(Cliente cliente, String role) {
+			this.cliente = cliente;
+			this.role = role;
+		}
+	}
+	
+	public ArrayList<MembroInfo> getMembrosComRole(int idGrupo) throws SQLException {
+		String query = """
+				SELECT c.*, mg.role FROM Cliente c
+				INNER JOIN MembroGrupo mg ON c.id = mg.id_cliente
+				WHERE mg.id_grupo = ?
+				ORDER BY mg.role DESC, c.nome
+		""";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idGrupo);
+
+		ArrayList<MembroInfo> membros = new ArrayList<>();
+
+		try (ResultSet resultSet = this.dbConnector.executeQuery(query, parameters)) {
+			while (resultSet.next()) {
+				int id = resultSet.getInt("id");
+				String nome = resultSet.getString("nome");
+				String cpf = resultSet.getString("cpf");
+				java.sql.Date dataNascimento = resultSet.getDate("data_nasc");
+				int idPlano = resultSet.getInt("id_plano");
+				String role = resultSet.getString("role");
+
+				Cliente cliente = new Cliente(id, nome, cpf, dataNascimento, idPlano);
+				membros.add(new MembroInfo(cliente, role));
+			}
+		}
+
+		return membros;
+	}
 }
