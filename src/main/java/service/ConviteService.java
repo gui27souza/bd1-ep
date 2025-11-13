@@ -99,7 +99,7 @@ public class ConviteService {
 			JOIN Plano p ON c.id_plano = p.id
 			LEFT JOIN Convite conv ON conv.id_remetente = c.id 
 				AND conv.status IN ('pendente', 'aceito')
-				AND DATE_TRUNC('month', CURRENT_DATE) = DATE_TRUNC('month', CURRENT_DATE)
+				AND DATE_TRUNC('month', conv.data_criacao) = DATE_TRUNC('month', CURRENT_DATE)
 			WHERE c.id = ?
 			GROUP BY p.qtd_convites
 		""";
@@ -136,7 +136,7 @@ public class ConviteService {
 			JOIN Plano p ON c.id_plano = p.id
 			LEFT JOIN Convite conv ON conv.id_remetente = c.id 
 				AND conv.status IN ('pendente', 'aceito')
-				AND DATE_TRUNC('month', CURRENT_DATE) = DATE_TRUNC('month', CURRENT_DATE)
+				AND DATE_TRUNC('month', conv.data_criacao) = DATE_TRUNC('month', CURRENT_DATE)
 			WHERE c.id = ?
 			GROUP BY p.qtd_convites
 		""";
@@ -213,6 +213,7 @@ public class ConviteService {
 				conv.id,
 				conv.id_remetente,
 				conv.id_grupo,
+				conv.data_criacao,
 				c_rem.nome as nome_remetente,
 				g.nome as nome_grupo,
 				g.descricao as descricao_grupo
@@ -220,7 +221,7 @@ public class ConviteService {
 			JOIN Cliente c_rem ON conv.id_remetente = c_rem.id
 			JOIN Grupo g ON conv.id_grupo = g.id
 			WHERE conv.id_destino = ? AND conv.status = 'pendente'
-			ORDER BY conv.id DESC
+			ORDER BY conv.data_criacao DESC
 		""";
 
 		ArrayList<Object> parameters = new ArrayList<>();
@@ -236,7 +237,8 @@ public class ConviteService {
 					rs.getInt("id_grupo"),
 					rs.getString("nome_remetente"),
 					rs.getString("nome_grupo"),
-					rs.getString("descricao_grupo")
+					rs.getString("descricao_grupo"),
+					rs.getTimestamp("data_criacao")
 				);
 				convites.add(info);
 			}
@@ -342,14 +344,16 @@ public class ConviteService {
 		public final String nomeRemetente;
 		public final String nomeGrupo;
 		public final String descricaoGrupo;
+		public final java.sql.Timestamp dataCriacao;
 
-		public ConviteInfo(int id, int idRemetente, int idGrupo, String nomeRemetente, String nomeGrupo, String descricaoGrupo) {
+		public ConviteInfo(int id, int idRemetente, int idGrupo, String nomeRemetente, String nomeGrupo, String descricaoGrupo, java.sql.Timestamp dataCriacao) {
 			this.id = id;
 			this.idRemetente = idRemetente;
 			this.idGrupo = idGrupo;
 			this.nomeRemetente = nomeRemetente;
 			this.nomeGrupo = nomeGrupo;
 			this.descricaoGrupo = descricaoGrupo;
+			this.dataCriacao = dataCriacao;
 		}
 	}
 }

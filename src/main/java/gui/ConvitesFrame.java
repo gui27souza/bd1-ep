@@ -10,6 +10,7 @@ import main.java.service.GrupoService;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class ConvitesFrame extends JFrame {
@@ -201,9 +202,16 @@ public class ConvitesFrame extends JFrame {
         
         // Lista de convites
         DefaultListModel<String> listModel = new DefaultListModel<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        
         for (ConviteService.ConviteInfo conv : convites) {
-            listModel.addElement(String.format("Grupo: %s - Convidado por: %s", 
-                conv.nomeGrupo, conv.nomeRemetente));
+            String dataFormatada = "";
+            if (conv.dataCriacao != null) {
+                dataFormatada = dateFormat.format(conv.dataCriacao);
+            }
+            
+            listModel.addElement(String.format("[%s] Grupo: %s - Convidado por: %s", 
+                dataFormatada, conv.nomeGrupo, conv.nomeRemetente));
         }
         
         JList<String> convitesList = new JList<>(listModel);
