@@ -26,18 +26,23 @@ public class ConviteService {
 		if (!clientePodeEnviarConvites(idRemetente)) {
 			throw new DomainException("Seu plano não permite enviar convites. Faça upgrade para um plano superior.");
 		}
+		
+		// Validação 2: Verificar se o cliente não atingiu o limite de convites do mês
+		if (!clienteTemConvitesDisponiveis(idRemetente)) {
+			throw new DomainException("Você já atingiu o limite de convites do seu plano neste mês. Aguarde o próximo ciclo ou faça upgrade.");
+		}
 
-		// Validação 2: Verificar se o remetente é admin do grupo
+		// Validação 3: Verificar se o remetente é admin do grupo
 		if (!clienteEhAdminDoGrupo(idRemetente, idGrupo)) {
 			throw new DomainException("Você precisa ser administrador do grupo para enviar convites.");
 		}
 
-		// Validação 3: Verificar se o destino já é membro do grupo
+		// Validação 4: Verificar se o destino já é membro do grupo
 		if (clienteJaEstaNoGrupo(idDestino, idGrupo)) {
 			throw new DomainException("Este cliente já é membro do grupo.");
 		}
 
-		// Validação 4: Verificar se já existe um convite pendente
+		// Validação 5: Verificar se já existe um convite pendente
 		if (existeConvitePendente(idDestino, idGrupo)) {
 			throw new DomainException("Já existe um convite pendente para este cliente neste grupo.");
 		}
@@ -77,6 +82,75 @@ public class ConviteService {
 				return qtdConvites > 0;
 			}
 			return false;
+		}
+	}
+	
+	/**
+	 * Verifica se o cliente ainda tem convites disponíveis no mês atual
+	 * Compara quantidade de convites enviados no mês com o limite do plano
+	 */
+	private boolean clienteTemConvitesDisponiveis(int idCliente) throws SQLException {
+		
+		String query = """
+			SELECT 
+				p.qtd_convites as limite,
+				COUNT(conv.id) as enviados
+			FROM Cliente c
+			JOIN Plano p ON c.id_plano = p.id
+			LEFT JOIN Convite conv ON conv.id_remetente = c.id 
+				AND conv.status IN ('pendente', 'aceito')
+				AND DATE_TRUNC('month', CURRENT_DATE) = DATE_TRUNC('month', CURRENT_DATE)
+			WHERE c.id = ?
+			GROUP BY p.qtd_convites
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idCliente);
+
+		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
+			if (rs.next()) {
+				int limite = rs.getInt("limite");
+				int enviados = rs.getInt("enviados");
+				
+				// Se o limite é -1, significa convites ilimitados
+				if (limite == -1) {
+					return true;
+				}
+				
+				return enviados < limite;
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * Retorna quantidade de convites disponíveis do cliente no mês
+	 */
+	public ConvitesStatus getConvitesStatus(int idCliente) throws SQLException {
+		
+		String query = """
+			SELECT 
+				p.qtd_convites as limite,
+				COUNT(conv.id) as enviados
+			FROM Cliente c
+			JOIN Plano p ON c.id_plano = p.id
+			LEFT JOIN Convite conv ON conv.id_remetente = c.id 
+				AND conv.status IN ('pendente', 'aceito')
+				AND DATE_TRUNC('month', CURRENT_DATE) = DATE_TRUNC('month', CURRENT_DATE)
+			WHERE c.id = ?
+			GROUP BY p.qtd_convites
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idCliente);
+
+		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
+			if (rs.next()) {
+				int limite = rs.getInt("limite");
+				int enviados = rs.getInt("enviados");
+				return new ConvitesStatus(limite, enviados);
+			}
+			return new ConvitesStatus(0, 0);
 		}
 	}
 
@@ -241,6 +315,21 @@ public class ConviteService {
 		paramsUpdate.add(idConvite);
 
 		dbConnector.executeUpdate(queryUpdate, paramsUpdate);
+	}
+
+	/**
+	 * Classe interna para armazenar status de convites
+	 */
+	public static class ConvitesStatus {
+		public final int limite;
+		public final int enviados;
+		public final int disponiveis;
+		
+		public ConvitesStatus(int limite, int enviados) {
+			this.limite = limite;
+			this.enviados = enviados;
+			this.disponiveis = (limite == -1) ? -1 : Math.max(0, limite - enviados);
+		}
 	}
 
 	/**

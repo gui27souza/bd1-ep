@@ -70,7 +70,39 @@ public class ConvitesFrame extends JFrame {
             "<p>Visualize convites recebidos ou envie novos convites para membros.</p>" +
             "</center></html>");
         instrucaoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        centerPanel.add(instrucaoLabel);
+        
+        // Adicionar informa\u00e7\u00e3o sobre convites dispon\u00edveis
+        JLabel convitesInfoLabel = new JLabel();
+        convitesInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        convitesInfoLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        
+        try {
+            ConviteService.ConvitesStatus status = conviteService.getConvitesStatus(acessoAtual.getCliente().getId());
+            if (status.limite == -1) {
+                convitesInfoLabel.setText("✅ Convites Ilimitados neste mês");
+                convitesInfoLabel.setForeground(new Color(76, 175, 80));
+            } else if (status.limite == 0) {
+                convitesInfoLabel.setText("❌ Seu plano não permite enviar convites");
+                convitesInfoLabel.setForeground(Color.RED);
+            } else {
+                String texto = String.format("📊 Convites: %d enviados / %d disponíveis (%d restantes)", 
+                    status.enviados, status.limite, status.disponiveis);
+                convitesInfoLabel.setText(texto);
+                convitesInfoLabel.setForeground(status.disponiveis > 0 ? new Color(33, 150, 243) : Color.RED);
+            }
+        } catch (Exception e) {
+            convitesInfoLabel.setText("Erro ao carregar status de convites");
+            convitesInfoLabel.setForeground(Color.RED);
+        }
+        
+        JPanel centerContentPanel = new JPanel();
+        centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
+        centerContentPanel.setBackground(Color.WHITE);
+        centerContentPanel.add(instrucaoLabel);
+        centerContentPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        centerContentPanel.add(convitesInfoLabel);
+        
+        centerPanel.add(centerContentPanel);
         
         mainPanel.add(centerPanel, BorderLayout.CENTER);
         

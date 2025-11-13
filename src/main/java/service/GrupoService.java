@@ -183,4 +183,50 @@ public class GrupoService {
 			return 0;
 		}
 	}
+	
+	/**
+	 * Verifica se um cliente é administrador de um grupo
+	 */
+	public boolean isAdmin(int idCliente, int idGrupo) throws SQLException {
+		String query = "SELECT role FROM MembroGrupo WHERE id_cliente = ? AND id_grupo = ?";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idCliente);
+		parameters.add(idGrupo);
+
+		try (ResultSet resultSet = this.dbConnector.executeQuery(query, parameters)) {
+			if (resultSet.next()) {
+				String role = resultSet.getString("role");
+				return "admin".equals(role);
+			}
+			return false;
+		}
+	}
+	
+	/**
+	 * Altera o status de um grupo (ativo, inativo, arquivado)
+	 * Apenas administradores podem fazer esta operação
+	 */
+	public void alterarStatusGrupo(int idGrupo, String novoStatus, int idCliente) throws DomainException, SQLException {
+		
+		// Verificar se o cliente é admin do grupo
+		if (!isAdmin(idCliente, idGrupo)) {
+			throw new DomainException("Apenas administradores podem alterar o status do grupo.");
+		}
+		
+		// Validar status
+		if (!novoStatus.equals("ativo") && !novoStatus.equals("inativo") && !novoStatus.equals("arquivado")) {
+			throw new DomainException("Status inválido. Use 'ativo', 'inativo' ou 'arquivado'.");
+		}
+		
+		String query = "UPDATE Grupo SET status = ? WHERE id = ?";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(novoStatus);
+		parameters.add(idGrupo);
+
+		int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
+
+		if (rowsAffected == 0) {
+			throw new SQLException("Falha ao atualizar status do grupo.");
+		}
+	}
 }

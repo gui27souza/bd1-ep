@@ -149,11 +149,16 @@ public class GruposFrame extends JFrame {
         grupos = acessoAtual.getGrupos();
         
         if (grupos.isEmpty()) {
-            listModel.addElement("📭 Você não pertence a nenhum grupo ainda.");
+            listModel.addElement("Nenhum grupo encontrado");
         } else {
-            for (Grupo grupo : grupos) {
-                String status = grupo.getStatus().equals("ativo") ? "✓" : "✗";
-                listModel.addElement(status + " " + grupo.getNome() + " - " + grupo.getStatus().toUpperCase());
+            for (Grupo g : grupos) {
+                String statusIcon = switch (g.getStatus()) {
+                    case "ativo" -> "✅";
+                    case "arquivado" -> "📦";
+                    case "inativo" -> "⏸️";
+                    default -> "";
+                };
+                listModel.addElement(statusIcon + " " + g.getNome() + " (" + g.getStatus() + ")");
             }
         }
     }
@@ -251,6 +256,35 @@ public class GruposFrame extends JFrame {
         tabbedPane.addTab("💰 Transações", transacoesPanel);
         
         detailsPanel.add(tabbedPane, BorderLayout.CENTER);
+        
+        // Painel de botões de administração (se for admin)
+        try {
+            boolean isAdmin = grupoService.isAdmin(acessoAtual.getCliente().getId(), grupo.getId());
+            if (isAdmin) {
+                JPanel adminPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+                adminPanel.setBackground(Color.WHITE);
+                adminPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                
+                if (grupo.getStatus().equals("ativo")) {
+                    JButton btnArquivar = UIHelper.createButton("📦 Arquivar Grupo", new Color(255, 152, 0), 150, 35);
+                    btnArquivar.addActionListener(e -> alterarStatusGrupo(grupo, "arquivado"));
+                    adminPanel.add(btnArquivar);
+                } else if (grupo.getStatus().equals("arquivado")) {
+                    JButton btnDesarquivar = UIHelper.createButton("✅ Desarquivar Grupo", UIHelper.GREEN, 160, 35);
+                    btnDesarquivar.addActionListener(e -> alterarStatusGrupo(grupo, "ativo"));
+                    adminPanel.add(btnDesarquivar);
+                } else if (grupo.getStatus().equals("inativo")) {
+                    JButton btnAtivar = UIHelper.createButton("✅ Ativar Grupo", UIHelper.GREEN, 140, 35);
+                    btnAtivar.addActionListener(e -> alterarStatusGrupo(grupo, "ativo"));
+                    adminPanel.add(btnAtivar);
+                }
+                
+                detailsPanel.add(adminPanel, BorderLayout.SOUTH);
+            }
+        } catch (SQLException e) {
+            // Se falhar ao verificar se é admin, não mostra os botões
+            e.printStackTrace();
+        }
         
         detailsPanel.revalidate();
         detailsPanel.repaint();
@@ -437,6 +471,59 @@ public class GruposFrame extends JFrame {
                     "Erro ao criar grupo: " + e.getMessage(), 
                     "Erro", 
                     JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void alterarStatusGrupo(Grupo grupo, String novoStatus) {
+        String acao = switch (novoStatus) {
+            case "arquivado" -> "arquivar";
+            case "ativo" -> grupo.getStatus().equals("arquivado") ? "desarquivar" : "ativar";
+            case "inativo" -> "inativar";
+            default -> "alterar";
+        };
+        
+        int confirm = JOptionPane.showConfirmDialog(this,
+            String.format("Tem certeza que deseja %s o grupo '%s'?", acao, grupo.getNome()),
+            "Confirmar",
+            JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                grupoService.alterarStatusGrupo(grupo.getId(), novoStatus, acessoAtual.getCliente().getId());
+                
+                // Atualizar o status local do grupo
+                grupo.setStatus(novoStatus);
+                
+                // Recarregar a lista de grupos
+                ArrayList<Grupo> gruposAtualizados = grupoService.getGrupos(acessoAtual.getCliente());
+                acessoAtual.setGrupos(gruposAtualizados);
+                carregarGrupos();
+                
+                // Reselecionar o grupo para atualizar os detalhes
+                int index = grupos.indexOf(grupo);
+                if (index >= 0) {
+                    gruposList.setSelectedIndex(index);
+                }
+                
+                String mensagemSucesso = switch (novoStatus) {
+                    case "arquivado" -> "Grupo arquivado com sucesso! Ele ainda aparecerá na lista mas marcado como arquivado.";
+                    case "ativo" -> "Grupo ativado com sucesso!";
+                    case "inativo" -> "Grupo inativado com sucesso!";
+                    default -> "Status alterado com sucesso!";
+                };
+                
+                JOptionPane.showMessageDialog(this,
+                    mensagemSucesso,
+                    "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE);
+                    
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                    "Erro ao alterar status do grupo: " + e.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
             }
         }
     }
