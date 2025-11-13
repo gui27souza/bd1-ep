@@ -1,4 +1,5 @@
 package main.java.gui;
+
 import main.java.model.Acesso;
 import main.java.service.CadastroService;
 import main.java.service.ClienteService;
@@ -10,11 +11,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 public class CadastroFrame extends JFrame {
+
     private MainFrame mainFrame;
     private Acesso acessoAtual;
+
     private ClienteService clienteService;
     private CadastroService cadastroService;
     private PlanoService planoService;
+
     public CadastroFrame(MainFrame mainFrame, Acesso acessoAtual, ClienteService clienteService,
                         CadastroService cadastroService, PlanoService planoService) {
         this.mainFrame = mainFrame;
@@ -22,11 +26,16 @@ public class CadastroFrame extends JFrame {
         this.clienteService = clienteService;
         this.cadastroService = cadastroService;
         this.planoService = planoService;
+
         initComponents();
     }
 
+
     private void initComponents() {
+        
+        // configuração da janela
         setTitle("Meu Cadastro");
+        
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -34,13 +43,17 @@ public class CadastroFrame extends JFrame {
                 voltar();
             }
         });
+        
         setSize(800, 650);
         setLocationRelativeTo(null);
         setResizable(true);
+        
+        // painel principal
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         mainPanel.setBackground(new Color(240, 240, 240));
-        // Painel de título
+        
+        // título
         JPanel titlePanel = new JPanel();
         titlePanel.setBackground(new Color(77, 182, 172));     // BTN_LIGHT
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -49,7 +62,8 @@ public class CadastroFrame extends JFrame {
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
         mainPanel.add(titlePanel, BorderLayout.NORTH);
-        // Painel central com opções
+        
+        // opções de cadastro
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBackground(Color.WHITE);
@@ -57,19 +71,24 @@ public class CadastroFrame extends JFrame {
             BorderFactory.createLineBorder(Color.LIGHT_GRAY),
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
-        // Botões de ações
-        JButton btnVerDados = createActionButton("Ver Meus Dados", new Color(33, 150, 243));      // BTN_PRIMARY
-        JButton btnEditarNome = createActionButton("Editar Nome", new Color(41, 182, 246));       // BTN_SECONDARY
-        JButton btnEditarEmail = createActionButton("Editar E-mail", new Color(38, 198, 218));    // BTN_SUCCESS
-        JButton btnEditarCpf = createActionButton("Editar CPF", new Color(26, 188, 156));         // BTN_INFO
-        JButton btnEditarData = createActionButton("Editar Data de Nascimento", new Color(77, 182, 172)); // BTN_LIGHT
-        JButton btnTrocarPlano = createActionButton("Trocar Plano", new Color(33, 150, 243));     // BTN_PRIMARY
+        
+        // botões de ação
+        JButton btnVerDados = createActionButton("Ver Meus Dados", new Color(33, 150, 243));
+        JButton btnEditarNome = createActionButton("Editar Nome", new Color(41, 182, 246));
+        JButton btnEditarEmail = createActionButton("Editar E-mail", new Color(38, 198, 218));
+        JButton btnEditarCpf = createActionButton("Editar CPF", new Color(26, 188, 156));
+        JButton btnEditarData = createActionButton("Editar Data de Nascimento", new Color(77, 182, 172));
+        JButton btnTrocarPlano = createActionButton("Trocar Plano", new Color(33, 150, 243));
+        
+        // listeners
         btnVerDados.addActionListener(e -> verDados());
         btnEditarNome.addActionListener(e -> editarNome());
         btnEditarEmail.addActionListener(e -> editarEmail());
         btnEditarCpf.addActionListener(e -> editarCpf());
         btnEditarData.addActionListener(e -> editarDataNascimento());
         btnTrocarPlano.addActionListener(e -> trocarPlano());
+        
+        // montagem do painel
         centerPanel.add(btnVerDados);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         centerPanel.add(btnEditarNome);
@@ -81,8 +100,10 @@ public class CadastroFrame extends JFrame {
         centerPanel.add(btnEditarData);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         centerPanel.add(btnTrocarPlano);
+        
         mainPanel.add(centerPanel, BorderLayout.CENTER);
-        // Botão voltar
+        
+        // botão voltar
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBackground(new Color(240, 240, 240));
         JButton btnVoltar = new JButton("Voltar");
@@ -108,7 +129,8 @@ public class CadastroFrame extends JFrame {
         button.setBorderPainted(false);
         button.setOpaque(true);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        // Efeito hover
+        
+        // efeito hover
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(adjustBrightness(color, 0.9f));
@@ -130,22 +152,28 @@ public class CadastroFrame extends JFrame {
 
     private void verDados() {
         try {
-            // Buscar plano atual
+            
+            // buscar dados do plano
             PlanoService.PlanoInfo plano = planoService.getPlanoAtual(acessoAtual.getCliente().getId());
-            // Criar dialog customizado
+            
+            // janela de exibição
             JDialog dialog = new JDialog(this, "Meus Dados", true);
             dialog.setSize(550, 450);
             dialog.setLocationRelativeTo(this);
+            
+            // painel principal
             JPanel mainPanel = new JPanel(new BorderLayout(15, 15));
             mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
             mainPanel.setBackground(Color.WHITE);
-            // Título
+            
+            // título
             JLabel titleLabel = new JLabel("👤 Meus Dados Pessoais");
             titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
             titleLabel.setForeground(new Color(156, 39, 176));
             titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
             mainPanel.add(titleLabel, BorderLayout.NORTH);
-            // Painel de informações
+            
+            // informações
             JPanel infoPanel = new JPanel();
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
             infoPanel.setBackground(Color.WHITE);
@@ -153,18 +181,22 @@ public class CadastroFrame extends JFrame {
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
             ));
-            // Adicionar informações com formatação elegante
+            
+            // dados pessoais
             addInfoRow(infoPanel, "Nome:", acessoAtual.getCliente().getNome());
             addInfoRow(infoPanel, "E-mail:", acessoAtual.getEmail());
             addInfoRow(infoPanel, "CPF:", acessoAtual.getCliente().getCpf());
             addInfoRow(infoPanel, "Data de Nascimento:", acessoAtual.getCliente().getDataNascimento().toString());
+            
             infoPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-            // Separador
+            
+            // separador
             JSeparator separator = new JSeparator();
             separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
             infoPanel.add(separator);
             infoPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-            // Informações do plano com destaque
+            
+            // informações do plano
             JLabel planoTitleLabel = new JLabel("💳 Plano Atual");
             planoTitleLabel.setFont(new Font("Arial", Font.BOLD, 14));
             planoTitleLabel.setForeground(new Color(33, 150, 243));
@@ -174,8 +206,10 @@ public class CadastroFrame extends JFrame {
             addInfoRow(infoPanel, "Nome do Plano:", plano.nome);
             addInfoRow(infoPanel, "Valor Mensal:", String.format("R$ %.2f", plano.valor));
             addInfoRow(infoPanel, "Convites Disponíveis:", String.valueOf(plano.qtdConvites));
+            
             mainPanel.add(infoPanel, BorderLayout.CENTER);
-            // Botão fechar
+            
+            // botão fechar
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             buttonPanel.setBackground(Color.WHITE);
             JButton btnFechar = new JButton("Fechar");
@@ -199,14 +233,18 @@ public class CadastroFrame extends JFrame {
     }
 
     private void addInfoRow(JPanel panel, String label, String value) {
+        
+        // linha de informação
         JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
         rowPanel.setBackground(Color.WHITE);
         rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        
         JLabel lblLabel = new JLabel(label);
         lblLabel.setFont(new Font("Arial", Font.BOLD, 13));
         lblLabel.setPreferredSize(new Dimension(180, 25));
         lblLabel.setForeground(new Color(80, 80, 80));
+        
         JLabel lblValue = new JLabel(value);
         lblValue.setFont(new Font("Arial", Font.PLAIN, 13));
         lblValue.setForeground(new Color(50, 50, 50));
@@ -216,9 +254,12 @@ public class CadastroFrame extends JFrame {
     }
 
     private void editarNome() {
+        
+        // solicitar novo nome
         String novoNome = JOptionPane.showInputDialog(this, 
             "Digite o novo nome:", 
             acessoAtual.getCliente().getNome());
+        
         if (novoNome != null && !novoNome.trim().isEmpty()) {
             try {
                 clienteService.updateNome(acessoAtual.getCliente().getId(), novoNome.trim());
@@ -237,9 +278,12 @@ public class CadastroFrame extends JFrame {
     }
 
     private void editarEmail() {
+        
+        // solicitar novo email
         String novoEmail = JOptionPane.showInputDialog(this, 
             "Digite o novo e-mail:", 
             acessoAtual.getEmail());
+        
         if (novoEmail != null && !novoEmail.trim().isEmpty()) {
             try {
                 cadastroService.updateEmail(acessoAtual.getId(), novoEmail.trim());
@@ -258,9 +302,12 @@ public class CadastroFrame extends JFrame {
     }
 
     private void editarCpf() {
+        
+        // solicitar novo cpf
         String novoCpf = JOptionPane.showInputDialog(this, 
             "Digite o novo CPF (11 dígitos):", 
             acessoAtual.getCliente().getCpf());
+        
         if (novoCpf != null && !novoCpf.trim().isEmpty()) {
             try {
                 clienteService.updateCpf(acessoAtual.getCliente().getId(), novoCpf.trim());
@@ -279,9 +326,12 @@ public class CadastroFrame extends JFrame {
     }
 
     private void editarDataNascimento() {
+        
+        // solicitar nova data
         String novaData = JOptionPane.showInputDialog(this, 
             "Digite a nova data de nascimento (AAAA-MM-DD):", 
             acessoAtual.getCliente().getDataNascimento());
+        
         if (novaData != null && !novaData.trim().isEmpty()) {
             try {
                 LocalDate data = LocalDate.parse(novaData.trim(), DateTimeFormatter.ISO_LOCAL_DATE);
@@ -307,44 +357,62 @@ public class CadastroFrame extends JFrame {
 
     private void trocarPlano() {
         try {
+            
+            // buscar planos disponíveis
             ArrayList<PlanoService.PlanoInfo> planos = planoService.listarPlanos();
-            // Criar dialog para escolher plano
+            
+            // janela de seleção
             JDialog dialog = new JDialog(this, "Trocar Plano", true);
             dialog.setSize(500, 400);
             dialog.setLocationRelativeTo(this);
+            
             JPanel panel = new JPanel(new BorderLayout(10, 10));
             panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+            
+            // lista de planos
             DefaultListModel<String> listModel = new DefaultListModel<>();
             for (PlanoService.PlanoInfo plano : planos) {
                 listModel.addElement(String.format("%s - R$ %.2f - %d convites", 
                     plano.nome, plano.valor, plano.qtdConvites));
             }
+            
             JList<String> planosList = new JList<>(listModel);
             planosList.setFont(new Font("Arial", Font.PLAIN, 13));
             planosList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            
             JScrollPane scrollPane = new JScrollPane(planosList);
             panel.add(scrollPane, BorderLayout.CENTER);
+            
+            // botões
             JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+            
             JButton btnSelecionar = new JButton("Selecionar");
-            btnSelecionar.setBackground(new Color(33, 150, 243)); // BTN_PRIMARY
+            btnSelecionar.setBackground(new Color(33, 150, 243));
             btnSelecionar.setForeground(Color.WHITE);
             btnSelecionar.setFocusPainted(false);
+            
             JButton btnCancelar = new JButton("Cancelar");
-            btnCancelar.setBackground(new Color(158, 158, 158));   // BTN_NEUTRAL
+            btnCancelar.setBackground(new Color(158, 158, 158));
             btnCancelar.setForeground(Color.WHITE);
             btnCancelar.setFocusPainted(false);
+            
             btnSelecionar.addActionListener(e -> {
+                
+                // validação
                 int idx = planosList.getSelectedIndex();
                 if (idx == -1) {
                     JOptionPane.showMessageDialog(dialog, "Selecione um plano.", "Aviso", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
+                
+                // confirmação
                 PlanoService.PlanoInfo planoSelecionado = planos.get(idx);
                 int confirm = JOptionPane.showConfirmDialog(dialog, 
                     String.format("Deseja trocar para o plano %s (R$ %.2f)?", 
                         planoSelecionado.nome, planoSelecionado.valor),
                     "Confirmar", 
                     JOptionPane.YES_NO_OPTION);
+                
                 if (confirm == JOptionPane.YES_OPTION) {
                     try {
                         planoService.atualizarPlanoCliente(acessoAtual.getCliente().getId(), planoSelecionado.id);
@@ -361,10 +429,14 @@ public class CadastroFrame extends JFrame {
                     }
                 }
             });
+            
             btnCancelar.addActionListener(e -> dialog.dispose());
+            
             btnPanel.add(btnSelecionar);
             btnPanel.add(btnCancelar);
+            
             panel.add(btnPanel, BorderLayout.SOUTH);
+            
             dialog.add(panel);
             dialog.setVisible(true);
         } catch (Exception e) {

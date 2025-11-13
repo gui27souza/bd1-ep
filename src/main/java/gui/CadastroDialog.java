@@ -3,7 +3,6 @@ package main.java.gui;
 import main.java.model.Cliente;
 import main.java.service.CadastroService;
 import main.java.service.ClienteService;
-
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
@@ -31,18 +30,22 @@ public class CadastroDialog extends JDialog {
     }
     
     private void initComponents() {
+        
+        // configuração da janela
         setSize(450, 450);
         setLocationRelativeTo(getParent());
         setResizable(false);
         
+        // painel principal
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(new Color(240, 240, 240));
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         
-        // Título
+        // título
         JLabel titleLabel = new JLabel("Criar Nova Conta");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setForeground(new Color(76, 175, 80));
@@ -55,7 +58,7 @@ public class CadastroDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.WEST;
         
-        // Nome
+        // campos do formulário
         gbc.gridy = 1;
         gbc.gridx = 0;
         mainPanel.add(new JLabel("Nome completo:"), gbc);
@@ -63,7 +66,6 @@ public class CadastroDialog extends JDialog {
         txtNome = new JTextField(20);
         mainPanel.add(txtNome, gbc);
         
-        // Email
         gbc.gridy = 2;
         gbc.gridx = 0;
         mainPanel.add(new JLabel("E-mail:"), gbc);
@@ -71,7 +73,6 @@ public class CadastroDialog extends JDialog {
         txtEmail = new JTextField(20);
         mainPanel.add(txtEmail, gbc);
         
-        // Senha
         gbc.gridy = 3;
         gbc.gridx = 0;
         mainPanel.add(new JLabel("Senha:"), gbc);
@@ -79,7 +80,6 @@ public class CadastroDialog extends JDialog {
         txtSenha = new JPasswordField(20);
         mainPanel.add(txtSenha, gbc);
         
-        // Confirmar Senha
         gbc.gridy = 4;
         gbc.gridx = 0;
         mainPanel.add(new JLabel("Confirmar senha:"), gbc);
@@ -87,7 +87,6 @@ public class CadastroDialog extends JDialog {
         txtConfirmaSenha = new JPasswordField(20);
         mainPanel.add(txtConfirmaSenha, gbc);
         
-        // CPF
         gbc.gridy = 5;
         gbc.gridx = 0;
         mainPanel.add(new JLabel("CPF (11 dígitos):"), gbc);
@@ -95,27 +94,28 @@ public class CadastroDialog extends JDialog {
         txtCpf = new JTextField(20);
         mainPanel.add(txtCpf, gbc);
         
-        // Data de Nascimento
         gbc.gridy = 6;
         gbc.gridx = 0;
         mainPanel.add(new JLabel("Data de Nascimento:"), gbc);
         gbc.gridx = 1;
         txtDataNascimento = new JTextField(20);
+        
         JLabel lblFormato = new JLabel("(AAAA-MM-DD)");
         lblFormato.setFont(new Font("Arial", Font.ITALIC, 10));
         lblFormato.setForeground(Color.GRAY);
+        
         JPanel datePanel = new JPanel(new BorderLayout());
         datePanel.setBackground(new Color(240, 240, 240));
         datePanel.add(txtDataNascimento, BorderLayout.CENTER);
         datePanel.add(lblFormato, BorderLayout.SOUTH);
         mainPanel.add(datePanel, gbc);
         
-        // Botões
+        // botões de ação
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(240, 240, 240));
         
         JButton btnCadastrar = new JButton("Cadastrar");
-        btnCadastrar.setBackground(new Color(33, 150, 243));   // BTN_PRIMARY
+        btnCadastrar.setBackground(new Color(33, 150, 243));
         btnCadastrar.setForeground(Color.WHITE);
         btnCadastrar.setFocusPainted(false);
         btnCadastrar.setBorderPainted(false);
@@ -123,13 +123,14 @@ public class CadastroDialog extends JDialog {
         btnCadastrar.setPreferredSize(new Dimension(120, 35));
         
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(244, 67, 54));     // BTN_DANGER
+        btnCancelar.setBackground(new Color(244, 67, 54));
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFocusPainted(false);
         btnCancelar.setBorderPainted(false);
         btnCancelar.setOpaque(true);
         btnCancelar.setPreferredSize(new Dimension(120, 35));
         
+        // listeners
         btnCadastrar.addActionListener(e -> realizarCadastro());
         btnCancelar.addActionListener(e -> dispose());
         
@@ -145,6 +146,7 @@ public class CadastroDialog extends JDialog {
     }
     
     private void realizarCadastro() {
+        // coleta de dados
         String nome = txtNome.getText().trim();
         String email = txtEmail.getText().trim();
         String senha = new String(txtSenha.getPassword());
@@ -152,7 +154,7 @@ public class CadastroDialog extends JDialog {
         String cpf = txtCpf.getText().trim();
         String dataNascimentoStr = txtDataNascimento.getText().trim();
         
-        // Validações
+        // validação de campos vazios
         if (nome.isEmpty() || email.isEmpty() || senha.isEmpty() || cpf.isEmpty() || dataNascimentoStr.isEmpty()) {
             JOptionPane.showMessageDialog(this, 
                 "Todos os campos são obrigatórios!", 
@@ -161,6 +163,7 @@ public class CadastroDialog extends JDialog {
             return;
         }
         
+        // validação de senha
         if (!senha.equals(confirmaSenha)) {
             JOptionPane.showMessageDialog(this, 
                 "As senhas não coincidem!", 
@@ -169,6 +172,7 @@ public class CadastroDialog extends JDialog {
             return;
         }
         
+        // validação de cpf
         if (cpf.length() != 11 || !cpf.matches("\\d+")) {
             JOptionPane.showMessageDialog(this, 
                 "CPF deve conter exatamente 11 dígitos!", 
@@ -177,6 +181,7 @@ public class CadastroDialog extends JDialog {
             return;
         }
         
+        // validação de data
         LocalDate dataNascimento;
         try {
             dataNascimento = LocalDate.parse(dataNascimentoStr, DateTimeFormatter.ISO_LOCAL_DATE);
@@ -188,18 +193,15 @@ public class CadastroDialog extends JDialog {
             return;
         }
         
+        // criação do cadastro
         try {
-            // Criar cliente
             Cliente novoCliente = clienteService.createCliente(nome, cpf, java.sql.Date.valueOf(dataNascimento));
-            
-            // Criar credenciais (plano padrão = 1)
             cadastroService.createCredenciais(novoCliente.getId(), email, senha);
             
             JOptionPane.showMessageDialog(this, 
                 "Cadastro realizado com sucesso!\nFaça login para acessar o sistema.", 
                 "Sucesso", 
                 JOptionPane.INFORMATION_MESSAGE);
-            
             dispose();
             
         } catch (Exception e) {
