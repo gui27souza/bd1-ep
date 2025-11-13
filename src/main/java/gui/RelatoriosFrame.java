@@ -4,7 +4,10 @@ import main.java.model.Acesso;
 import main.java.service.RelatorioService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
+import java.util.Map;
 
 public class RelatoriosFrame extends JFrame {
     
@@ -108,7 +111,8 @@ public class RelatoriosFrame extends JFrame {
         buttonPanel.add(btnVoltar);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
-        add(mainPanel);
+        setContentPane(mainPanel);
+        UIHelper.ensureVisibility(this);
     }
     
     private JButton createReportButton(String text, Color color) {
@@ -127,57 +131,237 @@ public class RelatoriosFrame extends JFrame {
     }
     
     private void exibirRelatorio1() {
-        relatorioService.clientesAcimaDaMedia(acessoAtual.getCliente().getId());
+        List<Map<String, Object>> dados = relatorioService.clientesAcimaDaMedia(acessoAtual.getCliente().getId());
         
-        JOptionPane.showMessageDialog(this,
-            "Relatório exibido no console.",
-            "Clientes Acima da Média",
-            JOptionPane.INFORMATION_MESSAGE);
+        if (dados.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Nenhum cliente com transações acima da média foi encontrado.",
+                "Sem Resultados",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        String[] colunas = {"ID", "Nome", "Total Transações", "Total Gasto"};
+        DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        for (Map<String, Object> row : dados) {
+            Object[] rowData = {
+                row.get("id"),
+                row.get("nome"),
+                row.get("total_transacoes"),
+                String.format("R$ %.2f", (Float) row.get("total_gasto"))
+            };
+            tableModel.addRow(rowData);
+        }
+        
+        mostrarTabelaRelatorio(tableModel, "Clientes Acima da Média de Transações");
     }
     
     private void exibirRelatorio2() {
-        relatorioService.gruposComMaisMembros(acessoAtual.getCliente().getId());
+        List<Map<String, Object>> dados = relatorioService.gruposComMaisMembros(acessoAtual.getCliente().getId());
         
-        JOptionPane.showMessageDialog(this,
-            "Relatório exibido no console.",
-            "Grupos com Mais Membros",
-            JOptionPane.INFORMATION_MESSAGE);
+        if (dados.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Nenhum grupo com mais membros que a média foi encontrado.",
+                "Sem Resultados",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        String[] colunas = {"ID", "Nome", "Descrição", "Total Membros"};
+        DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        for (Map<String, Object> row : dados) {
+            Object[] rowData = {
+                row.get("id"),
+                row.get("nome"),
+                row.get("descricao"),
+                row.get("total_membros")
+            };
+            tableModel.addRow(rowData);
+        }
+        
+        mostrarTabelaRelatorio(tableModel, "Grupos com Mais Membros que a Média");
     }
     
     private void exibirRelatorio3() {
-        relatorioService.totalPorCategoria(acessoAtual.getCliente().getId());
+        List<Map<String, Object>> dados = relatorioService.totalPorCategoria(acessoAtual.getCliente().getId());
         
-        JOptionPane.showMessageDialog(this,
-            "Relatório exibido no console.",
-            "Total por Categoria",
-            JOptionPane.INFORMATION_MESSAGE);
+        if (dados.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Nenhuma transação foi encontrada.",
+                "Sem Resultados",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        String[] colunas = {"ID", "Categoria", "Qtd", "Total", "Média", "Mínimo", "Máximo"};
+        DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        for (Map<String, Object> row : dados) {
+            Object[] rowData = {
+                row.get("id"),
+                row.get("nome"),
+                row.get("total_transacoes"),
+                String.format("R$ %.2f", (Float) row.get("valor_total")),
+                String.format("R$ %.2f", (Float) row.get("valor_medio")),
+                String.format("R$ %.2f", (Float) row.get("valor_minimo")),
+                String.format("R$ %.2f", (Float) row.get("valor_maximo"))
+            };
+            tableModel.addRow(rowData);
+        }
+        
+        mostrarTabelaRelatorio(tableModel, "Total por Categoria de Transação");
     }
     
     private void exibirRelatorio4() {
-        relatorioService.estatisticasGrupos(acessoAtual.getCliente().getId());
+        List<Map<String, Object>> dados = relatorioService.estatisticasGrupos(acessoAtual.getCliente().getId());
         
-        JOptionPane.showMessageDialog(this,
-            "Relatório exibido no console.",
-            "Estatísticas dos Grupos",
-            JOptionPane.INFORMATION_MESSAGE);
+        if (dados.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Nenhum grupo foi encontrado.",
+                "Sem Resultados",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        String[] colunas = {"ID", "Nome", "Membros", "Transações", "Valor Total", "Valor Médio"};
+        DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        for (Map<String, Object> row : dados) {
+            Object[] rowData = {
+                row.get("id"),
+                row.get("nome"),
+                row.get("total_membros"),
+                row.get("total_transacoes"),
+                String.format("R$ %.2f", (Float) row.get("valor_total")),
+                String.format("R$ %.2f", (Float) row.get("valor_medio"))
+            };
+            tableModel.addRow(rowData);
+        }
+        
+        mostrarTabelaRelatorio(tableModel, "Estatísticas dos Grupos");
     }
     
     private void exibirRelatorio5() {
-        relatorioService.clientesAdminVsMembros(acessoAtual.getCliente().getId());
+        List<Map<String, Object>> dados = relatorioService.clientesAdminVsMembros(acessoAtual.getCliente().getId());
         
-        JOptionPane.showMessageDialog(this,
-            "Relatório exibido no console.",
-            "Clientes Admin vs Membros",
-            JOptionPane.INFORMATION_MESSAGE);
+        if (dados.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Nenhum dado foi encontrado.",
+                "Sem Resultados",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        String[] colunas = {"Tipo", "ID", "Nome", "Total Grupos"};
+        DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        for (Map<String, Object> row : dados) {
+            Object[] rowData = {
+                row.get("tipo"),
+                row.get("id"),
+                row.get("nome"),
+                row.get("total_grupos")
+            };
+            tableModel.addRow(rowData);
+        }
+        
+        mostrarTabelaRelatorio(tableModel, "Clientes Admin vs Membros (UNION)");
     }
     
     private void exibirRelatorio6() {
-        relatorioService.clientesPixECartao(acessoAtual.getCliente().getId());
+        List<Map<String, Object>> dados = relatorioService.clientesPixECartao(acessoAtual.getCliente().getId());
         
-        JOptionPane.showMessageDialog(this,
-            "Relatório exibido no console.",
-            "Clientes com PIX e Cartão",
-            JOptionPane.INFORMATION_MESSAGE);
+        if (dados.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Nenhum cliente usa tanto PIX quanto Cartão.",
+                "Sem Resultados",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        String[] colunas = {"ID", "Nome", "CPF"};
+        DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        for (Map<String, Object> row : dados) {
+            Object[] rowData = {
+                row.get("id"),
+                row.get("nome"),
+                row.get("cpf")
+            };
+            tableModel.addRow(rowData);
+        }
+        
+        mostrarTabelaRelatorio(tableModel, "Clientes com PIX e Cartão (INTERSECT)");
+    }
+    
+    private void mostrarTabelaRelatorio(DefaultTableModel tableModel, String titulo) {
+        JDialog dialog = new JDialog(this, titulo, true);
+        dialog.setSize(900, 500);
+        dialog.setLocationRelativeTo(this);
+        
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        mainPanel.setBackground(Color.WHITE);
+        
+        // Título
+        JLabel lblTitulo = new JLabel(titulo);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
+        lblTitulo.setForeground(UIHelper.PINK);
+        lblTitulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        mainPanel.add(lblTitulo, BorderLayout.NORTH);
+        
+        // Tabela
+        JTable table = new JTable(tableModel);
+        table.setFont(new Font("Arial", Font.PLAIN, 12));
+        table.setRowHeight(25);
+        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        UIHelper.configureTable(table);
+        
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Informação de total
+        JLabel lblTotal = new JLabel("Total de registros: " + tableModel.getRowCount());
+        lblTotal.setFont(new Font("Arial", Font.BOLD, 12));
+        lblTotal.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        mainPanel.add(lblTotal, BorderLayout.SOUTH);
+        
+        dialog.setContentPane(mainPanel);
+        UIHelper.ensureVisibility(dialog);
+        dialog.setVisible(true);
     }
     
     private void voltar() {

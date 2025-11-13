@@ -128,7 +128,8 @@ public class MainFrame extends JFrame {
     }
     
     private void abrirGrupos() {
-        GruposFrame gruposFrame = new GruposFrame(this, acessoAtual, grupoService);
+        GruposFrame gruposFrame = new GruposFrame(this, acessoAtual, grupoService, 
+                                                   clienteService, transacaoService);
         gruposFrame.setVisible(true);
         this.setVisible(false);
     }

@@ -1,10 +1,17 @@
 package main.java.gui;
 
 import main.java.model.Acesso;
+import main.java.model.Cliente;
 import main.java.model.Grupo;
+import main.java.model.transacao.Transacao;
+import main.java.model.transacao.TransacaoPix;
+import main.java.model.transacao.TransacaoCartao;
+import main.java.service.ClienteService;
 import main.java.service.GrupoService;
+import main.java.service.TransacaoService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,14 +21,20 @@ public class GruposFrame extends JFrame {
     private MainFrame mainFrame;
     private Acesso acessoAtual;
     private GrupoService grupoService;
+    private ClienteService clienteService;
+    private TransacaoService transacaoService;
     private DefaultListModel<String> listModel;
     private JList<String> gruposList;
     private ArrayList<Grupo> grupos;
+    private JPanel detailsPanel;
     
-    public GruposFrame(MainFrame mainFrame, Acesso acessoAtual, GrupoService grupoService) {
+    public GruposFrame(MainFrame mainFrame, Acesso acessoAtual, GrupoService grupoService,
+                      ClienteService clienteService, TransacaoService transacaoService) {
         this.mainFrame = mainFrame;
         this.acessoAtual = acessoAtual;
         this.grupoService = grupoService;
+        this.clienteService = clienteService;
+        this.transacaoService = transacaoService;
         
         initComponents();
         carregarGrupos();
@@ -36,11 +49,11 @@ public class GruposFrame extends JFrame {
                 voltar();
             }
         });
-        setSize(800, 600);
+        setSize(1000, 650);
         setLocationRelativeTo(null);
         setResizable(true);
         
-        // Painel principal
+        // Painel principal com split
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         mainPanel.setBackground(new Color(240, 240, 240));
@@ -57,61 +70,77 @@ public class GruposFrame extends JFrame {
         
         mainPanel.add(titlePanel, BorderLayout.NORTH);
         
-        // Lista de grupos
+        // Split pane para lista e detalhes
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setDividerLocation(300);
+        splitPane.setResizeWeight(0.3);
+        
+        // Painel esquerdo - Lista de grupos
+        JPanel leftPanel = new JPanel(new BorderLayout(5, 5));
+        leftPanel.setBackground(new Color(240, 240, 240));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
+        JLabel lblGrupos = new JLabel("Seus Grupos:");
+        lblGrupos.setFont(new Font("Arial", Font.BOLD, 14));
+        lblGrupos.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        leftPanel.add(lblGrupos, BorderLayout.NORTH);
+        
         listModel = new DefaultListModel<>();
         gruposList = new JList<>(listModel);
-        gruposList.setFont(new Font("Arial", Font.PLAIN, 14));
+        gruposList.setFont(new Font("Arial", Font.PLAIN, 13));
         gruposList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         gruposList.setBackground(Color.WHITE);
         gruposList.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
+        // Listener para mostrar detalhes ao selecionar
+        gruposList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && gruposList.getSelectedIndex() != -1) {
+                mostrarDetalhesGrupo();
+            }
+        });
+        
         JScrollPane scrollPane = new JScrollPane(gruposList);
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        leftPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        splitPane.setLeftComponent(leftPanel);
+        
+        // Painel direito - Detalhes do grupo
+        detailsPanel = new JPanel(new BorderLayout(10, 10));
+        detailsPanel.setBackground(Color.WHITE);
+        detailsPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY),
+            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+        
+        JLabel lblSelecione = new JLabel("<html><div style='text-align: center; color: gray;'>" +
+            "<h2>👈 Selecione um grupo</h2>" +
+            "<p>Clique em um grupo da lista para ver seus detalhes,<br>" +
+            "integrantes e transações.</p></div></html>", SwingConstants.CENTER);
+        detailsPanel.add(lblSelecione, BorderLayout.CENTER);
+        
+        splitPane.setRightComponent(detailsPanel);
+        
+        mainPanel.add(splitPane, BorderLayout.CENTER);
         
         // Painel de botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         buttonPanel.setBackground(new Color(240, 240, 240));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        JButton btnVerDetalhes = new JButton("Ver Detalhes");
-        btnVerDetalhes.setFont(new Font("Arial", Font.BOLD, 14));
-        btnVerDetalhes.setBackground(new Color(33, 150, 243));
-        btnVerDetalhes.setForeground(Color.WHITE);
-        btnVerDetalhes.setFocusPainted(false);
-        btnVerDetalhes.setBorderPainted(false);
-        btnVerDetalhes.setOpaque(true);
-        btnVerDetalhes.setPreferredSize(new Dimension(160, 45));
+        JButton btnCriarGrupo = UIHelper.createButton("Criar Novo Grupo", UIHelper.GREEN, 180, 45);
+        JButton btnVoltar = UIHelper.createButton("Voltar", UIHelper.GRAY, 120, 45);
         
-        JButton btnCriarGrupo = new JButton("Criar Novo Grupo");
-        btnCriarGrupo.setFont(new Font("Arial", Font.BOLD, 14));
-        btnCriarGrupo.setBackground(new Color(76, 175, 80));
-        btnCriarGrupo.setForeground(Color.WHITE);
-        btnCriarGrupo.setFocusPainted(false);
-        btnCriarGrupo.setBorderPainted(false);
-        btnCriarGrupo.setOpaque(true);
-        btnCriarGrupo.setPreferredSize(new Dimension(180, 45));
-        
-        JButton btnVoltar = new JButton("Voltar");
-        btnVoltar.setFont(new Font("Arial", Font.BOLD, 14));
-        btnVoltar.setBackground(new Color(158, 158, 158));
-        btnVoltar.setForeground(Color.WHITE);
-        btnVoltar.setFocusPainted(false);
-        btnVoltar.setBorderPainted(false);
-        btnVoltar.setOpaque(true);
-        btnVoltar.setPreferredSize(new Dimension(120, 45));
-        
-        btnVerDetalhes.addActionListener(e -> verDetalhesGrupo());
         btnCriarGrupo.addActionListener(e -> criarNovoGrupo());
         btnVoltar.addActionListener(e -> voltar());
         
-        buttonPanel.add(btnVerDetalhes);
         buttonPanel.add(btnCriarGrupo);
         buttonPanel.add(btnVoltar);
         
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
-        add(mainPanel);
+        setContentPane(mainPanel);
+        UIHelper.ensureVisibility(this);
     }
     
     private void carregarGrupos() {
@@ -139,25 +168,186 @@ public class GruposFrame extends JFrame {
             return;
         }
         
+        mostrarDetalhesGrupo();
+    }
+    
+    private void mostrarDetalhesGrupo() {
+        int selectedIndex = gruposList.getSelectedIndex();
+        if (selectedIndex == -1 || grupos.isEmpty()) {
+            return;
+        }
+        
         Grupo grupo = grupos.get(selectedIndex);
         
-        String detalhes = String.format(
-            "<html>" +
-            "<h2>%s</h2>" +
-            "<p><b>Descrição:</b> %s</p>" +
-            "<p><b>Status:</b> %s</p>" +
-            "<p><b>Data de Criação:</b> %s</p>" +
-            "</html>",
-            grupo.getNome(),
-            grupo.getDescricao() != null && !grupo.getDescricao().isEmpty() ? grupo.getDescricao() : "Sem descrição",
-            grupo.getStatus().toUpperCase(),
-            grupo.getDataCriacao()
-        );
+        // Limpar painel de detalhes
+        detailsPanel.removeAll();
+        detailsPanel.setLayout(new BorderLayout(10, 10));
         
-        JOptionPane.showMessageDialog(this, 
-            detalhes, 
-            "Detalhes do Grupo", 
-            JOptionPane.INFORMATION_MESSAGE);
+        // Painel superior com informações do grupo
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(Color.WHITE);
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        
+        JLabel lblNome = new JLabel(grupo.getNome());
+        lblNome.setFont(new Font("Arial", Font.BOLD, 18));
+        lblNome.setForeground(UIHelper.BLUE);
+        
+        JLabel lblDescricao = new JLabel(
+            (grupo.getDescricao() != null && !grupo.getDescricao().isEmpty()) 
+                ? grupo.getDescricao() 
+                : "Sem descrição"
+        );
+        lblDescricao.setFont(new Font("Arial", Font.PLAIN, 12));
+        lblDescricao.setForeground(Color.GRAY);
+        
+        JLabel lblStatus = new JLabel("Status: " + grupo.getStatus().toUpperCase());
+        lblStatus.setFont(new Font("Arial", Font.PLAIN, 12));
+        lblStatus.setForeground(grupo.getStatus().equals("ativo") ? UIHelper.GREEN : Color.RED);
+        
+        JLabel lblData = new JLabel("Criado em: " + grupo.getDataCriacao());
+        lblData.setFont(new Font("Arial", Font.PLAIN, 11));
+        lblData.setForeground(Color.GRAY);
+        
+        infoPanel.add(lblNome);
+        infoPanel.add(Box.createVerticalStrut(5));
+        infoPanel.add(lblDescricao);
+        infoPanel.add(Box.createVerticalStrut(5));
+        infoPanel.add(lblStatus);
+        infoPanel.add(Box.createVerticalStrut(3));
+        infoPanel.add(lblData);
+        
+        detailsPanel.add(infoPanel, BorderLayout.NORTH);
+        
+        // Tabs para integrantes e transações
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setFont(new Font("Arial", Font.BOLD, 12));
+        
+        // Tab 1: Integrantes
+        JPanel integrantesPanel = criarPainelIntegrantes(grupo);
+        tabbedPane.addTab("👥 Integrantes", integrantesPanel);
+        
+        // Tab 2: Transações
+        JPanel transacoesPanel = criarPainelTransacoes(grupo);
+        tabbedPane.addTab("💰 Transações", transacoesPanel);
+        
+        detailsPanel.add(tabbedPane, BorderLayout.CENTER);
+        
+        detailsPanel.revalidate();
+        detailsPanel.repaint();
+    }
+    
+    private JPanel criarPainelIntegrantes(Grupo grupo) {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        try {
+            ArrayList<Cliente> membros = grupoService.getMembros(grupo.getId());
+            
+            if (membros.isEmpty()) {
+                JLabel lblVazio = new JLabel("<html><div style='text-align: center; color: gray;'>" +
+                    "<p>Nenhum membro encontrado.</p></div></html>", SwingConstants.CENTER);
+                panel.add(lblVazio, BorderLayout.CENTER);
+            } else {
+                DefaultListModel<String> membrosModel = new DefaultListModel<>();
+                for (Cliente membro : membros) {
+                    String cpfMasked = membro.getCpf().substring(0, 3) + ".***.***-" + 
+                                      membro.getCpf().substring(membro.getCpf().length() - 2);
+                    membrosModel.addElement("👤 " + membro.getNome() + " (" + cpfMasked + ")");
+                }
+                
+                JList<String> membrosList = new JList<>(membrosModel);
+                membrosList.setFont(new Font("Arial", Font.PLAIN, 13));
+                membrosList.setBackground(Color.WHITE);
+                membrosList.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                UIHelper.configureList(membrosList);
+                
+                JScrollPane scrollPane = new JScrollPane(membrosList);
+                scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+                
+                JLabel lblTotal = new JLabel("Total: " + membros.size() + " membro(s)");
+                lblTotal.setFont(new Font("Arial", Font.BOLD, 12));
+                lblTotal.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                
+                panel.add(lblTotal, BorderLayout.NORTH);
+                panel.add(scrollPane, BorderLayout.CENTER);
+            }
+        } catch (Exception e) {
+            JLabel lblErro = new JLabel("<html><div style='text-align: center; color: red;'>" +
+                "<p>Erro ao carregar integrantes: " + e.getMessage() + "</p></div></html>", 
+                SwingConstants.CENTER);
+            panel.add(lblErro, BorderLayout.CENTER);
+        }
+        
+        return panel;
+    }
+    
+    private JPanel criarPainelTransacoes(Grupo grupo) {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        try {
+            ArrayList<Transacao> transacoes = transacaoService.getTransacoesPorGrupo(grupo.getId());
+            
+            if (transacoes.isEmpty()) {
+                JLabel lblVazio = new JLabel("<html><div style='text-align: center; color: gray;'>" +
+                    "<p>Nenhuma transação registrada neste grupo.</p></div></html>", 
+                    SwingConstants.CENTER);
+                panel.add(lblVazio, BorderLayout.CENTER);
+            } else {
+                String[] colunas = {"ID", "Valor", "Descrição", "Categoria"};
+                DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
+                    @Override
+                    public boolean isCellEditable(int row, int column) {
+                        return false;
+                    }
+                };
+                
+                for (Transacao t : transacoes) {
+                    String tipoTransacao = "";
+                    if (t instanceof TransacaoPix) {
+                        tipoTransacao = "PIX";
+                    } else if (t instanceof TransacaoCartao) {
+                        tipoTransacao = "Cartão";
+                    } else {
+                        tipoTransacao = "Outro";
+                    }
+                    
+                    Object[] row = {
+                        t.getId(),
+                        String.format("R$ %.2f", t.getValor()),
+                        t.getDescricao(),
+                        t.getCategoria().getNome() + " (" + tipoTransacao + ")"
+                    };
+                    tableModel.addRow(row);
+                }
+                
+                JTable table = new JTable(tableModel);
+                table.setFont(new Font("Arial", Font.PLAIN, 12));
+                table.setRowHeight(25);
+                table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+                UIHelper.configureTable(table);
+                
+                JScrollPane scrollPane = new JScrollPane(table);
+                scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+                
+                JLabel lblTotal = new JLabel("Total: " + transacoes.size() + " transação(ões)");
+                lblTotal.setFont(new Font("Arial", Font.BOLD, 12));
+                lblTotal.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                
+                panel.add(lblTotal, BorderLayout.NORTH);
+                panel.add(scrollPane, BorderLayout.CENTER);
+            }
+        } catch (Exception e) {
+            JLabel lblErro = new JLabel("<html><div style='text-align: center; color: red;'>" +
+                "<p>Erro ao carregar transações: " + e.getMessage() + "</p></div></html>", 
+                SwingConstants.CENTER);
+            panel.add(lblErro, BorderLayout.CENTER);
+        }
+        
+        return panel;
     }
     
     private void criarNovoGrupo() {

@@ -140,4 +140,35 @@ public class GrupoService {
 		
 		return novoGrupo;
 	}
+
+	/**
+	 * Retorna lista de membros (clientes) de um grupo
+	 */
+	public ArrayList<Cliente> getMembros(int idGrupo) throws SQLException {
+		String query = """
+				SELECT c.* FROM Cliente c
+				INNER JOIN MembroGrupo mg ON c.id = mg.id_cliente
+				WHERE mg.id_grupo = ?
+				ORDER BY c.nome
+		""";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idGrupo);
+
+		ArrayList<Cliente> membros = new ArrayList<>();
+
+		try (ResultSet resultSet = this.dbConnector.executeQuery(query, parameters)) {
+			while (resultSet.next()) {
+				int id = resultSet.getInt("id");
+				String nome = resultSet.getString("nome");
+				String cpf = resultSet.getString("cpf");
+				java.sql.Date dataNascimento = resultSet.getDate("data_nasc");
+				int idPlano = resultSet.getInt("id_plano");
+
+				Cliente cliente = new Cliente(id, nome, cpf, dataNascimento, idPlano);
+				membros.add(cliente);
+			}
+		}
+
+		return membros;
+	}
 }

@@ -1,11 +1,13 @@
 package main.java.service;
 
 import main.java.db.DBConnector;
-import main.java.util.menu.MenuUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RelatorioService {
 
@@ -20,9 +22,9 @@ public class RelatorioService {
 	/**
 	 * Consulta 1: Clientes que possuem transações acima da média de valor (apenas dos grupos do cliente)
 	 */
-	public void clientesAcimaDaMedia(int idClienteLogado) {
+	public List<Map<String, Object>> clientesAcimaDaMedia(int idClienteLogado) {
 		
-		System.out.println("\n========== Clientes com Transações Acima da Média (Meus Grupos) ==========\n");
+		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
 			SELECT c.id, c.nome, COUNT(t.id) as total_transacoes, SUM(t.valor) as total_gasto
@@ -51,37 +53,27 @@ public class RelatorioService {
 		parameters.add(idClienteLogado);
 		
 		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
-			
-			boolean temResultados = false;
-			
 			while (rs.next()) {
-				temResultados = true;
-				int id = rs.getInt("id");
-				String nome = rs.getString("nome");
-				int totalTransacoes = rs.getInt("total_transacoes");
-				float totalGasto = rs.getFloat("total_gasto");
-				
-				System.out.printf("ID: %d | Nome: %s\n", id, nome);
-				System.out.printf("Total de Transações: %d | Total Gasto: R$ %.2f\n\n", totalTransacoes, totalGasto);
+				Map<String, Object> row = new HashMap<>();
+				row.put("id", rs.getInt("id"));
+				row.put("nome", rs.getString("nome"));
+				row.put("total_transacoes", rs.getInt("total_transacoes"));
+				row.put("total_gasto", rs.getFloat("total_gasto"));
+				resultados.add(row);
 			}
-			
-			if (!temResultados) {
-				System.out.println("Nenhum resultado encontrado.\n");
-			}
-			
 		} catch (SQLException e) {
-			System.out.println("Erro ao executar consulta: " + e.getMessage());
+			System.err.println("Erro ao executar consulta: " + e.getMessage());
 		}
 		
-		MenuUtil.readStringInput("Pressione ENTER para continuar...");
+		return resultados;
 	}
 
 	/**
 	 * Consulta 2: Grupos que possuem mais membros que a média (apenas grupos do cliente)
 	 */
-	public void gruposComMaisMembros(int idClienteLogado) {
+	public List<Map<String, Object>> gruposComMaisMembros(int idClienteLogado) {
 		
-		System.out.println("\n========== Meus Grupos com Mais Membros que a Média ==========\n");
+		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
 			SELECT g.id, g.nome, g.descricao, COUNT(mg.id_cliente) as total_membros
@@ -110,30 +102,19 @@ public class RelatorioService {
 		parameters.add(idClienteLogado);
 		
 		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
-			
-			boolean temResultados = false;
-			
 			while (rs.next()) {
-				temResultados = true;
-				int id = rs.getInt("id");
-				String nome = rs.getString("nome");
-				String descricao = rs.getString("descricao");
-				int totalMembros = rs.getInt("total_membros");
-				
-				System.out.printf("ID: %d | Nome: %s\n", id, nome);
-				System.out.printf("Descrição: %s\n", descricao);
-				System.out.printf("Total de Membros: %d\n\n", totalMembros);
+				Map<String, Object> row = new HashMap<>();
+				row.put("id", rs.getInt("id"));
+				row.put("nome", rs.getString("nome"));
+				row.put("descricao", rs.getString("descricao"));
+				row.put("total_membros", rs.getInt("total_membros"));
+				resultados.add(row);
 			}
-			
-			if (!temResultados) {
-				System.out.println("Nenhum resultado encontrado.\n");
-			}
-			
 		} catch (SQLException e) {
-			System.out.println("Erro ao executar consulta: " + e.getMessage());
+			System.err.println("Erro ao executar consulta: " + e.getMessage());
 		}
 		
-		MenuUtil.readStringInput("Pressione ENTER para continuar...");
+		return resultados;
 	}
 
 	// ========== CONSULTAS COM FUNÇÕES DE GRUPO ==========
@@ -141,9 +122,9 @@ public class RelatorioService {
 	/**
 	 * Consulta 3: Total de transações e soma de valores por categoria (apenas dos grupos do cliente)
 	 */
-	public void totalPorCategoria(int idClienteLogado) {
+	public List<Map<String, Object>> totalPorCategoria(int idClienteLogado) {
 		
-		System.out.println("\n========== Total de Transações por Categoria (Meus Grupos) ==========\n");
+		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
 			SELECT 
@@ -168,43 +149,30 @@ public class RelatorioService {
 		parameters.add(idClienteLogado);
 		
 		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
-			
-			boolean temResultados = false;
-			
 			while (rs.next()) {
-				temResultados = true;
-				int id = rs.getInt("id");
-				String nome = rs.getString("nome");
-				int totalTransacoes = rs.getInt("total_transacoes");
-				float valorTotal = rs.getFloat("valor_total");
-				float valorMedio = rs.getFloat("valor_medio");
-				float valorMinimo = rs.getFloat("valor_minimo");
-				float valorMaximo = rs.getFloat("valor_maximo");
-				
-				System.out.printf("Categoria: %s (ID: %d)\n", nome, id);
-				System.out.printf("Total de Transações: %d\n", totalTransacoes);
-				System.out.printf("Valor Total: R$ %.2f\n", valorTotal);
-				System.out.printf("Valor Médio: R$ %.2f\n", valorMedio);
-				System.out.printf("Valor Mínimo: R$ %.2f | Valor Máximo: R$ %.2f\n\n", valorMinimo, valorMaximo);
+				Map<String, Object> row = new HashMap<>();
+				row.put("id", rs.getInt("id"));
+				row.put("nome", rs.getString("nome"));
+				row.put("total_transacoes", rs.getInt("total_transacoes"));
+				row.put("valor_total", rs.getFloat("valor_total"));
+				row.put("valor_medio", rs.getFloat("valor_medio"));
+				row.put("valor_minimo", rs.getFloat("valor_minimo"));
+				row.put("valor_maximo", rs.getFloat("valor_maximo"));
+				resultados.add(row);
 			}
-			
-			if (!temResultados) {
-				System.out.println("Nenhum resultado encontrado.\n");
-			}
-			
 		} catch (SQLException e) {
-			System.out.println("Erro ao executar consulta: " + e.getMessage());
+			System.err.println("Erro ao executar consulta: " + e.getMessage());
 		}
 		
-		MenuUtil.readStringInput("Pressione ENTER para continuar...");
+		return resultados;
 	}
 
 	/**
 	 * Consulta 4: Estatísticas de grupos (total de membros, transações e valores) - apenas grupos do cliente
 	 */
-	public void estatisticasGrupos(int idClienteLogado) {
+	public List<Map<String, Object>> estatisticasGrupos(int idClienteLogado) {
 		
-		System.out.println("\n========== Estatísticas dos Meus Grupos ==========\n");
+		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
 			SELECT 
@@ -228,32 +196,21 @@ public class RelatorioService {
 		parameters.add(idClienteLogado);
 		
 		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
-			
-			boolean temResultados = false;
-			
 			while (rs.next()) {
-				temResultados = true;
-				int id = rs.getInt("id");
-				String nome = rs.getString("nome");
-				int totalMembros = rs.getInt("total_membros");
-				int totalTransacoes = rs.getInt("total_transacoes");
-				float valorTotal = rs.getFloat("valor_total");
-				float valorMedio = rs.getFloat("valor_medio");
-				
-				System.out.printf("Grupo: %s (ID: %d)\n", nome, id);
-				System.out.printf("Membros: %d | Transações: %d\n", totalMembros, totalTransacoes);
-				System.out.printf("Valor Total: R$ %.2f | Valor Médio: R$ %.2f\n\n", valorTotal, valorMedio);
+				Map<String, Object> row = new HashMap<>();
+				row.put("id", rs.getInt("id"));
+				row.put("nome", rs.getString("nome"));
+				row.put("total_membros", rs.getInt("total_membros"));
+				row.put("total_transacoes", rs.getInt("total_transacoes"));
+				row.put("valor_total", rs.getFloat("valor_total"));
+				row.put("valor_medio", rs.getFloat("valor_medio"));
+				resultados.add(row);
 			}
-			
-			if (!temResultados) {
-				System.out.println("Nenhum resultado encontrado.\n");
-			}
-			
 		} catch (SQLException e) {
-			System.out.println("Erro ao executar consulta: " + e.getMessage());
+			System.err.println("Erro ao executar consulta: " + e.getMessage());
 		}
 		
-		MenuUtil.readStringInput("Pressione ENTER para continuar...");
+		return resultados;
 	}
 
 	// ========== CONSULTAS COM OPERADORES DE CONJUNTO ==========
@@ -261,15 +218,15 @@ public class RelatorioService {
 	/**
 	 * Consulta 5: Clientes que são administradores UNION com clientes que são apenas membros (apenas dos grupos do cliente)
 	 */
-	public void clientesAdminVsMembros(int idClienteLogado) {
+	public List<Map<String, Object>> clientesAdminVsMembros(int idClienteLogado) {
 		
-		System.out.println("\n========== Clientes: Administradores vs Membros (Meus Grupos) ==========\n");
+		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
 			SELECT 'ADMIN' as tipo, c.id, c.nome, COUNT(mg.id_grupo) as total_grupos
 			FROM Cliente c
 			JOIN MembroGrupo mg ON c.id = mg.id_cliente
-			WHERE mg.papel = 'admin'
+			WHERE mg.role = 'admin'
 				AND mg.id_grupo IN (
 					SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 				)
@@ -278,7 +235,7 @@ public class RelatorioService {
 			SELECT 'MEMBRO' as tipo, c.id, c.nome, COUNT(mg.id_grupo) as total_grupos
 			FROM Cliente c
 			JOIN MembroGrupo mg ON c.id = mg.id_cliente
-			WHERE mg.papel = 'membro'
+			WHERE mg.role = 'membro'
 				AND mg.id_grupo IN (
 					SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 				)
@@ -291,44 +248,27 @@ public class RelatorioService {
 		parameters.add(idClienteLogado);
 		
 		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
-			
-			boolean temResultados = false;
-			String tipoAtual = "";
-			
 			while (rs.next()) {
-				temResultados = true;
-				String tipo = rs.getString("tipo");
-				int id = rs.getInt("id");
-				String nome = rs.getString("nome");
-				int totalGrupos = rs.getInt("total_grupos");
-				
-				if (!tipo.equals(tipoAtual)) {
-					System.out.println("\n--- " + tipo + "S ---\n");
-					tipoAtual = tipo;
-				}
-				
-				System.out.printf("ID: %d | Nome: %s | Grupos: %d\n", id, nome, totalGrupos);
+				Map<String, Object> row = new HashMap<>();
+				row.put("tipo", rs.getString("tipo"));
+				row.put("id", rs.getInt("id"));
+				row.put("nome", rs.getString("nome"));
+				row.put("total_grupos", rs.getInt("total_grupos"));
+				resultados.add(row);
 			}
-			
-			if (!temResultados) {
-				System.out.println("Nenhum resultado encontrado.\n");
-			}
-			
-			System.out.println();
-			
 		} catch (SQLException e) {
-			System.out.println("Erro ao executar consulta: " + e.getMessage());
+			System.err.println("Erro ao executar consulta: " + e.getMessage());
 		}
 		
-		MenuUtil.readStringInput("Pressione ENTER para continuar...");
+		return resultados;
 	}
 
 	/**
 	 * Consulta 6: Clientes com transações PIX INTERSECT com clientes com transações de Cartão (apenas dos grupos do cliente)
 	 */
-	public void clientesPixECartao(int idClienteLogado) {
+	public List<Map<String, Object>> clientesPixECartao(int idClienteLogado) {
 		
-		System.out.println("\n========== Clientes que Usam PIX e Cartão (Meus Grupos) ==========\n");
+		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
 			SELECT c.id, c.nome, c.cpf
@@ -354,28 +294,17 @@ public class RelatorioService {
 		parameters.add(idClienteLogado);
 		
 		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
-			
-			boolean temResultados = false;
-			
 			while (rs.next()) {
-				temResultados = true;
-				int id = rs.getInt("id");
-				String nome = rs.getString("nome");
-				String cpf = rs.getString("cpf");
-				
-				System.out.printf("ID: %d | Nome: %s | CPF: %s\n", id, nome, cpf);
+				Map<String, Object> row = new HashMap<>();
+				row.put("id", rs.getInt("id"));
+				row.put("nome", rs.getString("nome"));
+				row.put("cpf", rs.getString("cpf"));
+				resultados.add(row);
 			}
-			
-			if (!temResultados) {
-				System.out.println("Nenhum cliente usa tanto PIX quanto Cartão.\n");
-			}
-			
-			System.out.println();
-			
 		} catch (SQLException e) {
-			System.out.println("Erro ao executar consulta: " + e.getMessage());
+			System.err.println("Erro ao executar consulta: " + e.getMessage());
 		}
 		
-		MenuUtil.readStringInput("Pressione ENTER para continuar...");
+		return resultados;
 	}
 }
