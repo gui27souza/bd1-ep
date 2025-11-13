@@ -23,7 +23,7 @@ public class RelatorioService {
 
 	/**
 	 * Relatório 1: Maiores Gastos
-	 * Mostra as 10 transações mais caras dos grupos do cliente (gastos em valor absoluto)
+	 * Mostra todas as transações de gastos dos grupos do cliente ordenadas por valor
 	 * Usa: SELECT aninhado para filtrar grupos do cliente
 	 */
 	public List<Map<String, Object>> maioresGastos(int idClienteLogado) {
@@ -46,7 +46,6 @@ public class RelatorioService {
 			)
 			AND t.valor < 0
 			ORDER BY t.valor ASC
-			LIMIT 10
 		""";
 		
 		ArrayList<Object> parameters = new ArrayList<>();
@@ -70,7 +69,54 @@ public class RelatorioService {
 	}
 
 	/**
-	 * Relatório 2: Gastos Detalhados por Categoria
+	 * Relatório 2: Maiores Contribuições
+	 * Mostra todas as contribuições/ganhos dos grupos do cliente ordenadas por valor
+	 * Usa: SELECT aninhado para filtrar grupos do cliente
+	 */
+	public List<Map<String, Object>> maioresContribuicoes(int idClienteLogado) {
+		
+		List<Map<String, Object>> resultados = new ArrayList<>();
+		
+		String query = """
+			SELECT 
+				t.data_transacao,
+				g.nome as grupo,
+				c.nome as cliente,
+				cat.nome as categoria,
+				t.valor
+			FROM Transacao t
+			JOIN Cliente c ON t.id_cliente = c.id
+			JOIN Grupo g ON t.id_grupo = g.id
+			JOIN Categoria cat ON t.id_categoria = cat.id
+			WHERE t.id_grupo IN (
+				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
+			)
+			AND t.valor > 0
+			ORDER BY t.valor DESC
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idClienteLogado);
+		
+		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
+			while (rs.next()) {
+				Map<String, Object> row = new HashMap<>();
+				row.put("data_transacao", rs.getTimestamp("data_transacao"));
+				row.put("grupo", rs.getString("grupo"));
+				row.put("cliente", rs.getString("cliente"));
+				row.put("categoria", rs.getString("categoria"));
+				row.put("valor", rs.getFloat("valor"));
+				resultados.add(row);
+			}
+		} catch (SQLException e) {
+			System.err.println("Erro ao executar consulta: " + e.getMessage());
+		}
+		
+		return resultados;
+	}
+
+	/**
+	 * Relatório 3: Gastos Detalhados por Categoria
 	 * Mostra detalhamento de gastos por categoria com subconsulta para percentual
 	 * Usa: SELECT aninhado para calcular total geral
 	 */
@@ -127,7 +173,7 @@ public class RelatorioService {
 	// ========== CONSULTAS COM FUNÇÕES DE GRUPO ==========
 
 	/**
-	 * Relatório 3: Divisão de Gastos por Membro
+	 * Relatório 4: Divisão de Gastos por Membro
 	 * Mostra quanto cada membro gastou em cada grupo
 	 * Usa: COUNT, SUM, AVG (funções de grupo)
 	 */
@@ -174,7 +220,7 @@ public class RelatorioService {
 	}
 
 	/**
-	 * Relatório 4: Estatísticas Gerais dos Grupos
+	 * Relatório 5: Estatísticas Gerais dos Grupos
 	 * Mostra estatísticas completas de cada grupo
 	 * Usa: COUNT, SUM, AVG, MIN, MAX (funções de grupo)
 	 */
@@ -226,9 +272,9 @@ public class RelatorioService {
 	// ========== CONSULTAS COM OPERADORES DE CONJUNTO ==========
 
 	/**
-	 * Relatório 5: Resumo Financeiro por Período
-	 * Compara gastos do último mês vs mês anterior usando UNION
-	 * Usa: UNION para combinar dados de diferentes períodos
+	 * Relatório 6: Resumo Financeiro por Período
+	 * Compara gastos e ganhos dos últimos 30 dias vs período anterior usando UNION
+	 * Usa: UNION para combinar dados de diferentes períodos com base nas datas das transações
 	 */
 	public List<Map<String, Object>> resumoFinanceiroPorPeriodo(int idClienteLogado) {
 		
@@ -236,32 +282,45 @@ public class RelatorioService {
 		
 		String query = """
 			SELECT 
-				'Último Mês' as periodo,
-				g.nome as grupo,
-				COUNT(t.id) as quantidade,
-				COALESCE(SUM(t.valor), 0) as total
-			FROM Grupo g
-			LEFT JOIN Transacao t ON g.id = t.id_grupo 
-				AND t.id IN (
-					SELECT id FROM Transacao 
-					WHERE id_grupo IN (SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?)
-				)
-			WHERE g.id IN (SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?)
-			GROUP BY g.id, g.nome
-			
-			UNION ALL
-			
-			SELECT 
-				'Total Geral' as periodo,
-				'Todos os Grupos' as grupo,
-				COUNT(t.id) as quantidade,
-				COALESCE(SUM(t.valor), 0) as total
+				'Últimos 30 dias' as periodo,
+				COUNT(t.id) as quantidade_transacoes,
+				COALESCE(SUM(CASE WHEN t.valor < 0 THEN t.valor ELSE 0 END), 0) as total_gastos,
+				COALESCE(SUM(CASE WHEN t.valor > 0 THEN t.valor ELSE 0 END), 0) as total_receitas,
+				COALESCE(SUM(t.valor), 0) as saldo
 			FROM Transacao t
 			WHERE t.id_grupo IN (
 				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 			)
+			AND t.data_transacao >= CURRENT_DATE - INTERVAL '30 days'
 			
-			ORDER BY periodo DESC, total DESC
+			UNION ALL
+			
+			SELECT 
+				'30-60 dias atrás' as periodo,
+				COUNT(t.id) as quantidade_transacoes,
+				COALESCE(SUM(CASE WHEN t.valor < 0 THEN t.valor ELSE 0 END), 0) as total_gastos,
+				COALESCE(SUM(CASE WHEN t.valor > 0 THEN t.valor ELSE 0 END), 0) as total_receitas,
+				COALESCE(SUM(t.valor), 0) as saldo
+			FROM Transacao t
+			WHERE t.id_grupo IN (
+				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
+			)
+			AND t.data_transacao >= CURRENT_DATE - INTERVAL '60 days'
+			AND t.data_transacao < CURRENT_DATE - INTERVAL '30 days'
+			
+			UNION ALL
+			
+			SELECT 
+				'Mais de 60 dias' as periodo,
+				COUNT(t.id) as quantidade_transacoes,
+				COALESCE(SUM(CASE WHEN t.valor < 0 THEN t.valor ELSE 0 END), 0) as total_gastos,
+				COALESCE(SUM(CASE WHEN t.valor > 0 THEN t.valor ELSE 0 END), 0) as total_receitas,
+				COALESCE(SUM(t.valor), 0) as saldo
+			FROM Transacao t
+			WHERE t.id_grupo IN (
+				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
+			)
+			AND t.data_transacao < CURRENT_DATE - INTERVAL '60 days'
 		""";
 		
 		ArrayList<Object> parameters = new ArrayList<>();
@@ -273,9 +332,10 @@ public class RelatorioService {
 			while (rs.next()) {
 				Map<String, Object> row = new HashMap<>();
 				row.put("periodo", rs.getString("periodo"));
-				row.put("grupo", rs.getString("grupo"));
-				row.put("quantidade", rs.getInt("quantidade"));
-				row.put("total", rs.getFloat("total"));
+				row.put("quantidade_transacoes", rs.getInt("quantidade_transacoes"));
+				row.put("total_gastos", rs.getFloat("total_gastos"));
+				row.put("total_receitas", rs.getFloat("total_receitas"));
+				row.put("saldo", rs.getFloat("saldo"));
 				resultados.add(row);
 			}
 		} catch (SQLException e) {
@@ -286,7 +346,7 @@ public class RelatorioService {
 	}
 
 	/**
-	 * Relatório 6: Grupos Ativos vs Inativos
+	 * Relatório 7: Grupos Ativos vs Inativos
 	 * Compara grupos com e sem transações recentes
 	 * Usa: EXCEPT para encontrar grupos sem atividade
 	 */

@@ -52,6 +52,42 @@ public class TransacaoService {
 		return executarQueryTransacoes(query, parameters);
 	}
 
+	public ArrayList<Transacao> getTransacoesPorCategoria(int idCliente, int idCategoria) throws SQLException {
+		
+		String query = """
+			SELECT t.id, t.descricao, t.valor, t.data_transacao, t.id_cliente, t.id_grupo, t.id_categoria,
+			       c.nome as categoria_nome, c.descricao as categoria_desc
+			FROM Transacao t
+			JOIN Categoria c ON t.id_categoria = c.id
+			WHERE t.id_cliente = ? AND t.id_categoria = ?
+			ORDER BY t.data_transacao DESC
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idCliente);
+		parameters.add(idCategoria);
+		
+		return executarQueryTransacoes(query, parameters);
+	}
+
+	public ArrayList<CategoriaTransacao> getCategorias() throws SQLException {
+		
+		String query = "SELECT id, nome, descricao FROM Categoria ORDER BY nome";
+		ArrayList<Object> parameters = new ArrayList<>();
+		ArrayList<CategoriaTransacao> categorias = new ArrayList<>();
+		
+		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String nome = rs.getString("nome");
+				String descricao = rs.getString("descricao");
+				categorias.add(new CategoriaTransacao(id, nome, descricao));
+			}
+		}
+		
+		return categorias;
+	}
+
 	private ArrayList<Transacao> executarQueryTransacoes(String query, ArrayList<Object> parameters) throws SQLException {
 		
 		ArrayList<Transacao> transacoes = new ArrayList<>();

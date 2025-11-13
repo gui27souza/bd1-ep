@@ -68,34 +68,32 @@ public class RelatoriosFrame extends JFrame {
         centerPanel.add(infoLabel);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         
-        // Botões dos relatórios
-        JButton btn1 = createReportButton("1. 💰 Maiores Gastos (Top 10 Transações)", new Color(33, 150, 243));
-        JButton btn2 = createReportButton("2. 📊 Gastos Detalhados por Categoria", new Color(76, 175, 80));
-        JButton btn3 = createReportButton("3. 👥 Divisão de Gastos por Membro", new Color(255, 152, 0));
-        JButton btn4 = createReportButton("4. 📈 Estatísticas dos Grupos", new Color(156, 39, 176));
-        JButton btn5 = createReportButton("5. 📅 Resumo Financeiro por Período", new Color(0, 150, 136));
-        JButton btn6 = createReportButton("6. 🔄 Grupos Ativos vs Inativos", new Color(233, 30, 99));
-        
-        btn1.addActionListener(e -> exibirRelatorio1());
-        btn2.addActionListener(e -> exibirRelatorio2());
-        btn3.addActionListener(e -> exibirRelatorio3());
-        btn4.addActionListener(e -> exibirRelatorio4());
-        btn5.addActionListener(e -> exibirRelatorio5());
-        btn6.addActionListener(e -> exibirRelatorio6());
-        
-        centerPanel.add(btn1);
-        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        centerPanel.add(btn2);
-        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        centerPanel.add(btn3);
-        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        centerPanel.add(btn4);
-        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        centerPanel.add(btn5);
-        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        centerPanel.add(btn6);
-        
-        mainPanel.add(centerPanel, BorderLayout.CENTER);
+		// Botões dos relatórios
+		JButton btn1 = createReportButton("1. 💰 Maiores Gastos", new Color(33, 150, 243));
+		JButton btn2 = createReportButton("2. 💸 Maiores Contribuições", new Color(67, 160, 71));
+		JButton btn3 = createReportButton("3. 📊 Gastos Detalhados por Categoria", new Color(76, 175, 80));
+		JButton btn4 = createReportButton("4. 👥 Divisão de Gastos por Membro", new Color(255, 152, 0));
+		JButton btn5 = createReportButton("5. 📈 Estatísticas dos Grupos", new Color(156, 39, 176));
+		JButton btn6 = createReportButton("6. 📅 Resumo Financeiro por Período", new Color(0, 150, 136));
+		JButton btn7 = createReportButton("7. 🔄 Grupos Ativos vs Inativos", new Color(233, 30, 99));		btn1.addActionListener(e -> exibirRelatorio1());
+		btn2.addActionListener(e -> exibirRelatorio2());
+		btn3.addActionListener(e -> exibirRelatorio3());
+		btn4.addActionListener(e -> exibirRelatorio4());
+		btn5.addActionListener(e -> exibirRelatorio5());
+		btn6.addActionListener(e -> exibirRelatorio6());
+		btn7.addActionListener(e -> exibirRelatorio7());		centerPanel.add(btn1);
+		centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		centerPanel.add(btn2);
+		centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		centerPanel.add(btn3);
+		centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		centerPanel.add(btn4);
+		centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		centerPanel.add(btn5);
+		centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		centerPanel.add(btn6);
+		centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		centerPanel.add(btn7);        mainPanel.add(centerPanel, BorderLayout.CENTER);
         
         // Botão voltar
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -165,16 +163,52 @@ public class RelatoriosFrame extends JFrame {
                 row.get("categoria"),
                 String.format("R$ %.2f", (Float) row.get("valor"))
             };
-            tableModel.addRow(rowData);
-        }
-        
-        mostrarTabelaRelatorio(tableModel, "💰 Maiores Gastos (Top 10 Transações)");
-    }
-    
-    private void exibirRelatorio2() {
-        List<Map<String, Object>> dados = relatorioService.gastosDetalhadosPorCategoria(acessoAtual.getCliente().getId());
-        
-        if (dados.isEmpty()) {
+			tableModel.addRow(rowData);
+		}
+		
+		mostrarTabelaRelatorio(tableModel, "💰 Maiores Gastos");
+	}	private void exibirRelatorio2() {
+		List<Map<String, Object>> dados = relatorioService.maioresContribuicoes(acessoAtual.getCliente().getId());
+		
+		if (dados.isEmpty()) {
+			JOptionPane.showMessageDialog(this,
+				"Nenhuma contribuição foi encontrada.",
+				"Sem Resultados",
+				JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		
+		String[] colunas = {"Data", "Grupo", "Cliente", "Categoria", "Valor"};
+		DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		
+		for (Map<String, Object> row : dados) {
+			String dataFormatada = "";
+			if (row.get("data_transacao") != null) {
+				dataFormatada = dateFormat.format(row.get("data_transacao"));
+			}
+			
+			Object[] rowData = {
+				dataFormatada,
+				row.get("grupo"),
+				row.get("cliente"),
+				row.get("categoria"),
+				String.format("R$ %.2f", (Float) row.get("valor"))
+			};
+			tableModel.addRow(rowData);
+		}
+		
+		mostrarTabelaRelatorio(tableModel, "💸 Maiores Contribuições");
+	}
+	
+	private void exibirRelatorio3() {
+		List<Map<String, Object>> dados = relatorioService.gastosDetalhadosPorCategoria(acessoAtual.getCliente().getId());        if (dados.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Nenhuma transação foi encontrada.",
                 "Sem Resultados",
@@ -200,13 +234,11 @@ public class RelatoriosFrame extends JFrame {
             tableModel.addRow(rowData);
         }
         
-        mostrarTabelaRelatorio(tableModel, "📊 Gastos Detalhados por Categoria");
-    }
-    
-    private void exibirRelatorio3() {
-        List<Map<String, Object>> dados = relatorioService.divisaoGastosPorMembro(acessoAtual.getCliente().getId());
-        
-        if (dados.isEmpty()) {
+		mostrarTabelaRelatorio(tableModel, "📊 Gastos Detalhados por Categoria");
+	}
+	
+	private void exibirRelatorio4() {
+		List<Map<String, Object>> dados = relatorioService.divisaoGastosPorMembro(acessoAtual.getCliente().getId());        if (dados.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Nenhuma transação foi encontrada.",
                 "Sem Resultados",
@@ -233,13 +265,11 @@ public class RelatoriosFrame extends JFrame {
             tableModel.addRow(rowData);
         }
         
-        mostrarTabelaRelatorio(tableModel, "👥 Divisão de Gastos por Membro");
-    }
-    
-    private void exibirRelatorio4() {
-        List<Map<String, Object>> dados = relatorioService.estatisticasGrupos(acessoAtual.getCliente().getId());
-        
-        if (dados.isEmpty()) {
+		mostrarTabelaRelatorio(tableModel, "👥 Divisão de Gastos por Membro");
+	}
+	
+	private void exibirRelatorio5() {
+		List<Map<String, Object>> dados = relatorioService.estatisticasGrupos(acessoAtual.getCliente().getId());        if (dados.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Nenhum grupo foi encontrado.",
                 "Sem Resultados",
@@ -268,13 +298,11 @@ public class RelatoriosFrame extends JFrame {
             tableModel.addRow(rowData);
         }
         
-        mostrarTabelaRelatorio(tableModel, "📈 Estatísticas dos Grupos");
-    }
-    
-    private void exibirRelatorio5() {
-        List<Map<String, Object>> dados = relatorioService.resumoFinanceiroPorPeriodo(acessoAtual.getCliente().getId());
-        
-        if (dados.isEmpty()) {
+		mostrarTabelaRelatorio(tableModel, "📈 Estatísticas dos Grupos");
+	}
+	
+	private void exibirRelatorio6() {
+		List<Map<String, Object>> dados = relatorioService.resumoFinanceiroPorPeriodo(acessoAtual.getCliente().getId());        if (dados.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Nenhum dado foi encontrado.",
                 "Sem Resultados",
@@ -282,7 +310,7 @@ public class RelatoriosFrame extends JFrame {
             return;
         }
         
-        String[] colunas = {"Período", "Grupo", "Quantidade", "Total"};
+        String[] colunas = {"Período", "Transações", "Total Gastos", "Total Receitas", "Saldo"};
         DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -293,20 +321,19 @@ public class RelatoriosFrame extends JFrame {
         for (Map<String, Object> row : dados) {
             Object[] rowData = {
                 row.get("periodo"),
-                row.get("grupo"),
-                row.get("quantidade"),
-                String.format("R$ %.2f", (Float) row.get("total"))
+                row.get("quantidade_transacoes"),
+                String.format("R$ %.2f", (Float) row.get("total_gastos")),
+                String.format("R$ %.2f", (Float) row.get("total_receitas")),
+                String.format("R$ %.2f", (Float) row.get("saldo"))
             };
             tableModel.addRow(rowData);
         }
         
-        mostrarTabelaRelatorio(tableModel, "📅 Resumo Financeiro por Período");
-    }
-    
-    private void exibirRelatorio6() {
-        List<Map<String, Object>> dados = relatorioService.gruposAtivosVsInativos(acessoAtual.getCliente().getId());
-        
-        if (dados.isEmpty()) {
+		mostrarTabelaRelatorio(tableModel, "📅 Resumo Financeiro por Período");
+	}
+	
+	private void exibirRelatorio7() {
+		List<Map<String, Object>> dados = relatorioService.gruposAtivosVsInativos(acessoAtual.getCliente().getId());        if (dados.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Nenhum grupo foi encontrado.",
                 "Sem Resultados",

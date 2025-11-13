@@ -2,6 +2,7 @@ package main.java.gui;
 
 import main.java.model.Acesso;
 import main.java.model.Grupo;
+import main.java.model.transacao.CategoriaTransacao;
 import main.java.model.transacao.Transacao;
 import main.java.service.GrupoService;
 import main.java.service.TransacaoService;
@@ -82,6 +83,15 @@ public class TransacoesFrame extends JFrame {
         btnTodas.setOpaque(true);
         btnTodas.setPreferredSize(new Dimension(170, 45));
         
+        JButton btnPorCategoria = new JButton("Ver por Categoria");
+        btnPorCategoria.setFont(new Font("Arial", Font.BOLD, 14));
+        btnPorCategoria.setBackground(new Color(255, 152, 0));
+        btnPorCategoria.setForeground(Color.WHITE);
+        btnPorCategoria.setFocusPainted(false);
+        btnPorCategoria.setBorderPainted(false);
+        btnPorCategoria.setOpaque(true);
+        btnPorCategoria.setPreferredSize(new Dimension(190, 45));
+        
         JButton btnVoltar = new JButton("Voltar");
         btnVoltar.setFont(new Font("Arial", Font.BOLD, 14));
         btnVoltar.setBackground(new Color(158, 158, 158));
@@ -93,10 +103,12 @@ public class TransacoesFrame extends JFrame {
         
         btnPorGrupo.addActionListener(e -> verTransacoesPorGrupo());
         btnTodas.addActionListener(e -> verTodasTransacoes());
+        btnPorCategoria.addActionListener(e -> verTransacoesPorCategoria());
         btnVoltar.addActionListener(e -> voltar());
         
         buttonPanel.add(btnPorGrupo);
         buttonPanel.add(btnTodas);
+        buttonPanel.add(btnPorCategoria);
         buttonPanel.add(btnVoltar);
         
         // Painel central com instruções
@@ -106,8 +118,9 @@ public class TransacoesFrame extends JFrame {
         
         JLabel instrucaoLabel = new JLabel("<html><center>" +
             "<h2>Escolha uma opção</h2>" +
-            "<p>Selecione <b>Ver por Grupo</b> para visualizar transações de um grupo específico</p>" +
-            "<p>ou <b>Ver Todas</b> para visualizar todas as suas transações.</p>" +
+            "<p>Selecione <b>Ver por Grupo</b> para visualizar transações de um grupo específico,</p>" +
+            "<p><b>Ver Todas</b> para visualizar todas as suas transações,</p>" +
+            "<p>ou <b>Ver por Categoria</b> para filtrar por categoria.</p>" +
             "</center></html>");
         instrucaoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(instrucaoLabel);
@@ -116,6 +129,79 @@ public class TransacoesFrame extends JFrame {
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
         add(mainPanel);
+    }
+    
+    private void verTransacoesPorCategoria() {
+        try {
+            // Buscar categorias disponíveis
+            ArrayList<CategoriaTransacao> categorias = transacaoService.getCategorias();
+            
+            if (categorias.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                    "Nenhuma categoria disponível.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            // Criar array de nomes para o dialog
+            String[] nomesCategorias = new String[categorias.size()];
+            for (int i = 0; i < categorias.size(); i++) {
+                nomesCategorias[i] = categorias.get(i).getNome();
+            }
+            
+            // Mostrar dialog de seleção
+            String categoriaSelecionada = (String) JOptionPane.showInputDialog(
+                this,
+                "Selecione a categoria:",
+                "Filtrar por Categoria",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                nomesCategorias,
+                nomesCategorias[0]
+            );
+            
+            if (categoriaSelecionada == null) {
+                return; // Usuário cancelou
+            }
+            
+            // Encontrar a categoria selecionada
+            CategoriaTransacao categoria = null;
+            for (CategoriaTransacao c : categorias) {
+                if (c.getNome().equals(categoriaSelecionada)) {
+                    categoria = c;
+                    break;
+                }
+            }
+            
+            if (categoria == null) {
+                return;
+            }
+            
+            // Buscar transações da categoria
+            ArrayList<Transacao> transacoes = transacaoService.getTransacoesPorCategoria(
+                acessoAtual.getCliente().getId(), 
+                categoria.getId()
+            );
+            
+            if (transacoes.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                    "Nenhuma transação encontrada para a categoria " + categoria.getNome() + ".",
+                    "Informação",
+                    JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            
+            // Exibir tabela de transações
+            exibirTransacoes(transacoes, "Categoria: " + categoria.getNome());
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Erro ao buscar transações por categoria: " + e.getMessage(),
+                "Erro",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
     
     private void verTransacoesPorGrupo() {
