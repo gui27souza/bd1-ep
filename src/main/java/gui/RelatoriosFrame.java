@@ -69,13 +69,13 @@ public class RelatoriosFrame extends JFrame {
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         
 		// Botões dos relatórios
-		JButton btn1 = createReportButton("1. 💰 Maiores Gastos", new Color(33, 150, 243));
-		JButton btn2 = createReportButton("2. 💸 Maiores Contribuições", new Color(67, 160, 71));
-		JButton btn3 = createReportButton("3. 📊 Gastos Detalhados por Categoria", new Color(76, 175, 80));
-		JButton btn4 = createReportButton("4. 👥 Divisão de Gastos por Membro", new Color(255, 152, 0));
-		JButton btn5 = createReportButton("5. 📈 Estatísticas dos Grupos", new Color(156, 39, 176));
-		JButton btn6 = createReportButton("6. 📅 Resumo Financeiro por Período", new Color(0, 150, 136));
-		JButton btn7 = createReportButton("7. 🔄 Grupos Ativos vs Inativos", new Color(233, 30, 99));		btn1.addActionListener(e -> exibirRelatorio1());
+		JButton btn1 = createReportButton("1. 💰 Maiores Gastos", new Color(33, 150, 243));           // BTN_PRIMARY
+		JButton btn2 = createReportButton("2. 💸 Maiores Contribuições", new Color(41, 182, 246));   // BTN_SECONDARY
+		JButton btn3 = createReportButton("3. 📊 Gastos Detalhados por Categoria", new Color(38, 198, 218)); // BTN_SUCCESS
+		JButton btn4 = createReportButton("4. 👥 Divisão de Gastos por Membro", new Color(26, 188, 156));  // BTN_INFO
+		JButton btn5 = createReportButton("5. 📈 Estatísticas dos Grupos", new Color(77, 182, 172));     // BTN_LIGHT
+		JButton btn6 = createReportButton("6. 📅 Resumo Financeiro por Período", new Color(38, 198, 218)); // BTN_SUCCESS
+		JButton btn7 = createReportButton("7. 🔄 Grupos Ativos vs Inativos", new Color(41, 182, 246));  // BTN_SECONDARY		btn1.addActionListener(e -> exibirRelatorio1());
 		btn2.addActionListener(e -> exibirRelatorio2());
 		btn3.addActionListener(e -> exibirRelatorio3());
 		btn4.addActionListener(e -> exibirRelatorio4());
@@ -126,7 +126,26 @@ public class RelatoriosFrame extends JFrame {
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setOpaque(true);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Efeito hover
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(adjustBrightness(color, 0.9f));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(color);
+            }
+        });
+        
         return button;
+    }
+    
+    private Color adjustBrightness(Color color, float factor) {
+        int r = (int)(color.getRed() * factor);
+        int g = (int)(color.getGreen() * factor);
+        int b = (int)(color.getBlue() * factor);
+        return new Color(Math.max(0, r), Math.max(0, g), Math.max(0, b));
     }
     
     private void exibirRelatorio1() {

@@ -70,12 +70,12 @@ public class CadastroFrame extends JFrame {
         ));
         
         // Botões de ações
-        JButton btnVerDados = createActionButton("Ver Meus Dados", new Color(33, 150, 243));
-        JButton btnEditarNome = createActionButton("Editar Nome", new Color(76, 175, 80));
-        JButton btnEditarEmail = createActionButton("Editar E-mail", new Color(255, 152, 0));
-        JButton btnEditarCpf = createActionButton("Editar CPF", new Color(103, 58, 183));
-        JButton btnEditarData = createActionButton("Editar Data de Nascimento", new Color(0, 150, 136));
-        JButton btnTrocarPlano = createActionButton("Trocar Plano", new Color(233, 30, 99));
+        JButton btnVerDados = createActionButton("Ver Meus Dados", new Color(33, 150, 243));      // BTN_PRIMARY
+        JButton btnEditarNome = createActionButton("Editar Nome", new Color(41, 182, 246));       // BTN_SECONDARY
+        JButton btnEditarEmail = createActionButton("Editar E-mail", new Color(38, 198, 218));    // BTN_SUCCESS
+        JButton btnEditarCpf = createActionButton("Editar CPF", new Color(26, 188, 156));         // BTN_INFO
+        JButton btnEditarData = createActionButton("Editar Data de Nascimento", new Color(77, 182, 172)); // BTN_LIGHT
+        JButton btnTrocarPlano = createActionButton("Trocar Plano", new Color(33, 150, 243));     // BTN_PRIMARY
         
         btnVerDados.addActionListener(e -> verDados());
         btnEditarNome.addActionListener(e -> editarNome());
@@ -126,7 +126,26 @@ public class CadastroFrame extends JFrame {
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setOpaque(true);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Efeito hover
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(adjustBrightness(color, 0.9f));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(color);
+            }
+        });
+        
         return button;
+    }
+    
+    private Color adjustBrightness(Color color, float factor) {
+        int r = (int)(color.getRed() * factor);
+        int g = (int)(color.getGreen() * factor);
+        int b = (int)(color.getBlue() * factor);
+        return new Color(Math.max(0, r), Math.max(0, g), Math.max(0, b));
     }
     
     private void verDados() {
