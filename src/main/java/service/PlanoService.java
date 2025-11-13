@@ -62,6 +62,34 @@ public class PlanoService {
 	}
 
 	/**
+	 * Busca o plano atual de um cliente
+	 */
+	public PlanoInfo getPlanoAtual(int idCliente) throws SQLException, DomainException {
+		
+		String query = """
+			SELECT p.id, p.nome, p.valor, p.qtd_convites 
+			FROM Plano p
+			JOIN Cliente c ON c.id_plano = p.id
+			WHERE c.id = ?
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idCliente);
+
+		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
+			if (rs.next()) {
+				return new PlanoInfo(
+					rs.getInt("id"),
+					rs.getString("nome"),
+					rs.getFloat("valor"),
+					rs.getInt("qtd_convites")
+				);
+			}
+			throw new DomainException("Plano não encontrado para o cliente.");
+		}
+	}
+
+	/**
 	 * Atualiza o plano de um cliente
 	 */
 	public void atualizarPlanoCliente(int idCliente, int novoIdPlano) throws SQLException, DomainException {

@@ -130,21 +130,109 @@ public class CadastroFrame extends JFrame {
     }
     
     private void verDados() {
-        String dados = String.format(
-            "<html>" +
-            "<h2>Meus Dados</h2>" +
-            "<p><b>Nome:</b> %s</p>" +
-            "<p><b>E-mail:</b> %s</p>" +
-            "<p><b>CPF:</b> %s</p>" +
-            "<p><b>Data de Nascimento:</b> %s</p>" +
-            "</html>",
-            acessoAtual.getCliente().getNome(),
-            acessoAtual.getEmail(),
-            acessoAtual.getCliente().getCpf(),
-            acessoAtual.getCliente().getDataNascimento()
-        );
+        try {
+            // Buscar plano atual
+            PlanoService.PlanoInfo plano = planoService.getPlanoAtual(acessoAtual.getCliente().getId());
+            
+            // Criar dialog customizado
+            JDialog dialog = new JDialog(this, "Meus Dados", true);
+            dialog.setSize(550, 450);
+            dialog.setLocationRelativeTo(this);
+            
+            JPanel mainPanel = new JPanel(new BorderLayout(15, 15));
+            mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            mainPanel.setBackground(Color.WHITE);
+            
+            // Título
+            JLabel titleLabel = new JLabel("👤 Meus Dados Pessoais");
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+            titleLabel.setForeground(new Color(156, 39, 176));
+            titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            mainPanel.add(titleLabel, BorderLayout.NORTH);
+            
+            // Painel de informações
+            JPanel infoPanel = new JPanel();
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+            infoPanel.setBackground(Color.WHITE);
+            infoPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+            ));
+            
+            // Adicionar informações com formatação elegante
+            addInfoRow(infoPanel, "Nome:", acessoAtual.getCliente().getNome());
+            addInfoRow(infoPanel, "E-mail:", acessoAtual.getEmail());
+            addInfoRow(infoPanel, "CPF:", acessoAtual.getCliente().getCpf());
+            addInfoRow(infoPanel, "Data de Nascimento:", acessoAtual.getCliente().getDataNascimento().toString());
+            
+            infoPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+            
+            // Separador
+            JSeparator separator = new JSeparator();
+            separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+            infoPanel.add(separator);
+            infoPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+            
+            // Informações do plano com destaque
+            JLabel planoTitleLabel = new JLabel("💳 Plano Atual");
+            planoTitleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            planoTitleLabel.setForeground(new Color(33, 150, 243));
+            planoTitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            infoPanel.add(planoTitleLabel);
+            infoPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            
+            addInfoRow(infoPanel, "Nome do Plano:", plano.nome);
+            addInfoRow(infoPanel, "Valor Mensal:", String.format("R$ %.2f", plano.valor));
+            addInfoRow(infoPanel, "Convites Disponíveis:", String.valueOf(plano.qtdConvites));
+            
+            mainPanel.add(infoPanel, BorderLayout.CENTER);
+            
+            // Botão fechar
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            buttonPanel.setBackground(Color.WHITE);
+            
+            JButton btnFechar = new JButton("Fechar");
+            btnFechar.setFont(new Font("Arial", Font.BOLD, 13));
+            btnFechar.setBackground(new Color(156, 39, 176));
+            btnFechar.setForeground(Color.WHITE);
+            btnFechar.setFocusPainted(false);
+            btnFechar.setPreferredSize(new Dimension(120, 35));
+            btnFechar.addActionListener(e -> dialog.dispose());
+            
+            buttonPanel.add(btnFechar);
+            mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+            
+            dialog.setContentPane(mainPanel);
+            dialog.setVisible(true);
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Erro ao buscar dados: " + e.getMessage(),
+                "Erro",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+    
+    private void addInfoRow(JPanel panel, String label, String value) {
+        JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
+        rowPanel.setBackground(Color.WHITE);
+        rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
         
-        JOptionPane.showMessageDialog(this, dados, "Meus Dados", JOptionPane.INFORMATION_MESSAGE);
+        JLabel lblLabel = new JLabel(label);
+        lblLabel.setFont(new Font("Arial", Font.BOLD, 13));
+        lblLabel.setPreferredSize(new Dimension(180, 25));
+        lblLabel.setForeground(new Color(80, 80, 80));
+        
+        JLabel lblValue = new JLabel(value);
+        lblValue.setFont(new Font("Arial", Font.PLAIN, 13));
+        lblValue.setForeground(new Color(50, 50, 50));
+        
+        rowPanel.add(lblLabel);
+        rowPanel.add(lblValue);
+        
+        panel.add(rowPanel);
     }
     
     private void editarNome() {
