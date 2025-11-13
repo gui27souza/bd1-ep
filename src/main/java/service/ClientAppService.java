@@ -27,6 +27,7 @@ public class ClientAppService {
 		String[] menuOptions = {
 			"Ver grupos",
 			"Ver transações",
+			"Ver convites",
 			"Ver/Editar cadastro"
 		};
 
@@ -83,6 +84,11 @@ public class ClientAppService {
 			}
 
 		}
+
+	}
+
+
+	public void menuConvites() {
 
 	}
 }
