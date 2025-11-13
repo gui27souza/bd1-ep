@@ -1,8 +1,6 @@
-package main.java.model.acesso;
+package main.java.model;
 
 import main.java.exceptions.DomainException;
-import main.java.model.cliente.Cliente;
-import main.java.model.grupo.Grupo;
 
 import java.util.ArrayList;
 
@@ -11,54 +9,64 @@ public class Acesso {
 	public final int id;
 	String email;
 	private final String senha_hash;
-	Cliente clienteVinculado;
+	Cliente cliente;
 	ArrayList<Grupo> grupos;
 
-	public Acesso(int id, String email, String senha_hash, Cliente clienteVinculado) {
+	public Acesso(int id, String email, String senha_hash, Cliente cliente) {
 		this.id = id;
 		this.email = email;
 		this.senha_hash = senha_hash;
-		this.clienteVinculado = clienteVinculado;
+		this.cliente = cliente;
 		this.grupos = new ArrayList<>();
+	}
+
+	public Acesso(int id, String email, String senha_hash, Cliente cliente, ArrayList<Grupo> grupos) {
+		this.id = id;
+		this.email = email;
+		this.senha_hash = senha_hash;
+		this.cliente = cliente;
+		this.grupos = grupos;
 	}
 
 	public int getId() { return id;	}
 	public String getEmail() { return email; }
-	public Cliente getClienteVinculado() { return clienteVinculado; }
+	public void setEmail(String email) { this.email = email; }
+	public Cliente getCliente() { return cliente; }
 	public ArrayList<Grupo> getGrupos() { return new ArrayList<>(this.grupos); }
+	public void setGrupos(ArrayList<Grupo> grupos) { this.grupos = grupos; }
 
-	public void setClienteVinculado(Cliente clienteVinculado) throws DomainException {
+	public void setCliente(Cliente cliente) throws DomainException {
 
-		if (this.clienteVinculado != null) {
+		if (this.cliente != null) {
 			throw new DomainException("Acesso já tem um cliente vinculado!");
 		}
 
-		this.clienteVinculado = clienteVinculado;
+		this.cliente = cliente;
 	}
 
 	public void addGrupo(Grupo grupo) throws DomainException {
 
 		if (this.grupos.contains(grupo)) {
 			throw new DomainException(
-				"Cliente " + this.clienteVinculado.getNome() + "(id: " + this.clienteVinculado.getId() + ")" +
+				"Cliente " + this.cliente.getNome() + "(id: " + this.cliente.getId() + ")" +
 				" já está no grupo " + grupo.getNome() + "(id: " + grupo.getId() + ")"
 			);
 		}
 
 		this.grupos.add(grupo);
-		grupo.addCliente(this.clienteVinculado);
+		grupo.addCliente(this.cliente);
 	}
 
 	public void removeGrupo(Grupo grupo) throws DomainException {
 
 		if (!this.grupos.contains(grupo)) {
 			throw new DomainException(
-				"Cliente " + this.clienteVinculado.getNome() + "(id: " + this.clienteVinculado.getId() + ")" +
+				"Cliente " + this.cliente.getNome() + "(id: " + this.cliente.getId() + ")" +
 				" não está no grupo " + grupo.getNome() + "(id: " + grupo.getId() + ")"
 			);
 		}
 
 		this.grupos.remove(grupo);
-		grupo.removeCliente(this.clienteVinculado);
+		grupo.removeCliente(this.cliente);
 	}
 }

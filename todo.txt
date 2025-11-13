@@ -1,0 +1,1 @@
+- Checar duplicidade de email no cadastro (só é feito com cpf atualmente)
