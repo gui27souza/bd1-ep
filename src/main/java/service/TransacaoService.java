@@ -158,10 +158,12 @@ public class TransacaoService {
 		System.out.println("\n================================\n");
 	}
 
-	public void criarTransacao(Transacao transacao) throws SQLException {
+	public void criarTransacao(Transacao transacao, String tipoTransacao) throws SQLException {
+		// Inserir na tabela Transacao e obter o ID gerado
 		String query = """
 			INSERT INTO Transacao (id_cliente, id_grupo, id_categoria, valor, descricao, data_transacao)
 			VALUES (?, ?, ?, ?, ?, ?)
+			RETURNING id
 		""";
 		
 		ArrayList<Object> parameters = new ArrayList<>();
@@ -172,7 +174,28 @@ public class TransacaoService {
 		parameters.add(transacao.getDescricao());
 		parameters.add(transacao.getDataTransacao());
 		
-		dbConnector.executeUpdate(query, parameters);
+		int idTransacao = 0;
+		try (ResultSet rs = dbConnector.executeQuery(query, parameters)) {
+			if (rs.next()) {
+				idTransacao = rs.getInt("id");
+			}
+		}
+		
+		// Inserir na tabela especializada (Pix ou Cartao)
+		if (tipoTransacao.equals("PIX")) {
+			String queryPix = "INSERT INTO Pix (id_transacao, chave) VALUES (?, ?)";
+			ArrayList<Object> paramsPix = new ArrayList<>();
+			paramsPix.add(idTransacao);
+			paramsPix.add("chave.generica@pix.com"); // Chave genérica para Opção 1
+			dbConnector.executeUpdate(queryPix, paramsPix);
+		} else if (tipoTransacao.equals("CARTAO")) {
+			String queryCartao = "INSERT INTO Cartao (id_transacao, bandeira, digitos_finais) VALUES (?, ?, ?)";
+			ArrayList<Object> paramsCartao = new ArrayList<>();
+			paramsCartao.add(idTransacao);
+			paramsCartao.add("Visa"); // Bandeira genérica
+			paramsCartao.add("0000"); // Dígitos genéricos
+			dbConnector.executeUpdate(queryCartao, paramsCartao);
+		}
 	}
 
 	public void editarTransacao(Transacao transacao) throws SQLException {

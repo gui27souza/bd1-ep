@@ -564,7 +564,7 @@ public class TransacoesFrame extends JFrame {
         
         // Dialog para nova transação
         JDialog dialog = new JDialog(this, "Nova Transação", true);
-        dialog.setSize(500, 450);
+        dialog.setSize(500, 500);
         dialog.setLocationRelativeTo(this);
         
         JPanel panel = new JPanel(new GridBagLayout());
@@ -608,9 +608,18 @@ public class TransacoesFrame extends JFrame {
         }
         panel.add(cbCategoria, gbc);
         
-        // Valor
+        // Tipo de Pagamento
         gbc.gridx = 0;
         gbc.gridy = 2;
+        panel.add(new JLabel("Tipo de Pagamento:"), gbc);
+        
+        gbc.gridx = 1;
+        JComboBox<String> cbTipoPagamento = new JComboBox<>(new String[]{"PIX", "CARTAO"});
+        panel.add(cbTipoPagamento, gbc);
+        
+        // Valor
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         panel.add(new JLabel("Valor (R$):"), gbc);
         
         gbc.gridx = 1;
@@ -618,7 +627,7 @@ public class TransacoesFrame extends JFrame {
         panel.add(txtValor, gbc);
         
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.gridwidth = 2;
         JLabel lblInfo = new JLabel("<html><i>Dica: Use valores negativos para gastos e positivos para receitas/contribuições</i></html>");
         lblInfo.setFont(new Font("Arial", Font.PLAIN, 10));
@@ -628,7 +637,7 @@ public class TransacoesFrame extends JFrame {
         
         // Descrição
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         panel.add(new JLabel("Descrição:"), gbc);
         
         gbc.gridx = 1;
@@ -637,7 +646,7 @@ public class TransacoesFrame extends JFrame {
         
         // Botões
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(20, 5, 5, 5);
         
@@ -672,6 +681,9 @@ public class TransacoesFrame extends JFrame {
                 Grupo grupoSelecionado = grupos.get(cbGrupo.getSelectedIndex());
                 CategoriaTransacao categoriaSelecionada = finalCategorias.get(cbCategoria.getSelectedIndex());
                 
+                // Obter tipo de pagamento selecionado
+                String tipoTransacao = (String) cbTipoPagamento.getSelectedItem();
+                
                 // Criar transação (PIX como padrão)
                 Transacao novaTransacao = new main.java.model.transacao.TransacaoPix(
                     acessoAtual.getCliente().getId(),
@@ -682,7 +694,7 @@ public class TransacoesFrame extends JFrame {
                     new java.sql.Timestamp(System.currentTimeMillis())
                 );
                 
-                transacaoService.criarTransacao(novaTransacao);
+                transacaoService.criarTransacao(novaTransacao, tipoTransacao);
                 
                 JOptionPane.showMessageDialog(dialog,
                     "Transação criada com sucesso!",
