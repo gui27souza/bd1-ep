@@ -123,7 +123,7 @@ public class CadastroService {
 		return novoAcesso;
 	}
 
-	public void createCredenciais(int id, String email, String senha) throws SQLException {
+	public void createCredenciais(int id, String email, String senha) throws SQLException, DomainException {
 
 		String query = "INSERT INTO Credenciais (id_cliente, email, senha_hash) VALUES (?, ?, ?)";
 		ArrayList<Object> parameters = new ArrayList<>();
@@ -131,12 +131,19 @@ public class CadastroService {
 		parameters.add(email);
 		parameters.add(senha);
 
-		int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
+		try {
+			int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
 
-		if (rowsAffected == 0) {
-			throw new SQLException("Falha ao criar credenciais para o cliente de ID " + id + "Realizando rollback.");
-		} else if (rowsAffected != 1) {
-			throw new RuntimeException("ERRO DE INTEGRIDADE: Mais de uma credencial criada. Rows affected: " + rowsAffected);
+			if (rowsAffected == 0) {
+				throw new SQLException("Falha ao criar credenciais para o cliente de ID " + id + "Realizando rollback.");
+			} else if (rowsAffected != 1) {
+				throw new RuntimeException("ERRO DE INTEGRIDADE: Mais de uma credencial criada. Rows affected: " + rowsAffected);
+			}
+		} catch (SQLException e) {
+			if (e.getSQLState().equals("23505")) {
+				throw new DomainException("Já existe uma conta cadastrada com este e-mail.");
+			}
+			throw e;
 		}
 
 	}
@@ -204,4 +211,33 @@ public class CadastroService {
 	}
 
 	// ===============================================
+
+	// ==================== UPDATE ====================
+
+	public void updateEmail(int idCliente, String novoEmail) throws DomainException, SQLException {
+		
+		if (novoEmail == null || novoEmail.trim().isEmpty()) {
+			throw new DomainException("O e-mail não pode ser vazio.");
+		}
+
+		String query = "UPDATE Credenciais SET email = ? WHERE id_cliente = ?";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(novoEmail);
+		parameters.add(idCliente);
+
+		try {
+			int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
+
+			if (rowsAffected == 0) {
+				throw new SQLException("Nenhuma credencial encontrada para o cliente ID " + idCliente);
+			}
+		} catch (SQLException e) {
+			if (e.getSQLState().equals("23505")) {
+				throw new DomainException("Já existe uma conta cadastrada com este e-mail.");
+			}
+			throw e;
+		}
+	}
+
+	// ================================================
 }

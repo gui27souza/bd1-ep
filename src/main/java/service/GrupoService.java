@@ -37,7 +37,7 @@ public class GrupoService {
 			descricao = "Grupo sem descrição.";
 		}
 
-		String query =  "INSERT INTO grupo (nome, status, descricao) VALUES (?, ?, ?) RETURNING id, status, data_criacao";
+		String query =  "INSERT INTO grupo (nome, descricao) VALUES (?, ?) RETURNING id, status, data_criacao";
 		ArrayList<Object> parameters =  new ArrayList<>();
 		parameters.add(nome);
 		parameters.add(descricao);
@@ -96,5 +96,48 @@ public class GrupoService {
 
 			return listaGrupos;
 		}
+	}
+
+	/**
+	 * Adiciona um membro ao grupo com um papel específico (admin ou membro)
+	 */
+	public void adicionarMembroAoGrupo(int idCliente, int idGrupo, String papel) throws DomainException, SQLException {
+		
+		if (!papel.equals("admin") && !papel.equals("membro")) {
+			throw new DomainException("Papel inválido. Use 'admin' ou 'membro'.");
+		}
+
+		String query = "INSERT INTO MembroGrupo (id_cliente, id_grupo, role) VALUES (?, ?, ?)";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idCliente);
+		parameters.add(idGrupo);
+		parameters.add(papel);
+
+		try {
+			int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
+
+			if (rowsAffected == 0) {
+				throw new SQLException("Falha ao adicionar membro ao grupo.");
+			}
+		} catch (SQLException e) {
+			if (e.getSQLState().equals("23505")) {
+				throw new DomainException("Cliente já é membro deste grupo.");
+			}
+			throw e;
+		}
+	}
+
+	/**
+	 * Cria um grupo e automaticamente adiciona o criador como administrador
+	 */
+	public Grupo criarGrupoComAdmin(String nome, String descricao, int idCriador) throws DomainException, SQLException {
+		
+		// Criar o grupo
+		Grupo novoGrupo = createGrupo(nome, descricao);
+		
+		// Adicionar o criador como admin
+		adicionarMembroAoGrupo(idCriador, novoGrupo.getId(), "admin");
+		
+		return novoGrupo;
 	}
 }

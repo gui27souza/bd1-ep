@@ -1,0 +1,61 @@
+Identificação do Problema 
+ 
+a)  Problema  a  ser  tratado:  Atualmente,  grupos  de pessoas (ex: famílias, associações, amigos, 
+pequenos negócios) possuem dificuldades em gerenciar suas finanças de forma coletiva. 
+i)  Entradas  (contribuições  e  recebimentos)  e  saídas  (gastos  e  pagamentos)  não  são 
+centralizadas 
+ii)  Em muitos momentos o controle é realizado por meio de planilhas soltas - por vezes 
+muito  complexas  -  ou  manualmente, o que gera uma falta de transparência e risco 
+de erro de rastreio financeiro.  
+Com  base  nesse  cenário,  o  objetivo  é  criar  um  sistema  que  forneça  a  possibilidade  de 
+gerenciamento financeiro grupos, que ofereça: 
+1)  Registro  centralizado de todas as entradas e saídas 
+2)  Observabilidade: relatórios, gráficos e dashboards sobre 
+a)  Quem contribuiu 
+b)  Quem mais contribuiu e quem menos contribui 
+c)  Data e quantidade das entradas e saídas de forma coletiva e individual  
+d)  Saldo disponível do grupo 
+3)  Controle por categorias de receitas e despesas 
+4)  Visões  diferentes:  cada  membro  de  um  grupo  conseguirá  somente  ter  acesso  aos 
+dados dos grupos a qual pertence. Além disso, haverá dois tipos de classificação no 
+grupo: 
+a)  Administradores  (terá  acesso  a  mais detalhes, como opção de adicionar ou 
+remover alguém do grupo ou deletar). 
+b)  Membros (terá visão simplificada apenas para registro de entradas e saídas)
+   
+5)  Possibilidade de relatórios periódicos (mensais, semanais) para transparência. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Módulos 
+ 
+ 
+Módulo de Clientes 
+-  Unidade básica do nosso sistema, o usuário/cliente em si 
+Módulo Cadastral 
+-  Responsável pelo cadastro e alteração de dados pessoais do cliente e grupo 
+-  Permitirá adição e atualização de dados, sendo também o responsável por criar uma 
+instância de usuário no banco de dados 
+Módulo de Acesso 
+-  Responsável pelo acesso (login) do cliente 
+-  Realiza a validação de credenciais de acesso do usuário, gerando uma sessão de uso do 
+sistema 
+Módulo Financeiro 
+-  Responsável pela entrada e saída financeira do cliente 
+-  Armazena transações e registra o saldo do cliente 
+Módulo de Grupos 
+-  Responsável pelo gerenciamento de grupos contendo clientes 
+-  Ao criar um grupo, uma instância de grupo é criada no Banco de Dados, relacionando os 
+integrantes às instâncias de usuários, além de saldos e operações 
+Módulo Gráficos/Tabelas 
+-  Responsável por geração de gráficos e dashboards sobre o grupo 
+-  Aqui que está o especial do nosso sistema, permite a observabilidade financeira de como o 
+grupo está andando, o quanto entrou e saiu, quem adicionou mais e quem gastou mais, 
+gráficos de como está o saldo do grupo ao longo do tempo, além de outros gráficos, tabelas 
+e dashboards a serem definidos. 

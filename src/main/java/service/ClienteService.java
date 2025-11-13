@@ -318,6 +318,76 @@ public class ClienteService {
 		return null;
 	}
 
+	public void updateNome(int idCliente, String novoNome) throws DomainException, SQLException {
+		
+		if (novoNome == null || novoNome.trim().isEmpty()) {
+			throw new DomainException("O nome não pode ser vazio.");
+		}
+
+		String query = "UPDATE Cliente SET nome = ? WHERE id = ?";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(novoNome);
+		parameters.add(idCliente);
+
+		int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
+
+		if (rowsAffected == 0) {
+			throw new SQLException("Nenhum cliente encontrado com ID " + idCliente);
+		}
+	}
+
+	public void updateCpf(int idCliente, String novoCpf) throws DomainException, SQLException {
+		
+		if (novoCpf.length() != 11) {
+			throw new DomainException("CPF inválido, deve conter 11 dígitos.");
+		}
+
+		try {
+			Long.parseLong(novoCpf);
+		} catch (NumberFormatException e) {
+			throw new DomainException("CPF inválido, deve conter 11 dígitos numéricos.");
+		}
+
+		String query = "UPDATE Cliente SET cpf = ? WHERE id = ?";
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(novoCpf);
+		parameters.add(idCliente);
+
+		try {
+			int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
+
+			if (rowsAffected == 0) {
+				throw new SQLException("Nenhum cliente encontrado com ID " + idCliente);
+			}
+		} catch (SQLException e) {
+			if (e.getSQLState().equals("23505")) {
+				throw new DomainException("Já existe um cliente cadastrado com este CPF.");
+			}
+			throw e;
+		}
+	}
+
+	public void updateDataNascimento(int idCliente, String novaDataStr) throws DomainException, SQLException {
+		
+		try {
+			LocalDate localDate = LocalDate.parse(novaDataStr);
+			Date novaData = Date.valueOf(localDate);
+
+			String query = "UPDATE Cliente SET data_nasc = ? WHERE id = ?";
+			ArrayList<Object> parameters = new ArrayList<>();
+			parameters.add(novaData);
+			parameters.add(idCliente);
+
+			int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
+
+			if (rowsAffected == 0) {
+				throw new SQLException("Nenhum cliente encontrado com ID " + idCliente);
+			}
+		} catch (DateTimeParseException e) {
+			throw new DomainException("Formato de data inválido. Use YYYY-MM-DD.");
+		}
+	}
+
 
 	// ===== Delete ====================
 

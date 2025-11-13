@@ -1,0 +1,51 @@
+1 Objetivo 
+Desenvolver um sistema utilizando Banco de Dados. O assunto é livre, mas deverá ter 
+um conteúdo que proporcione uma base de dados e um volume de trabalho 
+proporcional  a  quatro  alunos.  Procure  algo  inovador,  diferente,  que  motive  a 
+equipe a fazer um produto final de excelência! 
+ 
+2 Especificações 
+1. O  grupo  deve  ser  composto  por  até  quatro  alunos.  O  trabalho  será  avaliado 
+considerando quatro componentes no grupo, mesmo se o grupo apresentar 
+quantidade menor de membros. 2. A  parte  de  implementação  poderá  usar  qualquer  linguagem  de  programação  e 
+qualquer SGBD. Também poderá ser usada qualquer ferramenta para modelagem 
+do Banco de Dados. No entanto, será fornecido material e apoio para as 
+ferramentas vistas em aula. Não poderão ser usados frameworks, isto é, o SGBD 
+deve ser manipulado diretamente pelo programa.  3. Ao final, o grupo deverá entregar e apresentar o sistema completo funcionando. O 
+nível mínimo de interface exigido é correspondente ao material fornecido 
+(programação em Java). 4. Não será exigida interface gráfica, mas interfaces mais elaboradas que 
+mostrem integração de conteúdo com outras disciplinas ou esforço 
+adicional da equipe contarão pontos adicionais na avaliação. 5. O trabalho terá entregas parciais conforme as frases descritas a seguir. 
+  
+3 Detalhamento de cada fase 
+ Fase 1 – Levantamento de requisitos (1ª entrega) 
+Nesta  fase  deve ser realizado o levantamento de requisitos a respeito  do problema escolhido 
+para o desenvolvimento.  
+ O  documento  final  (formato  PDF)  a  ser  entregue  a  respeito  desta  fase  deverá  seguir  o anexo 1 e conter: i. Levantamento  de  requisitos,  com  documentos  a  respeito  da empresa (se houver), 
+do problema e da base de dados; 
+ Fase 2 – Definição da base de dados e início do protótipo (2ª Entrega) 
+Nesta  fase  deve  ser  definido  o  Modelo  do  Banco  de  Dados  para  atender  aos  requisitos 
+especificados  na  Fase  1  e  iniciadas  a  implementação  do  sistema.  O  modelo  final  deverá 
+conter  pelo  menos  7  tabelas  (sem  contar  as  tabelas  resultantes  de  relacionamentos). Deverá 
+ter  pelo  menos  um  relacionamento  vários-para-vários  e  pelo  menos  uma  generalização  ou 
+especialização. 
+ O documento final (formato PDF) a ser entregue a respeito desta fase deverá conter: i. Diagrama Entidade-Relacionamento normalizado da base de dados (modelo lógico 
+da ferramenta ERWin ou semelhante); ii. Definição  do  Modelo  Relacional  do  Banco  de  Dados  (modelo físico da ferramenta 
+ERWin ou semelhante); iii. Dicionário  de  Dados  do  modelo  físico  (elaborado  usando  a  ferramenta  ERWin  ou 
+semelhante); iv. Script para criação das tabelas usando SGBD Oracle ou semelhante.
+
+Nesta  fase o grupo  também deverá instalar o SGBD e confeccionar um programa que faça a 
+conexão  com  o  SGBD.  O  programa  deve  conter  as  funcionalidades  de  inclusão,  exclusão, 
+alteração e consulta de dados de uma tabela que pertença ao BD, utilizando comandos SQL. 
+ O  documento  final  (formato  PDF)  a  ser  entregue  a  respeito  desta  fase  deverá  ter  no máximo 3 páginas e conter: i. Apresentação da linguagem de programação usada (um parágrafo) ii. Apresentação do SGBD usado (até dois parágrafos) iii. Procedimentos realizados para instalar o SGBD (no máximo uma página) iv. Procedimentos  realizados  para  fazer  conexão  com  o  SGBD  a  partir  do  programa 
+desenvolvido (no máximo meia página) v. Programa(s) fonte(s) desenvolvido(s) 
+ Fase 3 – Finalização das manutenções das tabelas (3ª Entrega) 
+Nesta fase o grupo deverá fazer os seguintes programas: 1) Terminar  todas  as  manutenções  de  tabelas  do  sistema,  inclusive  considerando  as 
+tabelas resultantes de relacionamentos entre elas.  2) Uma consulta com pelo menos três tabelas Todos  os  programas  fontes  deverão  ser  compactados  em  um  arquivo  e  disponibilizados  na 
+plataforma e-disciplinas. Deverá ser entregue um único arquivo no formato .zip ou .rar.  
+ Fase 4 – Finalização do sistema (4ª Entrega) 
+Nesta fase o grupo deverá finalizar o sistema, acrescentando pelo menos: 
+ Duas consultas com select aninhado 
+ Duas consultas com funções de grupo 
+ Duas consultas com operadores de conjunto. 
+ Entregas: i. Arquivo  (formato  PDF)  apresentando  o  código  das  consultas  e  um  parágrafo explicando a finalidade de cada uma delas. ii. Arquivo  (formato  PDF)  com  todas  as  interfaces  de  manutenção  de  tabelas  ou consultas (telas do sistema). iii. Sistema completo (programas fontes + BD) compactados em um único arquivo .zip ou .rar. iv. Filme  (formato  .wav  ou  .mp4  ou  .avi  ou  .wmv)  de  no  máximo  2  minutos  de demonstração  do  sistema  desenvolvido.  Atenção:  este  filme  será  visto  para  a correção do trabalho e poderá aumentar a nota da equipe. Capriche!!! 

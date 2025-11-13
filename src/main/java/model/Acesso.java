@@ -30,8 +30,10 @@ public class Acesso {
 
 	public int getId() { return id;	}
 	public String getEmail() { return email; }
+	public void setEmail(String email) { this.email = email; }
 	public Cliente getCliente() { return cliente; }
 	public ArrayList<Grupo> getGrupos() { return new ArrayList<>(this.grupos); }
+	public void setGrupos(ArrayList<Grupo> grupos) { this.grupos = grupos; }
 
 	public void setCliente(Cliente cliente) throws DomainException {
 
