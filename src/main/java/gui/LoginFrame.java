@@ -101,23 +101,8 @@ public class LoginFrame extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         buttonPanel.setBackground(new Color(240, 240, 240));
         
-        JButton btnLogin = new JButton("Entrar");
-        btnLogin.setFont(new Font("Arial", Font.BOLD, 14));
-        btnLogin.setBackground(new Color(33, 150, 243));
-        btnLogin.setForeground(Color.WHITE);
-        btnLogin.setFocusPainted(false);
-        btnLogin.setBorderPainted(false);
-        btnLogin.setOpaque(true);
-        btnLogin.setPreferredSize(new Dimension(140, 40));
-        
-        JButton btnCadastro = new JButton("Criar Conta");
-        btnCadastro.setFont(new Font("Arial", Font.BOLD, 14));
-        btnCadastro.setBackground(new Color(76, 175, 80));
-        btnCadastro.setForeground(Color.WHITE);
-        btnCadastro.setFocusPainted(false);
-        btnCadastro.setBorderPainted(false);
-        btnCadastro.setOpaque(true);
-        btnCadastro.setPreferredSize(new Dimension(140, 40));
+        JButton btnLogin = UIHelper.createButton("Entrar", UIHelper.BLUE, 140, 40);
+        JButton btnCadastro = UIHelper.createButton("Criar Conta", UIHelper.GREEN, 140, 40);
         
         btnLogin.addActionListener(e -> fazerLogin());
         btnCadastro.addActionListener(e -> fazerCadastro());
@@ -134,7 +119,8 @@ public class LoginFrame extends JFrame {
         gbc.insets = new Insets(15, 8, 8, 8);
         mainPanel.add(buttonPanel, gbc);
         
-        add(mainPanel);
+        // Usar setContentPane em vez de add direto
+        setContentPane(mainPanel);
     }
     
     private void fazerLogin() {

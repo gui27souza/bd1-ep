@@ -98,13 +98,22 @@ public class UIHelper {
      */
     public static JButton createButton(String text, Color backgroundColor, int width, int height) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 13));
+        button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setBackground(backgroundColor);
         button.setForeground(TEXT_WHITE);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setOpaque(true);
-        button.setPreferredSize(new Dimension(width, height));
+        button.setContentAreaFilled(true);
+        
+        // Definir tamanhos mínimo, preferido e máximo
+        Dimension size = new Dimension(width, height);
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
+        
+        // Garantir que o botão seja visível
+        button.setVisible(true);
         
         // Efeito hover
         button.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -146,8 +155,18 @@ public class UIHelper {
         for (Component comp : container.getComponents()) {
             if (comp instanceof JLabel) {
                 JLabel label = (JLabel) comp;
-                if (label.getForeground() == null || label.getForeground().equals(UIManager.getColor("Label.foreground"))) {
+                // Só alterar se for cor padrão do sistema
+                Color fg = label.getForeground();
+                if (fg == null || isSystemColor(fg)) {
                     label.setForeground(TEXT_BLACK);
+                }
+            } else if (comp instanceof JButton) {
+                // Não alterar botões - eles já têm cores customizadas
+                // Apenas garantir que sejam opacos
+                JButton btn = (JButton) comp;
+                if (btn.getBackground() != null) {
+                    btn.setOpaque(true);
+                    btn.setBorderPainted(false);
                 }
             } else if (comp instanceof JTextField) {
                 configureTextField((JTextField) comp);
@@ -163,5 +182,14 @@ public class UIHelper {
                 ensureVisibility((Container) comp);
             }
         }
+    }
+    
+    /**
+     * Verifica se uma cor é uma cor padrão do sistema
+     */
+    private static boolean isSystemColor(Color color) {
+        return color.equals(UIManager.getColor("Label.foreground")) ||
+               color.equals(UIManager.getColor("Button.foreground")) ||
+               color.equals(UIManager.getColor("TextField.foreground"));
     }
 }
