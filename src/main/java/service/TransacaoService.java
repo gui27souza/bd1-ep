@@ -70,6 +70,26 @@ public class TransacaoService {
 		return executarQueryTransacoes(query, parameters);
 	}
 
+	public ArrayList<Transacao> getTransacoesPorPeriodo(int idCliente, java.sql.Date dataInicio, java.sql.Date dataFim) throws SQLException {
+		
+		String query = """
+			SELECT t.id, t.descricao, t.valor, t.data_transacao, t.id_cliente, t.id_grupo, t.id_categoria,
+			       c.nome as categoria_nome, c.descricao as categoria_desc
+			FROM Transacao t
+			JOIN Categoria c ON t.id_categoria = c.id
+			WHERE t.id_cliente = ? 
+			AND DATE(t.data_transacao) BETWEEN ? AND ?
+			ORDER BY t.data_transacao DESC
+		""";
+		
+		ArrayList<Object> parameters = new ArrayList<>();
+		parameters.add(idCliente);
+		parameters.add(dataInicio);
+		parameters.add(dataFim);
+		
+		return executarQueryTransacoes(query, parameters);
+	}
+
 	public ArrayList<CategoriaTransacao> getCategorias() throws SQLException {
 		
 		String query = "SELECT id, nome, descricao FROM Categoria ORDER BY nome";

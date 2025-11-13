@@ -92,6 +92,14 @@ public class TransacoesFrame extends JFrame {
         btnPorCategoria.setBorderPainted(false);
         btnPorCategoria.setOpaque(true);
         
+        JButton btnPorPeriodo = new JButton("📅 Ver por Período");
+        btnPorPeriodo.setFont(new Font("Arial", Font.BOLD, 14));
+        btnPorPeriodo.setBackground(new Color(103, 58, 183));
+        btnPorPeriodo.setForeground(Color.WHITE);
+        btnPorPeriodo.setFocusPainted(false);
+        btnPorPeriodo.setBorderPainted(false);
+        btnPorPeriodo.setOpaque(true);
+        
         JButton btnNova = new JButton("➕ Nova Transação");
         btnNova.setFont(new Font("Arial", Font.BOLD, 14));
         btnNova.setBackground(new Color(156, 39, 176));
@@ -111,6 +119,7 @@ public class TransacoesFrame extends JFrame {
         btnPorGrupo.addActionListener(e -> verTransacoesPorGrupo());
         btnTodas.addActionListener(e -> verTodasTransacoes());
         btnPorCategoria.addActionListener(e -> verTransacoesPorCategoria());
+        btnPorPeriodo.addActionListener(e -> verTransacoesPorPeriodo());
         btnNova.addActionListener(e -> novaTransacao());
         btnVoltar.addActionListener(e -> voltar());
         
@@ -119,10 +128,10 @@ public class TransacoesFrame extends JFrame {
         buttonPanel.add(btnTodas);
         buttonPanel.add(btnPorCategoria);
         
-        // Segunda linha: Nova transação e Voltar (com um espaço vazio)
+        // Segunda linha: Período, Nova transação e Voltar
+        buttonPanel.add(btnPorPeriodo);
         buttonPanel.add(btnNova);
         buttonPanel.add(btnVoltar);
-        buttonPanel.add(new JLabel("")); // Espaço vazio para manter o layout
         
         // Painel central com instruções (será substituído pela tabela)
         centerPanel = new JPanel(new GridBagLayout());
@@ -309,6 +318,141 @@ public class TransacoesFrame extends JFrame {
                 "Erro", 
                 JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    private void verTransacoesPorPeriodo() {
+        // Dialog para selecionar período
+        JDialog dialog = new JDialog(this, "Selecionar Período", true);
+        dialog.setSize(400, 250);
+        dialog.setLocationRelativeTo(this);
+        
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        
+        // Data Início
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(new JLabel("Data Início (DD/MM/AAAA):"), gbc);
+        
+        gbc.gridx = 1;
+        JTextField txtDataInicio = new JTextField(10);
+        panel.add(txtDataInicio, gbc);
+        
+        // Data Fim
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(new JLabel("Data Fim (DD/MM/AAAA):"), gbc);
+        
+        gbc.gridx = 1;
+        JTextField txtDataFim = new JTextField(10);
+        panel.add(txtDataFim, gbc);
+        
+        // Info
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        JLabel lblInfo = new JLabel("<html><i>Exemplos: 01/01/2025 ou 31/12/2025</i></html>");
+        lblInfo.setFont(new Font("Arial", Font.PLAIN, 10));
+        lblInfo.setForeground(Color.GRAY);
+        panel.add(lblInfo, gbc);
+        gbc.gridwidth = 1;
+        
+        // Botões
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(20, 5, 5, 5);
+        
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        
+        JButton btnBuscar = new JButton("🔍 Buscar");
+        btnBuscar.setBackground(new Color(76, 175, 80));
+        btnBuscar.setForeground(Color.WHITE);
+        btnBuscar.setFocusPainted(false);
+        btnBuscar.setPreferredSize(new Dimension(120, 35));
+        
+        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.setBackground(new Color(158, 158, 158));
+        btnCancelar.setForeground(Color.WHITE);
+        btnCancelar.setFocusPainted(false);
+        btnCancelar.setPreferredSize(new Dimension(120, 35));
+        
+        btnBuscar.addActionListener(e -> {
+            try {
+                String dataInicioStr = txtDataInicio.getText().trim();
+                String dataFimStr = txtDataFim.getText().trim();
+                
+                if (dataInicioStr.isEmpty() || dataFimStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog,
+                        "Preencha ambas as datas.",
+                        "Aviso",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                // Converter strings para java.sql.Date
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                sdf.setLenient(false);
+                
+                java.util.Date dateInicio = sdf.parse(dataInicioStr);
+                java.util.Date dateFim = sdf.parse(dataFimStr);
+                
+                java.sql.Date sqlDataInicio = new java.sql.Date(dateInicio.getTime());
+                java.sql.Date sqlDataFim = new java.sql.Date(dateFim.getTime());
+                
+                // Validar que data início é antes da data fim
+                if (sqlDataInicio.after(sqlDataFim)) {
+                    JOptionPane.showMessageDialog(dialog,
+                        "A data inicial deve ser anterior à data final.",
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                ArrayList<Transacao> transacoes = transacaoService.getTransacoesPorPeriodo(
+                    acessoAtual.getCliente().getId(),
+                    sqlDataInicio,
+                    sqlDataFim
+                );
+                
+                dialog.dispose();
+                
+                if (transacoes.isEmpty()) {
+                    JOptionPane.showMessageDialog(this,
+                        "Nenhuma transação encontrada neste período.",
+                        "Informação",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    exibirInstrucoes();
+                    return;
+                }
+                
+                String titulo = String.format("Transações de %s a %s", dataInicioStr, dataFimStr);
+                exibirTransacoes(transacoes, titulo);
+                
+            } catch (java.text.ParseException ex) {
+                JOptionPane.showMessageDialog(dialog,
+                    "Formato de data inválido. Use DD/MM/AAAA",
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog,
+                    "Erro ao buscar transações: " + ex.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        btnCancelar.addActionListener(e -> dialog.dispose());
+        
+        btnPanel.add(btnBuscar);
+        btnPanel.add(btnCancelar);
+        panel.add(btnPanel, gbc);
+        
+        dialog.add(panel);
+        dialog.setVisible(true);
     }
     
     private void exibirTransacoes(ArrayList<Transacao> transacoes, String titulo) {

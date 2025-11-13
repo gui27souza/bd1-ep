@@ -38,7 +38,7 @@ public class GruposFrame extends JFrame {
         this.transacaoService = transacaoService;
         
         initComponents();
-        carregarGrupos();
+        carregarGrupos("Todos");
     }
     
     private void initComponents() {
@@ -81,10 +81,33 @@ public class GruposFrame extends JFrame {
         leftPanel.setBackground(new Color(240, 240, 240));
         leftPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         
+        // Painel superior com label e filtro
+        JPanel topLeftPanel = new JPanel(new BorderLayout(5, 5));
+        topLeftPanel.setBackground(new Color(240, 240, 240));
+        
         JLabel lblGrupos = new JLabel("Seus Grupos:");
         lblGrupos.setFont(new Font("Arial", Font.BOLD, 14));
         lblGrupos.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        leftPanel.add(lblGrupos, BorderLayout.NORTH);
+        topLeftPanel.add(lblGrupos, BorderLayout.WEST);
+        
+        // ComboBox para filtrar por status
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        filterPanel.setBackground(new Color(240, 240, 240));
+        
+        JLabel lblFiltro = new JLabel("Filtro:");
+        lblFiltro.setFont(new Font("Arial", Font.PLAIN, 11));
+        filterPanel.add(lblFiltro);
+        
+        JComboBox<String> cbFiltroStatus = new JComboBox<>(new String[]{
+            "Todos", "Ativos", "Arquivados", "Inativos"
+        });
+        cbFiltroStatus.setFont(new Font("Arial", Font.PLAIN, 11));
+        cbFiltroStatus.setPreferredSize(new Dimension(100, 25));
+        cbFiltroStatus.addActionListener(e -> carregarGrupos((String) cbFiltroStatus.getSelectedItem()));
+        filterPanel.add(cbFiltroStatus);
+        
+        topLeftPanel.add(filterPanel, BorderLayout.EAST);
+        leftPanel.add(topLeftPanel, BorderLayout.NORTH);
         
         listModel = new DefaultListModel<>();
         gruposList = new JList<>(listModel);
@@ -144,9 +167,26 @@ public class GruposFrame extends JFrame {
         UIHelper.ensureVisibility(this);
     }
     
-    private void carregarGrupos() {
+    private void carregarGrupos(String filtroStatus) {
         listModel.clear();
         grupos = acessoAtual.getGrupos();
+        
+        // Aplicar filtro
+        ArrayList<Grupo> gruposFiltrados = new ArrayList<>();
+        for (Grupo g : grupos) {
+            if (filtroStatus.equals("Todos")) {
+                gruposFiltrados.add(g);
+            } else if (filtroStatus.equals("Ativos") && g.getStatus().equals("ativo")) {
+                gruposFiltrados.add(g);
+            } else if (filtroStatus.equals("Arquivados") && g.getStatus().equals("arquivado")) {
+                gruposFiltrados.add(g);
+            } else if (filtroStatus.equals("Inativos") && g.getStatus().equals("inativo")) {
+                gruposFiltrados.add(g);
+            }
+        }
+        
+        // Substituir lista de grupos pela filtrada
+        grupos = gruposFiltrados;
         
         if (grupos.isEmpty()) {
             listModel.addElement("Nenhum grupo encontrado");
@@ -487,7 +527,7 @@ public class GruposFrame extends JFrame {
                 ArrayList<Grupo> gruposAtualizados = grupoService.getGrupos(acessoAtual.getCliente());
                 acessoAtual.setGrupos(gruposAtualizados);
                 
-                carregarGrupos();
+                carregarGrupos("Todos");
                 
                 JOptionPane.showMessageDialog(this, 
                     "<html><h3>✓ Grupo criado com sucesso!</h3>" +
@@ -724,7 +764,7 @@ public class GruposFrame extends JFrame {
         // Atualizar a lista de grupos
         ArrayList<Grupo> gruposAtualizados = grupoService.getGrupos(acessoAtual.getCliente());
         acessoAtual.setGrupos(gruposAtualizados);
-        carregarGrupos();
+        carregarGrupos("Todos");
         
         // Reselecionar o grupo para atualizar os detalhes
         for (int i = 0; i < grupos.size(); i++) {
