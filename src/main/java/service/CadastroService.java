@@ -6,7 +6,6 @@ import main.java.model.Acesso;
 import main.java.model.Cliente;
 import main.java.model.Grupo;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,26 +20,6 @@ public class CadastroService {
 		this.dbConnector = connector;
 		this.clienteService = clienteService;
 		this.grupoService = grupoService;
-	}
-
-	// ==================== CADASTRO ====================
-
-	public Acesso processarCadastro(
-		String nome, String cpf, String email, String senha, Date dataNascimento
-	) throws DomainException, SQLException {
-
-		Cliente novoCliente = this.clienteService.createCliente(nome, cpf, dataNascimento);
-
-		try{
-			createCredenciais(novoCliente.getId(), email, senha);
-		} catch (SQLException e) {
-			this.clienteService.deleteCliente(novoCliente);
-			throw e;
-		}
-
-		Acesso novoAcesso = new Acesso(novoCliente.getId(), email, senha, novoCliente);
-
-		return novoAcesso;
 	}
 
 	public void createCredenciais(int id, String email, String senha) throws SQLException, DomainException {
@@ -67,12 +46,6 @@ public class CadastroService {
 		}
 
 	}
-
-	// ==================================================
-
-
-
-	// ==================== LOGIN ====================
 
 	public Acesso verificarCredenciais(String email, String senha) throws SQLException, DomainException {
 
@@ -108,10 +81,6 @@ public class CadastroService {
 		}
 	}
 
-	// ===============================================
-
-	// ==================== UPDATE ====================
-
 	public void updateEmail(int idCliente, String novoEmail) throws DomainException, SQLException {
 		
 		if (novoEmail == null || novoEmail.trim().isEmpty()) {
@@ -136,6 +105,4 @@ public class CadastroService {
 			throw e;
 		}
 	}
-
-	// ================================================
 }

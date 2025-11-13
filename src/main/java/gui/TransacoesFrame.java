@@ -11,6 +11,7 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 public class TransacoesFrame extends JFrame {
     private MainFrame mainFrame;
     private Acesso acessoAtual;

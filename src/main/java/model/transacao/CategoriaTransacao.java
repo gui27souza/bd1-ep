@@ -7,15 +7,9 @@ public class CategoriaTransacao {
 	int id;
 	String nome;
 	String descricao;
-	ArrayList<Transacao> transacoes;
 
 	public CategoriaTransacao(int id, String nome, String descricao) {
 		this.id = id;
-		this.nome = nome;
-		this.descricao = descricao;
-	}
-
-	public CategoriaTransacao(String nome, String descricao) {
 		this.nome = nome;
 		this.descricao = descricao;
 	}
@@ -37,17 +31,6 @@ public class CategoriaTransacao {
 	}
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
-	}
-
-	public ArrayList<Transacao> getTransacoes() {
-		return transacoes;
-	}
-
-	public void addTransacao(Transacao transacao) {
-		transacoes.add(transacao);
-	}
-	public void removeTransacao(Transacao transacao) {
-		transacoes.remove(transacao);
 	}
 
 }

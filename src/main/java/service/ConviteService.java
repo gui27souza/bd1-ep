@@ -17,9 +17,6 @@ public class ConviteService {
 		this.clienteService = clienteService;
 	}
 
-	/**
-	 * Envia um convite de um cliente remetente para um cliente destino para entrar em um grupo
-	 */
 	public void enviarConvite(int idRemetente, int idDestino, int idGrupo) throws DomainException, SQLException {
 		
 		// Validação 1: Verificar se o remetente tem plano que permite convites
@@ -61,15 +58,12 @@ public class ConviteService {
 		}
 	}
 
-	/**
-	 * Verifica se o cliente tem um plano que permite enviar convites (plano_id > 1)
-	 */
 	private boolean clientePodeEnviarConvites(int idCliente) throws SQLException {
 		
 		String query = """
-			SELECT p.qtd_convites 
-			FROM Cliente c 
-			JOIN Plano p ON c.id_plano = p.id 
+			SELECT p.qtd_convites
+			FROM Cliente c
+			JOIN Plano p ON c.id_plano = p.id
 			WHERE c.id = ?
 		""";
 		
@@ -84,20 +78,16 @@ public class ConviteService {
 			return false;
 		}
 	}
-	
-	/**
-	 * Verifica se o cliente ainda tem convites disponíveis no mês atual
-	 * Compara quantidade de convites enviados no mês com o limite do plano
-	 */
+
 	private boolean clienteTemConvitesDisponiveis(int idCliente) throws SQLException {
 		
 		String query = """
-			SELECT 
+			SELECT
 				p.qtd_convites as limite,
 				COUNT(conv.id) as enviados
 			FROM Cliente c
 			JOIN Plano p ON c.id_plano = p.id
-			LEFT JOIN Convite conv ON conv.id_remetente = c.id 
+			LEFT JOIN Convite conv ON conv.id_remetente = c.id
 				AND conv.status IN ('pendente', 'aceito')
 				AND DATE_TRUNC('month', conv.data_criacao) = DATE_TRUNC('month', CURRENT_DATE)
 			WHERE c.id = ?
@@ -123,18 +113,15 @@ public class ConviteService {
 		}
 	}
 
-	/**
-	 * Retorna quantidade de convites disponíveis do cliente no mês
-	 */
 	public ConvitesStatus getConvitesStatus(int idCliente) throws SQLException {
 		
 		String query = """
-			SELECT 
+			SELECT
 				p.qtd_convites as limite,
 				COUNT(conv.id) as enviados
 			FROM Cliente c
 			JOIN Plano p ON c.id_plano = p.id
-			LEFT JOIN Convite conv ON conv.id_remetente = c.id 
+			LEFT JOIN Convite conv ON conv.id_remetente = c.id
 				AND conv.status IN ('pendente', 'aceito')
 				AND DATE_TRUNC('month', conv.data_criacao) = DATE_TRUNC('month', CURRENT_DATE)
 			WHERE c.id = ?
@@ -154,9 +141,6 @@ public class ConviteService {
 		}
 	}
 
-	/**
-	 * Verifica se o cliente é administrador do grupo
-	 */
 	private boolean clienteEhAdminDoGrupo(int idCliente, int idGrupo) throws SQLException {
 		
 		String query = "SELECT role FROM MembroGrupo WHERE id_cliente = ? AND id_grupo = ?";
@@ -173,9 +157,6 @@ public class ConviteService {
 		}
 	}
 
-	/**
-	 * Verifica se o cliente já é membro do grupo
-	 */
 	private boolean clienteJaEstaNoGrupo(int idCliente, int idGrupo) throws SQLException {
 		
 		String query = "SELECT id FROM MembroGrupo WHERE id_cliente = ? AND id_grupo = ?";
@@ -188,9 +169,6 @@ public class ConviteService {
 		}
 	}
 
-	/**
-	 * Verifica se já existe um convite pendente para o cliente neste grupo
-	 */
 	private boolean existeConvitePendente(int idDestino, int idGrupo) throws SQLException {
 		
 		String query = "SELECT id FROM Convite WHERE id_destino = ? AND id_grupo = ? AND status = 'pendente'";
@@ -203,13 +181,10 @@ public class ConviteService {
 		}
 	}
 
-	/**
-	 * Lista todos os convites pendentes recebidos por um cliente
-	 */
 	public ArrayList<ConviteInfo> listarConvitesPendentes(int idCliente) throws SQLException {
 		
 		String query = """
-			SELECT 
+			SELECT
 				conv.id,
 				conv.id_remetente,
 				conv.id_grupo,
@@ -247,9 +222,6 @@ public class ConviteService {
 		return convites;
 	}
 
-	/**
-	 * Aceita um convite e adiciona o cliente ao grupo como membro
-	 */
 	public void aceitarConvite(int idConvite, int idCliente) throws DomainException, SQLException {
 		
 		// Buscar informações do convite
@@ -290,9 +262,6 @@ public class ConviteService {
 		dbConnector.executeUpdate(queryUpdate, paramsUpdate);
 	}
 
-	/**
-	 * Recusa um convite
-	 */
 	public void recusarConvite(int idConvite, int idCliente) throws DomainException, SQLException {
 		
 		// Verificar se o convite existe e é para o cliente correto
@@ -319,9 +288,6 @@ public class ConviteService {
 		dbConnector.executeUpdate(queryUpdate, paramsUpdate);
 	}
 
-	/**
-	 * Classe interna para armazenar status de convites
-	 */
 	public static class ConvitesStatus {
 		public final int limite;
 		public final int enviados;
@@ -334,9 +300,6 @@ public class ConviteService {
 		}
 	}
 
-	/**
-	 * Classe interna para armazenar informações do convite
-	 */
 	public static class ConviteInfo {
 		public final int id;
 		public final int idRemetente;

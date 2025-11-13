@@ -12,14 +12,6 @@ public class Acesso {
 	Cliente cliente;
 	ArrayList<Grupo> grupos;
 
-	public Acesso(int id, String email, String senha_hash, Cliente cliente) {
-		this.id = id;
-		this.email = email;
-		this.senha_hash = senha_hash;
-		this.cliente = cliente;
-		this.grupos = new ArrayList<>();
-	}
-
 	public Acesso(int id, String email, String senha_hash, Cliente cliente, ArrayList<Grupo> grupos) {
 		this.id = id;
 		this.email = email;
@@ -44,29 +36,4 @@ public class Acesso {
 		this.cliente = cliente;
 	}
 
-	public void addGrupo(Grupo grupo) throws DomainException {
-
-		if (this.grupos.contains(grupo)) {
-			throw new DomainException(
-				"Cliente " + this.cliente.getNome() + "(id: " + this.cliente.getId() + ")" +
-				" já está no grupo " + grupo.getNome() + "(id: " + grupo.getId() + ")"
-			);
-		}
-
-		this.grupos.add(grupo);
-		grupo.addCliente(this.cliente);
-	}
-
-	public void removeGrupo(Grupo grupo) throws DomainException {
-
-		if (!this.grupos.contains(grupo)) {
-			throw new DomainException(
-				"Cliente " + this.cliente.getNome() + "(id: " + this.cliente.getId() + ")" +
-				" não está no grupo " + grupo.getNome() + "(id: " + grupo.getId() + ")"
-			);
-		}
-
-		this.grupos.remove(grupo);
-		grupo.removeCliente(this.cliente);
-	}
 }

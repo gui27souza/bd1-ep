@@ -17,21 +17,12 @@ public class RelatorioService {
 		this.dbConnector = dbConnector;
 	}
 
-	// ========== RELATÓRIOS FINANCEIROS ÚTEIS ==========
-	
-	// ========== CONSULTAS COM SELECT ANINHADO ==========
-
-	/**
-	 * Relatório 1: Maiores Gastos
-	 * Mostra todas as transações de gastos dos grupos do cliente ordenadas por valor
-	 * Usa: SELECT aninhado para filtrar grupos do cliente
-	 */
 	public List<Map<String, Object>> maioresGastos(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
-			SELECT 
+			SELECT
 				t.data_transacao,
 				g.nome as grupo,
 				c.nome as cliente,
@@ -68,17 +59,12 @@ public class RelatorioService {
 		return resultados;
 	}
 
-	/**
-	 * Relatório 2: Maiores Contribuições
-	 * Mostra todas as contribuições/ganhos dos grupos do cliente ordenadas por valor
-	 * Usa: SELECT aninhado para filtrar grupos do cliente
-	 */
 	public List<Map<String, Object>> maioresContribuicoes(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
-			SELECT 
+			SELECT
 				t.data_transacao,
 				g.nome as grupo,
 				c.nome as cliente,
@@ -115,31 +101,26 @@ public class RelatorioService {
 		return resultados;
 	}
 
-	/**
-	 * Relatório 3: Gastos Detalhados por Categoria
-	 * Mostra detalhamento de gastos por categoria com subconsulta para percentual
-	 * Usa: SELECT aninhado para calcular total geral
-	 */
 	public List<Map<String, Object>> gastosDetalhadosPorCategoria(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
-			SELECT 
+			SELECT
 				cat.nome as categoria,
 				COUNT(t.id) as quantidade,
 				COALESCE(SUM(ABS(t.valor)), 0) as total,
 				COALESCE(AVG(ABS(t.valor)), 0) as media,
 				ROUND(
 					COALESCE(SUM(ABS(t.valor)), 0) * 100.0 / NULLIF(
-						(SELECT SUM(ABS(valor)) FROM Transacao 
+						(SELECT SUM(ABS(valor)) FROM Transacao
 						 WHERE id_grupo IN (SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?)
 						 AND valor < 0),
 						0
 					), 2
 				) as percentual
 			FROM Categoria cat
-			LEFT JOIN Transacao t ON cat.id = t.id_categoria 
+			LEFT JOIN Transacao t ON cat.id = t.id_categoria
 				AND t.id_grupo IN (
 					SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 				)
@@ -170,19 +151,12 @@ public class RelatorioService {
 		return resultados;
 	}
 
-	// ========== CONSULTAS COM FUNÇÕES DE GRUPO ==========
-
-	/**
-	 * Relatório 4: Divisão de Gastos por Membro
-	 * Mostra quanto cada membro gastou em cada grupo
-	 * Usa: COUNT, SUM, AVG (funções de grupo)
-	 */
 	public List<Map<String, Object>> divisaoGastosPorMembro(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
-			SELECT 
+			SELECT
 				g.nome as grupo,
 				c.nome as membro,
 				COUNT(t.id) as transacoes,
@@ -219,17 +193,12 @@ public class RelatorioService {
 		return resultados;
 	}
 
-	/**
-	 * Relatório 5: Estatísticas Gerais dos Grupos
-	 * Mostra estatísticas completas de cada grupo
-	 * Usa: COUNT, SUM, AVG, MIN, MAX (funções de grupo)
-	 */
 	public List<Map<String, Object>> estatisticasGrupos(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
-			SELECT 
+			SELECT
 				g.nome,
 				COUNT(DISTINCT mg.id_cliente) as total_membros,
 				COUNT(t.id) as total_transacoes,
@@ -269,19 +238,12 @@ public class RelatorioService {
 		return resultados;
 	}
 
-	// ========== CONSULTAS COM OPERADORES DE CONJUNTO ==========
-
-	/**
-	 * Relatório 6: Resumo Financeiro por Período
-	 * Compara gastos e ganhos dos últimos 30 dias vs período anterior usando UNION
-	 * Usa: UNION para combinar dados de diferentes períodos com base nas datas das transações
-	 */
 	public List<Map<String, Object>> resumoFinanceiroPorPeriodo(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
-			SELECT 
+			SELECT
 				'Últimos 30 dias' as periodo,
 				COUNT(t.id) as quantidade_transacoes,
 				COALESCE(SUM(CASE WHEN t.valor < 0 THEN t.valor ELSE 0 END), 0) as total_gastos,
@@ -292,10 +254,10 @@ public class RelatorioService {
 				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 			)
 			AND t.data_transacao >= CURRENT_DATE - INTERVAL '30 days'
-			
+		
 			UNION ALL
-			
-			SELECT 
+		
+			SELECT
 				'30-60 dias atrás' as periodo,
 				COUNT(t.id) as quantidade_transacoes,
 				COALESCE(SUM(CASE WHEN t.valor < 0 THEN t.valor ELSE 0 END), 0) as total_gastos,
@@ -307,10 +269,10 @@ public class RelatorioService {
 			)
 			AND t.data_transacao >= CURRENT_DATE - INTERVAL '60 days'
 			AND t.data_transacao < CURRENT_DATE - INTERVAL '30 days'
-			
+		
 			UNION ALL
-			
-			SELECT 
+		
+			SELECT
 				'Mais de 60 dias' as periodo,
 				COUNT(t.id) as quantidade_transacoes,
 				COALESCE(SUM(CASE WHEN t.valor < 0 THEN t.valor ELSE 0 END), 0) as total_gastos,
@@ -345,17 +307,12 @@ public class RelatorioService {
 		return resultados;
 	}
 
-	/**
-	 * Relatório 7: Grupos Ativos vs Inativos
-	 * Compara grupos com e sem transações recentes
-	 * Usa: EXCEPT para encontrar grupos sem atividade
-	 */
 	public List<Map<String, Object>> gruposAtivosVsInativos(int idClienteLogado) {
 		
 		List<Map<String, Object>> resultados = new ArrayList<>();
 		
 		String query = """
-			SELECT 
+			SELECT
 				'ATIVO' as status,
 				g.id,
 				g.nome,
@@ -366,17 +323,17 @@ public class RelatorioService {
 			JOIN MembroGrupo mg ON g.id = mg.id_grupo
 			LEFT JOIN Transacao t ON g.id = t.id_grupo
 			WHERE g.id IN (
-				SELECT DISTINCT t2.id_grupo 
+				SELECT DISTINCT t2.id_grupo
 				FROM Transacao t2
 				WHERE t2.id_grupo IN (
 					SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 				)
 			)
 			GROUP BY g.id, g.nome, g.descricao
-			
+		
 			UNION ALL
-			
-			SELECT 
+		
+			SELECT
 				'INATIVO' as status,
 				g.id,
 				g.nome,
@@ -389,14 +346,14 @@ public class RelatorioService {
 				SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 			)
 			AND g.id NOT IN (
-				SELECT DISTINCT t2.id_grupo 
+				SELECT DISTINCT t2.id_grupo
 				FROM Transacao t2
 				WHERE t2.id_grupo IN (
 					SELECT id_grupo FROM MembroGrupo WHERE id_cliente = ?
 				)
 			)
 			GROUP BY g.id, g.nome, g.descricao
-			
+		
 			ORDER BY status, transacoes DESC
 		""";
 		

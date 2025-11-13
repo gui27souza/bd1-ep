@@ -21,8 +21,6 @@ public class ClienteService {
 		this.dbConnector = dbConnector;
 	}
 
-	// ==================== CREATE ====================
-
 	public Cliente createCliente(String nome, String cpf, Date dataNascimento) throws SQLException, DomainException {
 
 		if (nome == null || nome.trim().isEmpty()) {
@@ -72,8 +70,6 @@ public class ClienteService {
 		}
 	}
 
-	// ==================== READ ====================
-
 	public Cliente findById(int id) throws DomainException, SQLException {
 
 		if (id <= 0) {
@@ -98,32 +94,6 @@ public class ClienteService {
 
 			return null;
 		}
-	}
-
-	public ArrayList<Cliente> findByName(String name) throws SQLException {
-
-		String query = "SELECT id, nome, cpf, data_nasc, id_plano FROM cliente WHERE nome LIKE ?";
-		List<Object> parameters = new ArrayList<>();
-		parameters.add("%" + name + "%");
-
-		ArrayList<Cliente> clientesBuscados = new ArrayList<>();
-
-		try (ResultSet resultSet = this.dbConnector.executeQuery(query, parameters)) {
-
-			while (resultSet.next()) {
-
-				int id = resultSet.getInt("id");
-				String nomeDB = resultSet.getString("nome");
-				String cpf = resultSet.getString("cpf");
-				Date dataNascimento = resultSet.getDate("data_nasc");
-				int idPlano = resultSet.getInt("id_plano");
-
-				Cliente cliente = new Cliente(id, nomeDB, cpf, dataNascimento, idPlano);
-				clientesBuscados.add(cliente);
-			}
-		}
-
-		return clientesBuscados;
 	}
 
 	public Cliente findByCpf(String cpf) throws DomainException, SQLException {
@@ -180,8 +150,6 @@ public class ClienteService {
 
 		return clientes;
 	}
-
-	// ==================== UPDATE ====================
 
 	public void updateNome(int idCliente, String novoNome) throws DomainException, SQLException {
 		
@@ -253,25 +221,6 @@ public class ClienteService {
 
 		if (rowsAffected == 0) {
 			throw new SQLException("Nenhum cliente encontrado com ID " + idCliente);
-		}
-	}
-
-	// ==================== DELETE ====================
-
-	public void deleteCliente(Cliente cliente) throws SQLException, DomainException {
-
-		if (cliente == null) {
-			throw new DomainException("Cliente não pode ser nulo!");
-		}
-
-		String query = "DELETE FROM cliente WHERE id = ?";
-		ArrayList<Object> parameters = new ArrayList<>();
-		parameters.add(cliente.getId());
-
-		int rowsAffected = this.dbConnector.executeUpdate(query, parameters);
-
-		if (rowsAffected == 0) {
-			throw new SQLException("Nenhum cliente encontrado com ID " + cliente.getId());
 		}
 	}
 }
