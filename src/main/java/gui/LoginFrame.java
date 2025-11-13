@@ -4,15 +4,17 @@ import main.java.db.DBConnector;
 import main.java.exceptions.DomainException;
 import main.java.model.Acesso;
 import main.java.service.*;
-
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
 public class LoginFrame extends JFrame {
     
+    // campos do formulário
     private JTextField txtEmail;
     private JPasswordField txtSenha;
+    
+    // serviços
     private DBConnector dbConnector;
     private CadastroService cadastroService;
     private ClienteService clienteService;
@@ -29,20 +31,24 @@ public class LoginFrame extends JFrame {
     }
     
     private void initComponents() {
+        
+        // configuração da janela
         setTitle("ClientApp - Bem vindo");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 350);
         setLocationRelativeTo(null);
         setResizable(false);
         
+        // painel principal
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(new Color(240, 240, 240));
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         
-        // Título
+        // título
         JLabel titleLabel = new JLabel("ClientApp");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
         titleLabel.setForeground(new Color(33, 150, 243));
@@ -52,6 +58,7 @@ public class LoginFrame extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         mainPanel.add(titleLabel, gbc);
         
+        // subtítulo
         JLabel subtitleLabel = new JLabel("Sistema de Gestão Financeira de Grupos");
         subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 13));
         subtitleLabel.setForeground(Color.GRAY);
@@ -60,11 +67,11 @@ public class LoginFrame extends JFrame {
         mainPanel.add(subtitleLabel, gbc);
         
         gbc.insets = new Insets(8, 8, 8, 8);
-        
-        // Email
         gbc.gridwidth = 1;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
+        
+        // campo email
         JLabel lblEmail = new JLabel("E-mail:");
         lblEmail.setFont(new Font("Arial", Font.BOLD, 14));
         lblEmail.setForeground(Color.BLACK);
@@ -78,9 +85,10 @@ public class LoginFrame extends JFrame {
         txtEmail.setForeground(Color.BLACK);
         mainPanel.add(txtEmail, gbc);
         
-        // Senha
         gbc.gridx = 0;
         gbc.gridy = 3;
+        
+        // campo senha
         JLabel lblSenha = new JLabel("Senha:");
         lblSenha.setFont(new Font("Arial", Font.BOLD, 14));
         lblSenha.setForeground(Color.BLACK);
@@ -94,17 +102,16 @@ public class LoginFrame extends JFrame {
         txtSenha.setForeground(Color.BLACK);
         mainPanel.add(txtSenha, gbc);
         
-        // Botões
+        // botões de ação
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         buttonPanel.setBackground(new Color(240, 240, 240));
         
-        JButton btnLogin = UIHelper.createButton("Entrar", new Color(33, 150, 243), 140, 40);      // BTN_PRIMARY
-        JButton btnCadastro = UIHelper.createButton("Criar Conta", new Color(26, 188, 156), 140, 40); // BTN_INFO
+        JButton btnLogin = UIHelper.createButton("Entrar", new Color(33, 150, 243), 140, 40);
+        JButton btnCadastro = UIHelper.createButton("Criar Conta", new Color(26, 188, 156), 140, 40);
         
+        // listeners
         btnLogin.addActionListener(e -> fazerLogin());
         btnCadastro.addActionListener(e -> fazerCadastro());
-        
-        // Enter para fazer login
         txtSenha.addActionListener(e -> fazerLogin());
         
         buttonPanel.add(btnLogin);
@@ -116,7 +123,6 @@ public class LoginFrame extends JFrame {
         gbc.insets = new Insets(15, 8, 8, 8);
         mainPanel.add(buttonPanel, gbc);
         
-        // Usar setContentPane em vez de add direto
         setContentPane(mainPanel);
     }
     
@@ -124,6 +130,7 @@ public class LoginFrame extends JFrame {
         String email = txtEmail.getText().trim();
         String senha = new String(txtSenha.getPassword());
         
+        // validação de campos
         if (email.isEmpty() || senha.isEmpty()) {
             JOptionPane.showMessageDialog(this, 
                 "Preencha todos os campos!", 
@@ -132,6 +139,7 @@ public class LoginFrame extends JFrame {
             return;
         }
         
+        // verificação de credenciais
         try {
             Acesso acesso = cadastroService.verificarCredenciais(email, senha);
             
@@ -159,14 +167,18 @@ public class LoginFrame extends JFrame {
     }
     
     private void abrirTelaPrincipal(Acesso acesso) {
+        
+        // inicialização de serviços
         TransacaoService transacaoService = new TransacaoService(dbConnector);
         RelatorioService relatorioService = new RelatorioService(dbConnector);
         ConviteService conviteService = new ConviteService(dbConnector, clienteService);
         PlanoService planoService = new PlanoService(dbConnector);
         
+        // abertura da tela principal
         MainFrame mainFrame = new MainFrame(acesso, grupoService, transacaoService, 
             clienteService, cadastroService, relatorioService, conviteService, planoService);
         mainFrame.setVisible(true);
+        
         this.dispose();
     }
 }

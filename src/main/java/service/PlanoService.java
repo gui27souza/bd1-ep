@@ -15,9 +15,6 @@ public class PlanoService {
 		this.dbConnector = dbConnector;
 	}
 
-	/**
-	 * Lista todos os planos disponíveis
-	 */
 	public ArrayList<PlanoInfo> listarPlanos() throws SQLException {
 		
 		String query = "SELECT id, nome, valor, qtd_convites FROM Plano ORDER BY valor";
@@ -39,9 +36,6 @@ public class PlanoService {
 		return planos;
 	}
 
-	/**
-	 * Busca informações de um plano específico
-	 */
 	public PlanoInfo buscarPlano(int idPlano) throws SQLException, DomainException {
 		
 		String query = "SELECT id, nome, valor, qtd_convites FROM Plano WHERE id = ?";
@@ -61,13 +55,10 @@ public class PlanoService {
 		}
 	}
 
-	/**
-	 * Busca o plano atual de um cliente
-	 */
 	public PlanoInfo getPlanoAtual(int idCliente) throws SQLException, DomainException {
 		
 		String query = """
-			SELECT p.id, p.nome, p.valor, p.qtd_convites 
+			SELECT p.id, p.nome, p.valor, p.qtd_convites
 			FROM Plano p
 			JOIN Cliente c ON c.id_plano = p.id
 			WHERE c.id = ?
@@ -89,12 +80,8 @@ public class PlanoService {
 		}
 	}
 
-	/**
-	 * Atualiza o plano de um cliente
-	 */
 	public void atualizarPlanoCliente(int idCliente, int novoIdPlano) throws SQLException, DomainException {
-		
-		// Verificar se o plano existe
+
 		buscarPlano(novoIdPlano);
 
 		String query = "UPDATE Cliente SET id_plano = ? WHERE id = ?";
@@ -109,9 +96,6 @@ public class PlanoService {
 		}
 	}
 
-	/**
-	 * Classe interna para armazenar informações do plano
-	 */
 	public static class PlanoInfo {
 		public final int id;
 		public final String nome;

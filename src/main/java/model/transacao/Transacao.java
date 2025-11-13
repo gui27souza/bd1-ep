@@ -38,7 +38,6 @@ public abstract class Transacao {
 	public int getId() { return id; }
 	public void setId(int id) { this.id = id; }
 	public int getId_cliente() { return id_cliente; }
-	public void setId_cliente(int id_cliente) { this.id_cliente = id_cliente; }
 	public int getId_grupo() { return id_grupo; }
 	public void setId_grupo(int id_grupo) { this.id_grupo = id_grupo; }
 	public float getValor() { return valor; }
@@ -48,5 +47,4 @@ public abstract class Transacao {
 	public String getDescricao() { return descricao; }
 	public void setDescricao(String descricao) { this.descricao = descricao; }
 	public Timestamp getDataTransacao() { return dataTransacao; }
-	public void setDataTransacao(Timestamp dataTransacao) { this.dataTransacao = dataTransacao; }
 }

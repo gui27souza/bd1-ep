@@ -1,4 +1,5 @@
 package main.java.gui;
+
 import main.java.model.Acesso;
 import main.java.model.Cliente;
 import main.java.model.Grupo;
@@ -14,16 +15,21 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 public class GruposFrame extends JFrame {
+    
     private MainFrame mainFrame;
     private Acesso acessoAtual;
+    
     private GrupoService grupoService;
     private ClienteService clienteService;
     private TransacaoService transacaoService;
+    
     private DefaultListModel<String> listModel;
     private JList<String> gruposList;
     private ArrayList<Grupo> grupos;
     private JPanel detailsPanel;
+    
     public GruposFrame(MainFrame mainFrame, Acesso acessoAtual, GrupoService grupoService,
                       ClienteService clienteService, TransacaoService transacaoService) {
         this.mainFrame = mainFrame;
@@ -31,12 +37,16 @@ public class GruposFrame extends JFrame {
         this.grupoService = grupoService;
         this.clienteService = clienteService;
         this.transacaoService = transacaoService;
+        
         initComponents();
         carregarGrupos("Todos");
     }
-
+    
     private void initComponents() {
+        
+        // configuração da janela
         setTitle("Gerenciar Grupos");
+        
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -44,31 +54,37 @@ public class GruposFrame extends JFrame {
                 voltar();
             }
         });
+        
         setSize(1000, 650);
         setLocationRelativeTo(null);
         setResizable(true);
-        // Painel principal com split
+        
+        // painel principal
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         mainPanel.setBackground(new Color(240, 240, 240));
-        // Painel de título
+        
+        // título
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(33, 150, 243));     // BTN_PRIMARY
+        titlePanel.setBackground(new Color(33, 150, 243));    
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         JLabel titleLabel = new JLabel("👥 Meus Grupos");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
         mainPanel.add(titlePanel, BorderLayout.NORTH);
-        // Split pane para lista e detalhes
+        
+        // divisão lista/detalhes
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(300);
         splitPane.setResizeWeight(0.3);
-        // Painel esquerdo - Lista de grupos
+        
+        // painel esquerdo - lista de grupos
         JPanel leftPanel = new JPanel(new BorderLayout(5, 5));
         leftPanel.setBackground(new Color(240, 240, 240));
         leftPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        // Painel superior com label e filtro
+        
+        // cabeçalho e filtro
         JPanel topLeftPanel = new JPanel(new BorderLayout(5, 5));
         topLeftPanel.setBackground(new Color(240, 240, 240));
         JLabel lblGrupos = new JLabel("Seus Grupos:");
@@ -90,13 +106,16 @@ public class GruposFrame extends JFrame {
         filterPanel.add(cbFiltroStatus);
         topLeftPanel.add(filterPanel, BorderLayout.EAST);
         leftPanel.add(topLeftPanel, BorderLayout.NORTH);
+        
+        // lista de grupos
         listModel = new DefaultListModel<>();
         gruposList = new JList<>(listModel);
         gruposList.setFont(new Font("Arial", Font.PLAIN, 13));
         gruposList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         gruposList.setBackground(Color.WHITE);
         gruposList.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        // Listener para mostrar detalhes ao selecionar
+        
+        // listener para seleção
         gruposList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && gruposList.getSelectedIndex() != -1) {
                 mostrarDetalhesGrupo();
@@ -106,7 +125,8 @@ public class GruposFrame extends JFrame {
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         leftPanel.add(scrollPane, BorderLayout.CENTER);
         splitPane.setLeftComponent(leftPanel);
-        // Painel direito - Detalhes do grupo
+        
+        // painel direito - detalhes do grupo
         detailsPanel = new JPanel(new BorderLayout(10, 10));
         detailsPanel.setBackground(Color.WHITE);
         detailsPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -120,12 +140,13 @@ public class GruposFrame extends JFrame {
         detailsPanel.add(lblSelecione, BorderLayout.CENTER);
         splitPane.setRightComponent(detailsPanel);
         mainPanel.add(splitPane, BorderLayout.CENTER);
-        // Painel de botões
+        
+        // botões principais
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         buttonPanel.setBackground(new Color(240, 240, 240));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JButton btnCriarGrupo = UIHelper.createButton("Criar Novo Grupo", new Color(77, 182, 172), 180, 45); // BTN_LIGHT
-        JButton btnVoltar = UIHelper.createButton("Voltar", new Color(158, 158, 158), 120, 45);         // BTN_NEUTRAL
+        JButton btnCriarGrupo = UIHelper.createButton("Criar Novo Grupo", new Color(77, 182, 172), 180, 45);
+        JButton btnVoltar = UIHelper.createButton("Voltar", new Color(158, 158, 158), 120, 45);        
         btnCriarGrupo.addActionListener(e -> criarNovoGrupo());
         btnVoltar.addActionListener(e -> voltar());
         buttonPanel.add(btnCriarGrupo);
@@ -135,9 +156,12 @@ public class GruposFrame extends JFrame {
     }
 
     private void carregarGrupos(String filtroStatus) {
+        
+        // preparar lista
         listModel.clear();
         grupos = acessoAtual.getGrupos();
-        // Aplicar filtro
+        
+        // aplicar filtro
         ArrayList<Grupo> gruposFiltrados = new ArrayList<>();
         for (Grupo g : grupos) {
             if (filtroStatus.equals("Todos")) {
@@ -150,7 +174,8 @@ public class GruposFrame extends JFrame {
                 gruposFiltrados.add(g);
             }
         }
-        // Substituir lista de grupos pela filtrada
+        
+        // popular lista
         grupos = gruposFiltrados;
         if (grupos.isEmpty()) {
             listModel.addElement("Nenhum grupo encontrado");
@@ -180,22 +205,28 @@ public class GruposFrame extends JFrame {
     }
 
     private void mostrarDetalhesGrupo() {
+        
+        // validação
         int selectedIndex = gruposList.getSelectedIndex();
         if (selectedIndex == -1 || grupos.isEmpty()) {
             return;
         }
+        
         Grupo grupo = grupos.get(selectedIndex);
-        // Limpar painel de detalhes
+        
+        // preparar painel
         detailsPanel.removeAll();
         detailsPanel.setLayout(new BorderLayout(10, 10));
-        // Painel superior com informações do grupo
+        
+        // informações do grupo
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Color.WHITE);
         infoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         JLabel lblNome = new JLabel(grupo.getNome());
         lblNome.setFont(new Font("Arial", Font.BOLD, 18));
-        lblNome.setForeground(new Color(33, 150, 243));        // BTN_PRIMARY
+        lblNome.setForeground(new Color(33, 150, 243));
+        
         JLabel lblDescricao = new JLabel(
             (grupo.getDescricao() != null && !grupo.getDescricao().isEmpty()) 
                 ? grupo.getDescricao() 
@@ -203,13 +234,16 @@ public class GruposFrame extends JFrame {
         );
         lblDescricao.setFont(new Font("Arial", Font.PLAIN, 12));
         lblDescricao.setForeground(Color.GRAY);
+        
         JLabel lblStatus = new JLabel("Status: " + grupo.getStatus().toUpperCase());
         lblStatus.setFont(new Font("Arial", Font.PLAIN, 12));
-        lblStatus.setForeground(grupo.getStatus().equals("ativo") ? new Color(26, 188, 156) : Color.RED); // BTN_INFO
+        lblStatus.setForeground(grupo.getStatus().equals("ativo") ? new Color(26, 188, 156) : Color.RED);
+        
         JLabel lblData = new JLabel("Criado em: " + grupo.getDataCriacao());
         lblData.setFont(new Font("Arial", Font.PLAIN, 11));
         lblData.setForeground(Color.GRAY);
-        // Calcular e exibir saldo do grupo
+        
+        // calcular saldo
         try {
             float saldo = grupoService.getSaldoGrupo(grupo.getId());
             JLabel lblSaldo = new JLabel(String.format("Saldo: R$ %.2f", saldo));
@@ -233,8 +267,10 @@ public class GruposFrame extends JFrame {
             infoPanel.add(Box.createVerticalStrut(3));
             infoPanel.add(lblData);
         }
+        
         detailsPanel.add(infoPanel, BorderLayout.NORTH);
-        // Tabs para integrantes e transações
+        
+        // abas de integrantes e transações
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Arial", Font.BOLD, 12));
         // Tab 1: Integrantes
@@ -243,8 +279,10 @@ public class GruposFrame extends JFrame {
         // Tab 2: Transações
         JPanel transacoesPanel = criarPainelTransacoes(grupo);
         tabbedPane.addTab("💰 Transações", transacoesPanel);
+        
         detailsPanel.add(tabbedPane, BorderLayout.CENTER);
-        // Painel de botões de administração (se for admin)
+        
+        // botões de administração
         try {
             boolean isAdmin = grupoService.isAdmin(acessoAtual.getCliente().getId(), grupo.getId());
             if (isAdmin) {
@@ -259,7 +297,7 @@ public class GruposFrame extends JFrame {
                     adminPanel.add(btnArquivar);
                     adminPanel.add(btnDeletar);
                 } else if (grupo.getStatus().equals("arquivado")) {
-                    JButton btnDesarquivar = UIHelper.createButton("✅ Desarquivar", new Color(26, 188, 156), 160, 35); // BTN_INFO
+                    JButton btnDesarquivar = UIHelper.createButton("✅ Desarquivar", new Color(26, 188, 156), 160, 35);
                     btnDesarquivar.addActionListener(e -> desarquivarGrupo(grupo));
                     JButton btnDeletar = UIHelper.createButton("🗑️ Deletar", new Color(244, 67, 54), 130, 35);
                     btnDeletar.addActionListener(e -> deletarGrupo(grupo));
@@ -282,9 +320,12 @@ public class GruposFrame extends JFrame {
     }
 
     private JPanel criarPainelIntegrantes(Grupo grupo) {
+        // painel base
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // carregar membros
         try {
             ArrayList<GrupoService.MembroInfo> membros = grupoService.getMembrosComRole(grupo.getId());
             if (membros.isEmpty()) {
@@ -336,9 +377,12 @@ public class GruposFrame extends JFrame {
     }
 
     private JPanel criarPainelTransacoes(Grupo grupo) {
+        // painel base
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // carregar transações
         try {
             ArrayList<Transacao> transacoes = transacaoService.getTransacoesPorGrupo(grupo.getId());
             if (transacoes.isEmpty()) {
@@ -399,7 +443,8 @@ public class GruposFrame extends JFrame {
     }
 
     private void criarNovoGrupo() {
-        // Painel para criar grupo
+        
+        // formulário de criação
         JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JLabel lblNome = new JLabel("Nome do grupo:");
@@ -412,6 +457,8 @@ public class GruposFrame extends JFrame {
         panel.add(txtNome);
         panel.add(lblDescricao);
         panel.add(txtDescricao);
+        
+        // exibir dialog
         int result = JOptionPane.showConfirmDialog(this, panel, 
             "Criar Novo Grupo", 
             JOptionPane.OK_CANCEL_OPTION, 
@@ -426,6 +473,8 @@ public class GruposFrame extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            
+            // criar grupo
             try {
                 Grupo novoGrupo = grupoService.criarGrupoComAdmin(
                     nome, 
@@ -530,7 +579,8 @@ public class GruposFrame extends JFrame {
     }
 
     private void removerMembroDialog(Grupo grupo, ArrayList<GrupoService.MembroInfo> membros) {
-        // Filtrar apenas membros não-admin para remover
+        
+        // filtrar membros removíveis
         ArrayList<GrupoService.MembroInfo> membrosRemoveveis = new ArrayList<>();
         for (GrupoService.MembroInfo membroInfo : membros) {
             // Não pode remover admin nem a si mesmo
@@ -539,6 +589,8 @@ public class GruposFrame extends JFrame {
                 membrosRemoveveis.add(membroInfo);
             }
         }
+        
+        // validar se há membros
         if (membrosRemoveveis.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Não há membros disponíveis para remoção.\n" +
@@ -547,19 +599,23 @@ public class GruposFrame extends JFrame {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        // Criar dialog de seleção
+        
+        // criar dialog de seleção
         JDialog dialog = new JDialog(this, "Remover Membro do Grupo", true);
         dialog.setSize(450, 350);
         dialog.setLocationRelativeTo(this);
+        
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         panel.setBackground(Color.WHITE);
-        // Título
+        
+        // título
         JLabel lblTitulo = new JLabel("<html><b>Selecione o membro para remover:</b></html>");
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
         lblTitulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         panel.add(lblTitulo, BorderLayout.NORTH);
-        // Lista de membros
+        
+        // lista de membros
         DefaultListModel<String> listModel = new DefaultListModel<>();
         for (GrupoService.MembroInfo membroInfo : membrosRemoveveis) {
             Cliente membro = membroInfo.cliente;
@@ -571,24 +627,30 @@ public class GruposFrame extends JFrame {
         membrosList.setFont(new Font("Arial", Font.PLAIN, 13));
         membrosList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         membrosList.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
         JScrollPane scrollPane = new JScrollPane(membrosList);
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         panel.add(scrollPane, BorderLayout.CENTER);
-        // Painel de botões
+        
+        // botões de ação
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         btnPanel.setBackground(Color.WHITE);
+        
         JButton btnRemover = new JButton("🗑️ Remover");
-        btnRemover.setBackground(new Color(244, 67, 54));      // BTN_DANGER
+        btnRemover.setBackground(new Color(244, 67, 54));     
         btnRemover.setForeground(Color.WHITE);
         btnRemover.setFocusPainted(false);
         btnRemover.setFont(new Font("Arial", Font.BOLD, 13));
         btnRemover.setPreferredSize(new Dimension(130, 35));
+        
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(158, 158, 158));   // BTN_NEUTRAL
+        btnCancelar.setBackground(new Color(158, 158, 158));  
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFocusPainted(false);
         btnCancelar.setFont(new Font("Arial", Font.BOLD, 13));
         btnCancelar.setPreferredSize(new Dimension(130, 35));
+        
+        // listener do botão remover
         btnRemover.addActionListener(e -> {
             int selectedIndex = membrosList.getSelectedIndex();
             if (selectedIndex == -1) {
@@ -598,14 +660,17 @@ public class GruposFrame extends JFrame {
                     JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            
             GrupoService.MembroInfo membroSelecionado = membrosRemoveveis.get(selectedIndex);
-            // Confirmação
+            
+            // confirmação
             int confirm = JOptionPane.showConfirmDialog(dialog,
                 String.format("Tem certeza que deseja remover '%s' do grupo '%s'?",
                     membroSelecionado.cliente.getNome(), grupo.getNome()),
                 "Confirmar Remoção",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
+            
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
                     grupoService.removerMembro(
@@ -613,10 +678,12 @@ public class GruposFrame extends JFrame {
                         membroSelecionado.cliente.getId(),
                         acessoAtual.getCliente().getId()
                     );
+                    
                     JOptionPane.showMessageDialog(dialog,
                         "Membro removido com sucesso!",
                         "Sucesso",
                         JOptionPane.INFORMATION_MESSAGE);
+                    
                     dialog.dispose();
                     // Atualizar visualização do grupo
                     atualizarGrupoELista(grupo);
@@ -628,20 +695,26 @@ public class GruposFrame extends JFrame {
                 }
             }
         });
+        
         btnCancelar.addActionListener(e -> dialog.dispose());
+        
+        // montagem final
         btnPanel.add(btnRemover);
         btnPanel.add(btnCancelar);
         panel.add(btnPanel, BorderLayout.SOUTH);
+        
         dialog.add(panel);
         dialog.setVisible(true);
     }
 
     private void atualizarGrupoELista(Grupo grupo) throws Exception {
-        // Atualizar a lista de grupos
+        
+        // atualizar lista
         ArrayList<Grupo> gruposAtualizados = grupoService.getGrupos(acessoAtual.getCliente());
         acessoAtual.setGrupos(gruposAtualizados);
         carregarGrupos("Todos");
-        // Reselecionar o grupo para atualizar os detalhes
+        
+        // reselecionar grupo
         for (int i = 0; i < grupos.size(); i++) {
             if (grupos.get(i).getId() == grupo.getId()) {
                 gruposList.setSelectedIndex(i);

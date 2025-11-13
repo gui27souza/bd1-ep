@@ -37,7 +37,6 @@ public class Grupo {
 	public String getStatus() { return status;	}
 	public Date getDataCriacao() { return dataCriacao; }
 	public String getDescricao() { return descricao; }
-	public ArrayList<Cliente> getClientes() { return new ArrayList<>(this.clientes); }
 
 	public void setId(int id) throws DomainException {
 		if (this.id == -1) {
@@ -47,7 +46,6 @@ public class Grupo {
 		}
 	}
 	public void setNome(String nome) { this.nome = nome; }
-	public void setStatus(String status) { this.status = status; }
 	public void setDescricao(String descricao) { this.descricao = descricao; }
 
 	public void addCliente(Cliente cliente) throws DomainException {

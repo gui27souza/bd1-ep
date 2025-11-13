@@ -77,7 +77,7 @@ public class TransacaoService {
 			       c.nome as categoria_nome, c.descricao as categoria_desc
 			FROM Transacao t
 			JOIN Categoria c ON t.id_categoria = c.id
-			WHERE t.id_cliente = ? 
+			WHERE t.id_cliente = ?
 			AND DATE(t.data_transacao) BETWEEN ? AND ?
 			ORDER BY t.data_transacao DESC
 		""";
@@ -136,30 +136,8 @@ public class TransacaoService {
 		return transacoes;
 	}
 
-	public void imprimirTransacoes(ArrayList<Transacao> transacoes) {
-		
-		if (transacoes.isEmpty()) {
-			System.out.println("\nNenhuma transação encontrada.\n");
-			return;
-		}
-		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-		
-		System.out.println("\n========== TRANSAÇÕES ==========");
-		for (Transacao t : transacoes) {
-			System.out.println("\nID: " + t.getId());
-			if (t.getDataTransacao() != null) {
-				System.out.println("Data: " + dateFormat.format(t.getDataTransacao()));
-			}
-			System.out.println("Descrição: " + t.getDescricao());
-			System.out.println("Valor: R$ " + String.format("%.2f", t.getValor()));
-			System.out.println("Categoria: " + t.getCategoria().getNome());
-		}
-		System.out.println("\n================================\n");
-	}
-
 	public void criarTransacao(Transacao transacao, String tipoTransacao) throws SQLException {
-		// Inserir na tabela Transacao e obter o ID gerado
+
 		String query = """
 			INSERT INTO Transacao (id_cliente, id_grupo, id_categoria, valor, descricao, data_transacao)
 			VALUES (?, ?, ?, ?, ?, ?)
@@ -198,24 +176,6 @@ public class TransacaoService {
 		}
 	}
 
-	public void editarTransacao(Transacao transacao) throws SQLException {
-		String query = """
-			UPDATE Transacao
-			SET id_grupo = ?, id_categoria = ?, valor = ?, descricao = ?, data_transacao = ?
-			WHERE id = ?
-		""";
-		
-		ArrayList<Object> parameters = new ArrayList<>();
-		parameters.add(transacao.getId_grupo());
-		parameters.add(transacao.getCategoria().getId());
-		parameters.add(transacao.getValor());
-		parameters.add(transacao.getDescricao());
-		parameters.add(transacao.getDataTransacao());
-		parameters.add(transacao.getId());
-		
-		dbConnector.executeUpdate(query, parameters);
-	}
-
 	public void deletarTransacao(int idTransacao) throws SQLException {
 		String query = "DELETE FROM Transacao WHERE id = ?";
 		
@@ -226,7 +186,7 @@ public class TransacaoService {
 	}
 
 	public String getTipoTransacao(int idTransacao) throws SQLException {
-		// Verificar se existe em Pix
+
 		String queryPix = "SELECT id_transacao FROM Pix WHERE id_transacao = ?";
 		ArrayList<Object> paramsPix = new ArrayList<>();
 		paramsPix.add(idTransacao);
@@ -237,8 +197,7 @@ public class TransacaoService {
 			return "PIX";
 		}
 		rsPix.close();
-		
-		// Verificar se existe em Cartao
+
 		String queryCartao = "SELECT id_transacao FROM Cartao WHERE id_transacao = ?";
 		ArrayList<Object> paramsCartao = new ArrayList<>();
 		paramsCartao.add(idTransacao);
@@ -254,7 +213,7 @@ public class TransacaoService {
 	}
 
 	public void editarTransacao(Transacao transacao, String novoTipo) throws SQLException {
-		// Primeiro, atualizar a transação base
+
 		String query = """
 			UPDATE Transacao
 			SET id_grupo = ?, id_categoria = ?, valor = ?, descricao = ?, data_transacao = ?
@@ -270,12 +229,10 @@ public class TransacaoService {
 		parameters.add(transacao.getId());
 		
 		dbConnector.executeUpdate(query, parameters);
-		
-		// Se tipo foi fornecido, atualizar especialização
+
 		if (novoTipo != null && !novoTipo.isEmpty()) {
 			int idTransacao = transacao.getId();
-			
-			// Remover de ambas as tabelas
+
 			String deletePix = "DELETE FROM Pix WHERE id_transacao = ?";
 			String deleteCartao = "DELETE FROM Cartao WHERE id_transacao = ?";
 			
@@ -284,8 +241,7 @@ public class TransacaoService {
 			
 			dbConnector.executeUpdate(deletePix, paramsDel);
 			dbConnector.executeUpdate(deleteCartao, paramsDel);
-			
-			// Inserir no tipo correto
+
 			if (novoTipo.equals("PIX")) {
 				String insertPix = "INSERT INTO Pix (id_transacao, chave) VALUES (?, ?)";
 				ArrayList<Object> paramsIns = new ArrayList<>();
