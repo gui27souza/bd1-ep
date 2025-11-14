@@ -11,26 +11,13 @@ Kennedy Rohab Menezes da Silva NºUSP: 12683395
 
 ## Como executar?
 
-O sistema possui duas interfaces gráficas (GUI):
-
-### Interface do Cliente
 Para executar a aplicação principal do cliente:
 ```bash
 # Linux/Mac
-./run_client.sh
+./run_ep.sh
 
 # Windows
-run_client.bat
-```
-
-### Interface de Administração (Manager)
-Para executar a interface de gerenciamento administrativo:
-```bash
-# Linux/Mac
-./run_manager.sh
-
-# Windows
-run_manager.bat
+run_ep.bat
 ```
 
 **Observações:**
@@ -61,21 +48,14 @@ run_manager.bat
    - Com o PostgreSQL em execução, execute um dos scripts acima
    - A interface gráfica será iniciada automaticamente
 
-## Funcionalidades
+##  Interface do Cliente (ClientApp)
 
-### Interface do Cliente (ClientApp)
 - **Login/Cadastro:** Sistema de autenticação completo
 - **Gerenciar Grupos:** Criar grupos, visualizar membros e transações
 - **Transações:** Visualizar transações por grupo ou todas
 - **Convites:** Enviar e receber convites para grupos
 - **Cadastro:** Editar dados pessoais e trocar plano
 - **Relatórios:** 6 relatórios SQL complexos com visualização em tabelas
-
-### Interface de Administração (Manager)
-- **Ver Tabelas:** Visualizar conteúdo de qualquer tabela do banco
-- **Ver Clientes:** Listar todos os clientes cadastrados
-- **Listar Tabelas:** Ver todas as tabelas disponíveis no banco
-- Interface com formatação de texto para facilitar visualização
 
 ## Tecnologias Utilizadas
 
