@@ -4,6 +4,7 @@ REM SCRIPT DE EXECUÇÃO SIMPLES PARA WINDOWS (.BAT)
 REM Compila, Executa e Limpa.
 REM =======================================================
 
+set SOURCEPATH=src\main\java
 
 set CLASSPATH=lib\postgresql-42.7.8.jar
 
@@ -11,28 +12,29 @@ echo.
 echo === 1. Compilando projeto... ===
 echo.
 
-set SOURCEPATH=src\main\java
-set CLASSPATH=lib\postgresql-42.7.8.jar
-
 mkdir bin 2>NUL
 echo.
 
-for /R "%SOURCEPATH%" %%f in (*.java) do (
-    javac -encoding UTF-8 -d bin -cp %CLASSPATH% -sourcepath %SOURCEPATH% "%%f"
-)
+javac -encoding UTF-8 -d bin -cp %CLASSPATH% -sourcepath %SOURCEPATH% %SOURCEPATH%\**\*.java
 
 if errorlevel 1 (
     echo.
-    echo ❌ ERRO: Falha na compilação.
+    echo ❌ ERRO: Falha na compilação. Verifique as mensagens acima.
     pause
     exit /b 1
 )
 
 echo.
+echo Compilação concluída com sucesso!
 echo === 2. Executando Aplicação... ===
 echo.
 
-java -cp bin;%CLASSPATH% main.java.clientapp.Main
+java -cp bin;%CLASSPATH% clientapp.Main
+
+if errorlevel 1 (
+    echo.
+    echo ERRO: Falha na execução da aplicação.
+)
 
 echo.
 echo === 3. Limpando arquivos compilados... ===
