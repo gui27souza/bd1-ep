@@ -4,19 +4,23 @@ REM SCRIPT DE EXECUÇÃO SIMPLES PARA WINDOWS (.BAT)
 REM Compila, Executa e Limpa.
 REM =======================================================
 
-REM Define o delimitador de caminho de classe para ponto e vírgula (Windows)
+
 set CLASSPATH=lib\postgresql-42.7.8.jar
 
 echo.
 echo === 1. Compilando projeto... ===
 echo.
 
+set SOURCEPATH=src\main\java
+set CLASSPATH=lib\postgresql-42.7.8.jar
+
 mkdir bin 2>NUL
-for /R "src\main\java" %%f in (*.java) do (
-    javac -encoding UTF-8 -d bin -cp %CLASSPATH% "%%f"
+echo.
+
+for /R "%SOURCEPATH%" %%f in (*.java) do (
+    javac -encoding UTF-8 -d bin -cp %CLASSPATH% -sourcepath %SOURCEPATH% "%%f"
 )
 
-REM Verifica se a compilação falhou (código de erro > 0)
 if errorlevel 1 (
     echo.
     echo ❌ ERRO: Falha na compilação.
@@ -34,7 +38,6 @@ echo.
 echo === 3. Limpando arquivos compilados... ===
 echo.
 
-REM Limpa o diretório 'bin' onde os arquivos .class foram salvos
 rmdir /s /q bin
 
 echo.
