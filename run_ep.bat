@@ -14,12 +14,13 @@ echo.
 mkdir bin 2>NUL
 echo.
 
+setlocal enabledelayedexpansion
+
 set SOURCE_FILES=
 for /R "%SOURCEPATH%" %%f in (*.java) do (
     set SOURCE_FILES=!SOURCE_FILES! "%%f"
 )
 
-setlocal enabledelayedexpansion
 javac -encoding UTF-8 -d bin -cp %CLASSPATH% -sourcepath %SOURCEPATH% %SOURCE_FILES%
 
 if errorlevel 1 (
@@ -30,9 +31,10 @@ if errorlevel 1 (
     exit /b 1
 )
 
-endlocal
 echo.
 echo Compilação concluída com sucesso!
+
+endlocal
 
 echo.
 echo === 2. Executando Aplicação... ===
@@ -42,7 +44,7 @@ java -cp bin;%CLASSPATH% clientapp.Main
 
 if errorlevel 1 (
     echo.
-    echo ❌ ERRO: Falha na execução da aplicação.
+    echo ERRO: Falha na execução da aplicação.
 )
 
 echo.
