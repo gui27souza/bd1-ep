@@ -57,7 +57,7 @@ public class CadastroFrame extends JFrame {
         JPanel titlePanel = new JPanel();
         titlePanel.setBackground(new Color(77, 182, 172));     // BTN_LIGHT
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        JLabel titleLabel = new JLabel("👤 Meu Cadastro");
+        JLabel titleLabel = new JLabel("Meu Cadastro");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
@@ -167,7 +167,7 @@ public class CadastroFrame extends JFrame {
             mainPanel.setBackground(Color.WHITE);
             
             // título
-            JLabel titleLabel = new JLabel("👤 Meus Dados Pessoais");
+            JLabel titleLabel = new JLabel("Meus Dados Pessoais");
             titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
             titleLabel.setForeground(new Color(156, 39, 176));
             titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -197,7 +197,7 @@ public class CadastroFrame extends JFrame {
             infoPanel.add(Box.createRigidArea(new Dimension(0, 15)));
             
             // informações do plano
-            JLabel planoTitleLabel = new JLabel("💳 Plano Atual");
+            JLabel planoTitleLabel = new JLabel("Plano Atual");
             planoTitleLabel.setFont(new Font("Arial", Font.BOLD, 14));
             planoTitleLabel.setForeground(new Color(33, 150, 243));
             planoTitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);

@@ -48,7 +48,7 @@ public class RelatoriosFrame extends JFrame {
         JPanel titlePanel = new JPanel();
         titlePanel.setBackground(new Color(26, 188, 156));
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        JLabel titleLabel = new JLabel("📊 Relatórios e Consultas");
+        JLabel titleLabel = new JLabel("Relatórios e Consultas");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
@@ -71,13 +71,13 @@ public class RelatoriosFrame extends JFrame {
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         
         // botões de relatórios
-		JButton btn1 = createReportButton("1. 💰 Maiores Gastos", new Color(33, 150, 243));
-		JButton btn2 = createReportButton("2. 💸 Maiores Contribuições", new Color(41, 182, 246));
-		JButton btn3 = createReportButton("3. 📊 Gastos Detalhados por Categoria", new Color(38, 198, 218));
-		JButton btn4 = createReportButton("4. 👥 Divisão de Gastos por Membro", new Color(26, 188, 156));
-		JButton btn5 = createReportButton("5. 📈 Estatísticas dos Grupos", new Color(77, 182, 172));
-		JButton btn6 = createReportButton("6. 📅 Resumo Financeiro por Período", new Color(38, 198, 218));
-		JButton btn7 = createReportButton("7. 🔄 Grupos Ativos vs Inativos", new Color(41, 182, 246));
+		JButton btn1 = createReportButton("Maiores Gastos", new Color(33, 150, 243));
+		JButton btn2 = createReportButton("Maiores Contribuições", new Color(41, 182, 246));
+		JButton btn3 = createReportButton("Gastos Detalhados por Categoria", new Color(38, 198, 218));
+		JButton btn4 = createReportButton("Divisão de Gastos por Membro", new Color(26, 188, 156));
+		JButton btn5 = createReportButton("Estatísticas dos Grupos", new Color(77, 182, 172));
+		JButton btn6 = createReportButton("Resumo Financeiro por Período", new Color(38, 198, 218));
+		JButton btn7 = createReportButton("Grupos Ativos vs Inativos", new Color(41, 182, 246));
 		
 		// listeners
 		btn1.addActionListener(e -> exibirRelatorio1());
@@ -199,7 +199,7 @@ public class RelatoriosFrame extends JFrame {
 			    tableModel.addRow(rowData);
 		    }
 		    
-		    mostrarTabelaRelatorio(tableModel, "💰 Maiores Gastos");
+		    mostrarTabelaRelatorio(tableModel, "Maiores Gastos");
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this,
@@ -250,7 +250,7 @@ public class RelatoriosFrame extends JFrame {
 			tableModel.addRow(rowData);
 		}
 		
-		mostrarTabelaRelatorio(tableModel, "💸 Maiores Contribuições");
+		mostrarTabelaRelatorio(tableModel, "Maiores Contribuições");
 	}
 
 	private void exibirRelatorio3() {
@@ -289,7 +289,7 @@ public class RelatoriosFrame extends JFrame {
             tableModel.addRow(rowData);
         }
         
-		mostrarTabelaRelatorio(tableModel, "📊 Gastos Detalhados por Categoria");
+		mostrarTabelaRelatorio(tableModel, "Gastos Detalhados por Categoria");
 	}
 
 	private void exibirRelatorio4() {
@@ -328,7 +328,7 @@ public class RelatoriosFrame extends JFrame {
             tableModel.addRow(rowData);
         }
         
-		mostrarTabelaRelatorio(tableModel, "👥 Divisão de Gastos por Membro");
+		mostrarTabelaRelatorio(tableModel, "Divisão de Gastos por Membro");
 	}
 
 	private void exibirRelatorio5() {
@@ -372,7 +372,7 @@ public class RelatoriosFrame extends JFrame {
             tableModel.addRow(rowData);
         }
         
-		mostrarTabelaRelatorio(tableModel, "📈 Estatísticas dos Grupos");
+		mostrarTabelaRelatorio(tableModel, "Estatísticas dos Grupos");
 	}
 
 	private void exibirRelatorio6() {
@@ -413,7 +413,7 @@ public class RelatoriosFrame extends JFrame {
             tableModel.addRow(rowData);
         }
         
-		mostrarTabelaRelatorio(tableModel, "📅 Resumo Financeiro por Período");
+		mostrarTabelaRelatorio(tableModel, "Resumo Financeiro por Período");
 	}
 
 	private void exibirRelatorio7() {
@@ -450,7 +450,7 @@ public class RelatoriosFrame extends JFrame {
             };
             tableModel.addRow(rowData);
         }
-        mostrarTabelaRelatorio(tableModel, "🔄 Grupos Ativos vs Inativos");
+        mostrarTabelaRelatorio(tableModel, "Grupos Ativos vs Inativos");
     }
 
     private void mostrarTabelaRelatorio(DefaultTableModel tableModel, String titulo) {

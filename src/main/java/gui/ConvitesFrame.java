@@ -58,7 +58,7 @@ public class ConvitesFrame extends JFrame {
         JPanel titlePanel = new JPanel();
         titlePanel.setBackground(new Color(38, 198, 218));
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        JLabel titleLabel = new JLabel("📨 Convites");
+        JLabel titleLabel = new JLabel("Convites");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
@@ -138,13 +138,13 @@ public class ConvitesFrame extends JFrame {
             ConviteService.ConvitesStatus status = conviteService.getConvitesStatus(acessoAtual.getCliente().getId());
             
             if (status.limite == -1) {
-                convitesInfoLabel.setText("✅ Convites Ilimitados neste mês");
+                convitesInfoLabel.setText("Convites Ilimitados neste mês");
                 convitesInfoLabel.setForeground(new Color(76, 175, 80));
             } else if (status.limite == 0) {
-                convitesInfoLabel.setText("❌ Seu plano não permite enviar convites");
+                convitesInfoLabel.setText("Seu plano não permite enviar convites");
                 convitesInfoLabel.setForeground(Color.RED);
             } else {
-                String texto = String.format("📊 Convites: %d enviados / %d disponíveis (%d restantes)", 
+                String texto = String.format("Convites: %d enviados / %d disponíveis (%d restantes)", 
                     status.enviados, status.limite, status.disponiveis);
                 convitesInfoLabel.setText(texto);
                 convitesInfoLabel.setForeground(status.disponiveis > 0 ? new Color(33, 150, 243) : Color.RED);
@@ -235,13 +235,13 @@ public class ConvitesFrame extends JFrame {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         btnPanel.setBackground(Color.WHITE);
         
-        JButton btnAceitar = new JButton("✅ Aceitar");
+        JButton btnAceitar = new JButton("Aceitar");
         btnAceitar.setBackground(new Color(26, 188, 156));
         btnAceitar.setForeground(Color.WHITE);
         btnAceitar.setFocusPainted(false);
         btnAceitar.setFont(new Font("Arial", Font.BOLD, 13));
         
-        JButton btnRecusar = new JButton("❌ Recusar");
+        JButton btnRecusar = new JButton("Recusar");
         btnRecusar.setBackground(new Color(244, 67, 54));
         btnRecusar.setForeground(Color.WHITE);
         btnRecusar.setFocusPainted(false);

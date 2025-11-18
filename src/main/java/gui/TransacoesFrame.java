@@ -100,7 +100,7 @@ public class TransacoesFrame extends JFrame {
         btnPorCategoria.setOpaque(true);
         
         // Botão Ver por Período
-        JButton btnPorPeriodo = new JButton("📅 Ver por Período");
+        JButton btnPorPeriodo = new JButton("Ver por Período");
         btnPorPeriodo.setFont(new Font("Arial", Font.BOLD, 14));
         btnPorPeriodo.setBackground(new Color(26, 188, 156));  // BTN_INFO
         btnPorPeriodo.setForeground(Color.WHITE);
@@ -109,7 +109,7 @@ public class TransacoesFrame extends JFrame {
         btnPorPeriodo.setOpaque(true);
         
         // Botão Nova Transação
-        JButton btnNova = new JButton("➕ Nova Transação");
+        JButton btnNova = new JButton("Nova Transação");
         btnNova.setFont(new Font("Arial", Font.BOLD, 14));
         btnNova.setBackground(new Color(77, 182, 172));        // BTN_LIGHT
         btnNova.setForeground(Color.WHITE);
@@ -379,7 +379,7 @@ public class TransacoesFrame extends JFrame {
         gbc.insets = new Insets(20, 5, 5, 5);
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         
-        JButton btnBuscar = new JButton("🔍 Buscar");
+        JButton btnBuscar = new JButton("Buscar");
         btnBuscar.setBackground(new Color(33, 150, 243));
         btnBuscar.setForeground(Color.WHITE);
         btnBuscar.setFocusPainted(false);
@@ -547,14 +547,14 @@ public class TransacoesFrame extends JFrame {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
         actionPanel.setBackground(Color.WHITE);
         
-        JButton btnEditar = new JButton("✏️ Editar");
+        JButton btnEditar = new JButton("Editar");
         btnEditar.setFont(new Font("Arial", Font.BOLD, 12));
         btnEditar.setBackground(new Color(38, 198, 218));
         btnEditar.setForeground(Color.WHITE);
         btnEditar.setFocusPainted(false);
         btnEditar.setPreferredSize(new Dimension(110, 35));
         
-        JButton btnDeletar = new JButton("🗑️ Deletar");
+        JButton btnDeletar = new JButton("Deletar");
         btnDeletar.setFont(new Font("Arial", Font.BOLD, 12));
         btnDeletar.setBackground(new Color(244, 67, 54));
         btnDeletar.setForeground(Color.WHITE);
@@ -672,7 +672,7 @@ public class TransacoesFrame extends JFrame {
         gbc.insets = new Insets(20, 5, 5, 5);
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         
-        JButton btnSalvar = new JButton("💾 Salvar");
+        JButton btnSalvar = new JButton("Salvar");
         btnSalvar.setBackground(new Color(76, 175, 80));
         btnSalvar.setForeground(Color.WHITE);
         btnSalvar.setFocusPainted(false);
@@ -885,7 +885,7 @@ public class TransacoesFrame extends JFrame {
         gbc.insets = new Insets(20, 5, 5, 5);
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         
-        JButton btnSalvar = new JButton("💾 Salvar");
+        JButton btnSalvar = new JButton("Salvar");
         btnSalvar.setBackground(new Color(76, 175, 80));
         btnSalvar.setForeground(Color.WHITE);
         btnSalvar.setFocusPainted(false);

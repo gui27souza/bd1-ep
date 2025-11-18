@@ -68,7 +68,7 @@ public class GruposFrame extends JFrame {
         JPanel titlePanel = new JPanel();
         titlePanel.setBackground(new Color(33, 150, 243));    
         titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        JLabel titleLabel = new JLabel("👥 Meus Grupos");
+        JLabel titleLabel = new JLabel("Meus Grupos");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
         titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
@@ -134,7 +134,7 @@ public class GruposFrame extends JFrame {
             BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
         JLabel lblSelecione = new JLabel("<html><div style='text-align: center; color: gray;'>" +
-            "<h2>👈 Selecione um grupo</h2>" +
+            "<h2>Selecione um grupo</h2>" +
             "<p>Clique em um grupo da lista para ver seus detalhes,<br>" +
             "integrantes e transações.</p></div></html>", SwingConstants.CENTER);
         detailsPanel.add(lblSelecione, BorderLayout.CENTER);
@@ -275,10 +275,10 @@ public class GruposFrame extends JFrame {
         tabbedPane.setFont(new Font("Arial", Font.BOLD, 12));
         // Tab 1: Integrantes
         JPanel integrantesPanel = criarPainelIntegrantes(grupo);
-        tabbedPane.addTab("👥 Integrantes", integrantesPanel);
+        tabbedPane.addTab("Integrantes", integrantesPanel);
         // Tab 2: Transações
         JPanel transacoesPanel = criarPainelTransacoes(grupo);
-        tabbedPane.addTab("💰 Transações", transacoesPanel);
+        tabbedPane.addTab("Transações", transacoesPanel);
         
         detailsPanel.add(tabbedPane, BorderLayout.CENTER);
         
@@ -290,21 +290,21 @@ public class GruposFrame extends JFrame {
                 adminPanel.setBackground(Color.WHITE);
                 adminPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 if (grupo.getStatus().equals("ativo")) {
-                    JButton btnArquivar = UIHelper.createButton("📦 Arquivar", new Color(255, 152, 0), 130, 35);
+                    JButton btnArquivar = UIHelper.createButton("Arquivar", new Color(255, 152, 0), 130, 35);
                     btnArquivar.addActionListener(e -> arquivarGrupo(grupo));
-                    JButton btnDeletar = UIHelper.createButton("🗑️ Deletar", new Color(244, 67, 54), 130, 35);
+                    JButton btnDeletar = UIHelper.createButton("Deletar", new Color(244, 67, 54), 130, 35);
                     btnDeletar.addActionListener(e -> deletarGrupo(grupo));
                     adminPanel.add(btnArquivar);
                     adminPanel.add(btnDeletar);
                 } else if (grupo.getStatus().equals("arquivado")) {
-                    JButton btnDesarquivar = UIHelper.createButton("✅ Desarquivar", new Color(26, 188, 156), 160, 35);
+                    JButton btnDesarquivar = UIHelper.createButton("Desarquivar", new Color(26, 188, 156), 160, 35);
                     btnDesarquivar.addActionListener(e -> desarquivarGrupo(grupo));
-                    JButton btnDeletar = UIHelper.createButton("🗑️ Deletar", new Color(244, 67, 54), 130, 35);
+                    JButton btnDeletar = UIHelper.createButton("Deletar", new Color(244, 67, 54), 130, 35);
                     btnDeletar.addActionListener(e -> deletarGrupo(grupo));
                     adminPanel.add(btnDesarquivar);
                     adminPanel.add(btnDeletar);
                 } else if (grupo.getStatus().equals("inativo")) {
-                    JLabel lblDeletado = new JLabel("❌ Este grupo foi deletado");
+                    JLabel lblDeletado = new JLabel("Este grupo foi deletado");
                     lblDeletado.setFont(new Font("Arial", Font.BOLD, 13));
                     lblDeletado.setForeground(new Color(244, 67, 54));
                     adminPanel.add(lblDeletado);
@@ -360,7 +360,7 @@ public class GruposFrame extends JFrame {
                 // Adicionar botão de remover se for admin e grupo estiver ativo
                 boolean isAdmin = grupoService.isAdmin(acessoAtual.getCliente().getId(), grupo.getId());
                 if (isAdmin && grupo.getStatus().equals("ativo")) {
-                    JButton btnRemover = UIHelper.createButton("➖ Remover Membro", new Color(244, 67, 54), 160, 30);
+                    JButton btnRemover = UIHelper.createButton("- Remover Membro", new Color(244, 67, 54), 160, 30);
                     btnRemover.addActionListener(e -> removerMembroDialog(grupo, membros));
                     topPanel.add(btnRemover, BorderLayout.EAST);
                 }
@@ -621,7 +621,7 @@ public class GruposFrame extends JFrame {
             Cliente membro = membroInfo.cliente;
             String cpfMasked = membro.getCpf().substring(0, 3) + ".***.***-" + 
                               membro.getCpf().substring(membro.getCpf().length() - 2);
-            listModel.addElement("👤 " + membro.getNome() + " (" + cpfMasked + ")");
+            listModel.addElement(membro.getNome() + " (" + cpfMasked + ")");
         }
         JList<String> membrosList = new JList<>(listModel);
         membrosList.setFont(new Font("Arial", Font.PLAIN, 13));
@@ -636,7 +636,7 @@ public class GruposFrame extends JFrame {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         btnPanel.setBackground(Color.WHITE);
         
-        JButton btnRemover = new JButton("🗑️ Remover");
+        JButton btnRemover = new JButton("Remover");
         btnRemover.setBackground(new Color(244, 67, 54));     
         btnRemover.setForeground(Color.WHITE);
         btnRemover.setFocusPainted(false);
