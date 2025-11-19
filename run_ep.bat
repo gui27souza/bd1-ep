@@ -5,8 +5,13 @@ REM Compila, Executa e Limpa.
 REM =======================================================
 
 
-set SOURCEPATH=src
+set EP_DB=127.0.0.1:5432
+set EP_NAME_DB=ep_bd
+set EP_DB_USER=postgres
+set EP_DB_PASS=1234
 
+
+set SOURCEPATH=src
 set CLASSPATH=lib\postgresql-42.7.8.jar
 
 echo.
