@@ -35,14 +35,23 @@ run_ep.bat
    - Este script cria todas as tabelas e insere dados de teste realistas
 
 3. **Configurar Variáveis de Ambiente:**
-   - Edite o arquivo `run_client.sh` ou `run_manager.sh` (Linux/Mac) ou `.bat` (Windows)
+   - Edite o arquivo `run_ep.sh` (Linux/Mac) ou `.run_ep.bat` (Windows)
    - Substitua os valores das variáveis de ambiente:
-     ```bash
-     export EP_DB="127.0.0.1:5432"          # Host:Porta do PostgreSQL
-     export EP_NAME_DB="ep_bd"               # Nome do banco de dados
-     export EP_DB_USER="postgres"            # Usuário do banco
-     export EP_DB_PASS="sua_senha"           # Senha do banco
-     ```
+     - linux/mac
+       ```bash
+       export EP_DB="127.0.0.1:5432"          # Host:Porta do PostgreSQL
+       export EP_NAME_DB="ep_bd"               # Nome do banco de dados
+       export EP_DB_USER="postgres"            # Usuário do banco
+       export EP_DB_PASS="sua_senha"           # Senha do banco
+       ```
+
+     - Windows
+       ```powershell
+       set EP_DB=127.0.0.1:5432
+       set EP_NAME_DB=ep_bd
+       set EP_DB_USER=postgres
+       set EP_DB_PASS=1234
+       ```
 
 4. **Executar:**
    - Com o PostgreSQL em execução, execute um dos scripts acima
